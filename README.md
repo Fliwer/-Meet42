@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Meet42
 
-## Getting Started
+Application Next.js pour organiser des activités IRL en petits groupes (4 à 6), avec géolocalisation, création de plans rapides, OAuth social et logique d'annulation 24 h.
 
-First, run the development server:
+## Lancer en local
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Ouvre `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Variables d'environnement
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Créer un fichier `.env.local` :
 
-## Learn More
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+NEXT_PUBLIC_CONTACT_EMAIL=
+```
 
-To learn more about Next.js, take a look at the following resources:
+Sans Supabase configuré, l'application tourne en mode mock (données locales).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## OAuth Google + Facebook (Supabase)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Dans Supabase > Authentication > Providers :
+   - activer `Google`
+   - activer `Facebook`
+2. Ajouter dans chaque provider :
+   - `Site URL` : `http://localhost:3000` (dev) puis ton domaine prod
+   - `Redirect URL` :
+     - `https://<PROJECT_REF>.supabase.co/auth/v1/callback`
+3. Configurer les `Client ID / Secret` Google et Facebook dans Supabase.
+4. Dans Google/Facebook console, ajouter les URI de redirection autorisées ci-dessus.
 
-## Deploy on Vercel
+Ensuite les boutons `Continuer avec Google` et `Continuer avec Facebook` de la page login fonctionnent en un clic.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Schéma Supabase
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Le fichier `supabase/schema.sql` contient le schéma de base.
+
+Si la table `plans` existe déjà en version 2-4, exécuter :
+
+```sql
+alter table public.plans
+drop constraint if exists plans_max_participants_check;
+
+alter table public.plans
+add constraint plans_max_participants_check
+check (max_participants >= 4 and max_participants <= 6);
+```
+
+## Mise en ligne GitHub
+
+Après création du repo GitHub (ex: `Meet42`) :
+
+```bash
+git init
+git add .
+git commit -m "feat: social auth + pro UI + venue availability"
+git branch -M main
+git remote add origin https://github.com/<ton-user>/Meet42.git
+git push -u origin main
+```
+
