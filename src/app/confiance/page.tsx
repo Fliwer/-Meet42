@@ -10,8 +10,7 @@ export default function ConfiancePage() {
       <div className="max-w-2xl mx-auto">
         <h1 className="text-3xl font-bold text-zinc-900">Confiance & données</h1>
         <p className="mt-2 text-zinc-600">
-          Transparence minimale pour lancer sereinement — une vraie politique juridique viendra avec la monétisation et
-          les partenaires.
+          Transparence minimale pour lancer sereinement — une politique complète pourra évoluer avec le produit.
         </p>
 
         <section className="mt-10 space-y-4 text-sm text-zinc-700 leading-relaxed">
@@ -22,7 +21,7 @@ export default function ConfiancePage() {
             stockage local simplifié peut être utilisé.
           </p>
           <p>
-            Nous ne revendons pas tes données à des courtiers publicitaires. Toute évolution (analytics, outils Pro)
+            Nous ne revendons pas tes données à des courtiers publicitaires. Toute évolution (analytics, nouveaux usages)
             sera annoncée ici.
           </p>
         </section>
@@ -46,10 +45,6 @@ export default function ConfiancePage() {
         </section>
 
         <p className="mt-12 text-sm text-zinc-500">
-          <Link href="/tarifs" className="font-semibold text-zinc-800 hover:underline">
-            Voir les tarifs & l’offre Pro
-          </Link>
-          {" · "}
           <Link href="/" className="font-semibold text-zinc-800 hover:underline">
             Retour à l’accueil
           </Link>

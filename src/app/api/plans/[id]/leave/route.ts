@@ -75,6 +75,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
   } else {
     const { error: leaveErr } = await admin.from("plan_participants").delete().eq("plan_id", planId).eq("user_id", userId);
     if (leaveErr) return NextResponse.json({ error: "Impossible de te retirer" }, { status: 500 });
+    await admin.from("plan_attendance").delete().eq("plan_id", planId).eq("user_id", userId);
   }
 
   return NextResponse.json({ ok: true });

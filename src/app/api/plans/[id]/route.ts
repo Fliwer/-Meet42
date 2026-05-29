@@ -6,6 +6,8 @@ import {
   mockGetPlan,
   mockIsUserJoined,
   mockCountParticipants,
+  mockListUserIdsForPlan,
+  mockListProfilesByIds,
 } from "@/lib/mock/mockDb";
 
 function getBearerToken(req: NextRequest) {
@@ -33,7 +35,6 @@ export async function GET(
   if (!planId) return NextResponse.json({ error: "Plan id requis" }, { status: 400 });
 
   const userId = await resolveUserId(req);
-  if (!userId) return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
 
   if (!isSupabaseConfigured()) {
     const plan = mockGetPlan(planId);
@@ -42,6 +43,12 @@ export async function GET(
     const distance_km = null as PlanSummary["distance_km"];
     const participants_count = mockCountParticipants(planId);
     const creator = mockGetCreator(plan);
+    const previewIds = mockListUserIdsForPlan(plan.id).slice(0, 4);
+    const previewProfiles = mockListProfilesByIds(previewIds);
+    const participant_preview = previewProfiles.map((p) => ({
+      first_name: p.first_name,
+      photo_url: p.photo_url ?? null,
+    }));
 
     return NextResponse.json({
       id: plan.id,
@@ -54,8 +61,9 @@ export async function GET(
       lat: plan.lat,
       lng: plan.lng,
       creator,
-      is_joined: mockIsUserJoined(planId, userId),
-      is_creator: plan.creator_id === userId,
+      participant_preview,
+      is_joined: userId ? mockIsUserJoined(planId, userId) : false,
+      is_creator: userId ? plan.creator_id === userId : false,
     } satisfies PlanSummary);
   }
 
@@ -65,16 +73,21 @@ export async function GET(
   if (!planRow) return NextResponse.json({ error: "Introuvable" }, { status: 404 });
 
   const { data: participantRows } = await admin.from("plan_participants").select("plan_id,user_id").eq("plan_id", planId);
-  const participants_count = (participantRows ?? []).length;
   const typedParticipants = (participantRows ?? []) as Array<{ user_id: string }>;
-  const is_joined = typedParticipants.some((r) => r.user_id === userId);
+  const participants_count = typedParticipants.length;
+  const is_joined = userId ? typedParticipants.some((r) => r.user_id === userId) : false;
+  const previewUserIds = typedParticipants.slice(0, 4).map((r) => r.user_id);
 
   const creatorId = (planRow as { creator_id: string }).creator_id;
-  const { data: creatorRow } = await admin
-    .from("profiles")
-    .select("user_id,first_name,photo_url")
-    .eq("user_id", creatorId)
-    .maybeSingle();
+  const profileIds = Array.from(new Set([creatorId, ...previewUserIds]));
+  const { data: profileRows } = await admin.from("profiles").select("user_id,first_name,photo_url").in("user_id", profileIds);
+  type Prof = { user_id: string; first_name: string; photo_url: string | null };
+  const profById = new Map<string, Prof>(((profileRows ?? []) as Prof[]).map((p) => [p.user_id, p]));
+  const creatorRow = profById.get(creatorId) ?? null;
+  const participant_preview = previewUserIds
+    .map((uid) => profById.get(uid))
+    .filter(Boolean)
+    .map((row) => ({ first_name: row!.first_name, photo_url: row!.photo_url ?? null }));
 
   const typedPlanRow = planRow as {
     id: string;
@@ -103,8 +116,9 @@ export async function GET(
       first_name: typedCreatorRow?.first_name ?? "Anonyme",
       photo_url: typedCreatorRow?.photo_url ?? null,
     },
+    participant_preview,
     is_joined,
-    is_creator: creatorId === userId,
+    is_creator: userId ? creatorId === userId : false,
   } satisfies PlanSummary);
 }
 

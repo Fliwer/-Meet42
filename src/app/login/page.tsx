@@ -1,33 +1,83 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/lib/auth/useAuth";
 import ProfileSetup from "@/components/ProfileSetup";
+import ProfilePhotoField from "@/components/ProfilePhotoField";
+import { isFacebookLoginEnabled } from "@/lib/config/authUi";
+import { profilePhotoUrlsSchema } from "@/lib/profile/photoUrlSchema";
 
-export default function LoginPage() {
+const SIGNUP_BIO_MIN = 20;
+const SIGNUP_BIO_MAX = 240;
+
+function safeNextPath(raw: string | null): string {
+  if (!raw || !raw.startsWith("/")) return "/";
+  if (raw.startsWith("//")) return "/";
+  return raw;
+}
+
+function LoginPageInner() {
   const router = useRouter();
-  const { status, signInWithEmail, signUpWithEmail, signInWithGoogle, signInWithFacebook, profileStatus } = useAuth();
+  const searchParams = useSearchParams();
+  const nextPath = useMemo(() => safeNextPath(searchParams.get("next")), [searchParams]);
+  const { status, signInWithEmail, signUpWithEmail, signInWithGoogle, signInWithFacebook, profileStatus, updateProfile } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [age, setAge] = useState<number>(22);
+  const [photoUrls, setPhotoUrls] = useState<[string, string, string]>(["", "", ""]);
+  const [signupBio, setSignupBio] = useState("");
+
+  function patchSignupPhoto(index: 0 | 1 | 2, url: string) {
+    setPhotoUrls((prev) => {
+      const next: [string, string, string] = [...prev];
+      next[index] = url;
+      return next;
+    });
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
     setError(null);
     try {
-      if (mode === "login") await signInWithEmail(email.trim(), password);
-      else await signUpWithEmail(email.trim(), password);
-      // Profil sera demandé si nécessaire.
-      if (profileStatus === "missing") return;
-      router.push("/");
+      if (mode === "login") {
+        await signInWithEmail(email.trim(), password);
+      } else {
+        if (!firstName.trim()) throw new Error("Prénom requis");
+        if (!Number.isFinite(age) || age < 18 || age > 99) throw new Error("Âge invalide");
+        const urls = photoUrls.map((u) => u.trim()).filter(Boolean);
+        if (urls.length < 3) throw new Error("Ajoute au moins 3 photos");
+        const parsedPhotos = profilePhotoUrlsSchema.safeParse(urls);
+        if (!parsedPhotos.success) throw new Error("Une ou plusieurs photos sont invalides");
+        const bio = signupBio.trim();
+        if (bio.length < SIGNUP_BIO_MIN) throw new Error(`Présente-toi en au moins ${SIGNUP_BIO_MIN} caractères`);
+        if (bio.length > SIGNUP_BIO_MAX) throw new Error(`Bio trop longue (max ${SIGNUP_BIO_MAX} caractères)`);
+
+        await signUpWithEmail(email.trim(), password);
+        // Si signup ne crée pas de session (email confirmation activée), on tente un sign-in direct.
+        await signInWithEmail(email.trim(), password);
+        await updateProfile({
+          first_name: firstName.trim(),
+          age,
+          photo_urls: parsedPhotos.data,
+          bio,
+        });
+      }
+      router.push(nextPath);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur");
+      const msg = err instanceof Error ? err.message : "Erreur";
+      if (mode === "signup" && /confirm|verified|email/i.test(msg)) {
+        setError("Compte créé. Vérifie ton email puis reconnecte-toi pour finaliser ton profil.");
+      } else {
+        setError(msg);
+      }
     } finally {
       setBusy(false);
     }
@@ -58,14 +108,14 @@ export default function LoginPage() {
   useEffect(() => {
     if (status !== "authenticated") return;
     if (profileStatus === "missing") return;
-    router.push("/");
-  }, [router, status, profileStatus]);
+    router.push(nextPath);
+  }, [router, status, profileStatus, nextPath]);
 
   if (status === "authenticated" && profileStatus === "missing") {
     return (
       <main className="min-h-screen bg-zinc-50 px-4">
         <div className="py-10">
-          <ProfileSetup onDone={() => router.push("/")} />
+          <ProfileSetup onDone={() => router.push(nextPath)} />
         </div>
       </main>
     );
@@ -82,7 +132,13 @@ export default function LoginPage() {
           <p className="mt-2 text-sm text-white/80">
             Connexion en un clic, puis tu rejoins un plan réel en quelques secondes.
           </p>
-          <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+          <div
+            className={
+              isFacebookLoginEnabled()
+                ? "mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2"
+                : "mt-4 flex flex-col gap-2"
+            }
+          >
             <button
               onClick={onGoogle}
               type="button"
@@ -91,14 +147,16 @@ export default function LoginPage() {
             >
               Continuer avec Google
             </button>
-            <button
-              onClick={onFacebook}
-              type="button"
-              disabled={busy}
-              className="w-full rounded-2xl border border-white/25 bg-[#1877F2] px-4 py-3 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-60"
-            >
-              Continuer avec Facebook
-            </button>
+            {isFacebookLoginEnabled() ? (
+              <button
+                onClick={onFacebook}
+                type="button"
+                disabled={busy}
+                className="w-full rounded-2xl border border-white/25 bg-[#1877F2] px-4 py-3 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-60"
+              >
+                Continuer avec Facebook
+              </button>
+            ) : null}
           </div>
         </div>
 
@@ -149,6 +207,53 @@ export default function LoginPage() {
             />
           </label>
 
+          {mode === "signup" ? (
+            <>
+              <div className="rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-xs font-semibold text-zinc-700">
+                Profil de base (créé pendant l&apos;inscription)
+              </div>
+              <label className="flex flex-col gap-1">
+                <span className="text-sm font-medium text-zinc-900">Prénom</span>
+                <input
+                  className="rounded-xl border border-zinc-200 px-3 py-2"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  placeholder="Ex. Lina"
+                />
+              </label>
+              <label className="flex flex-col gap-1">
+                <span className="text-sm font-medium text-zinc-900">Âge</span>
+                <input
+                  type="number"
+                  min={18}
+                  max={99}
+                  className="rounded-xl border border-zinc-200 px-3 py-2"
+                  value={age}
+                  onChange={(e) => setAge(Number(e.target.value))}
+                />
+              </label>
+              <div className="flex flex-col gap-4 rounded-2xl border border-zinc-200 bg-zinc-50/50 p-4">
+                <p className="text-sm font-semibold text-zinc-900">3 photos minimum</p>
+                <ProfilePhotoField label="Photo 1 *" value={photoUrls[0]} onChange={(u) => patchSignupPhoto(0, u)} />
+                <ProfilePhotoField label="Photo 2 *" value={photoUrls[1]} onChange={(u) => patchSignupPhoto(1, u)} />
+                <ProfilePhotoField label="Photo 3 *" value={photoUrls[2]} onChange={(u) => patchSignupPhoto(2, u)} />
+              </div>
+              <label className="flex flex-col gap-1">
+                <span className="text-sm font-medium text-zinc-900">À propos de toi</span>
+                <textarea
+                  className="min-h-[96px] rounded-xl border border-zinc-200 px-3 py-2 text-sm leading-relaxed"
+                  value={signupBio}
+                  onChange={(e) => setSignupBio(e.target.value.slice(0, SIGNUP_BIO_MAX))}
+                  placeholder="Quelques phrases : ce que tu aimes, ce que tu cherches…"
+                  maxLength={SIGNUP_BIO_MAX}
+                />
+                <span className="text-xs text-zinc-500">
+                  {signupBio.trim().length}/{SIGNUP_BIO_MAX} — minimum {SIGNUP_BIO_MIN} caractères
+                </span>
+              </label>
+            </>
+          ) : null}
+
           {error ? (
             <div className="text-sm text-red-600" role="alert" aria-live="polite">
               {error}
@@ -165,7 +270,8 @@ export default function LoginPage() {
         </form>
 
         <div className="mt-3 rounded-xl border border-dashed border-zinc-300 bg-white px-3 py-2 text-xs text-zinc-500">
-          Astuce: le bouton Google/Facebook ci-dessus ouvre directement le provider OAuth.
+          Astuce : le bouton Google ci-dessus ouvre le flux OAuth Google
+          {isFacebookLoginEnabled() ? " ; Facebook aussi." : "."}
         </div>
 
         <p className="mt-4 text-xs text-zinc-500">
@@ -176,3 +282,14 @@ export default function LoginPage() {
   );
 }
 
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-zinc-50 px-4 py-16 text-center text-sm font-medium text-zinc-600">Chargement…</main>
+      }
+    >
+      <LoginPageInner />
+    </Suspense>
+  );
+}

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { ApiError, fetchWithNetworkHandling, parseApiErrorBody } from "@/lib/api/apiError";
 import { getBrowserSupabase } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 
@@ -8,7 +9,10 @@ export type Meet42Profile = {
   id: string;
   first_name: string;
   age: number;
+  /** 1ʳᵉ photo (cartes, compat) */
   photo_url?: string | null;
+  /** Au moins 3 en prod */
+  photo_urls?: string[];
   bio?: string | null;
 };
 
@@ -32,9 +36,10 @@ type AuthContextValue = {
   updateProfile: (payload: {
     first_name: string;
     age: number;
-    photo_url?: string;
-    bio?: string;
+    photo_urls: string[];
+    bio: string;
   }) => Promise<void>;
+  uploadProfilePhoto: (file: File) => Promise<string>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -76,6 +81,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<Meet42Profile | null>(null);
   const [profileStatus, setProfileStatus] = useState<AuthContextValue["profileStatus"]>("unknown");
 
+  function isProfileComplete(p: Meet42Profile) {
+    const bioOk = (p.bio?.trim().length ?? 0) >= 20;
+    const listed = (p.photo_urls ?? []).filter((u) => u?.trim());
+    const photoCount = listed.length > 0 ? listed.length : p.photo_url?.trim() ? 1 : 0;
+    return Boolean(
+      p.first_name?.trim() &&
+        Number.isFinite(p.age) &&
+        p.age >= 18 &&
+        p.age <= 99 &&
+        photoCount >= 3 &&
+        bioOk
+    );
+  }
+
   async function refreshProfileInner(targetUserId?: string | null) {
     const effectiveUserId = targetUserId ?? user?.id ?? null;
     setProfileStatus("unknown");
@@ -103,7 +122,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const data = (await res.json()) as Meet42Profile;
       setProfile(data);
-      setProfileStatus("ready");
+      setProfileStatus(isProfileComplete(data) ? "ready" : "missing");
     } catch {
       setProfileStatus("error");
     }
@@ -286,24 +305,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (supabase && accessToken) headers["Authorization"] = `Bearer ${accessToken}`;
         else Object.assign(headers, getMockHeaders(user?.id ?? null));
 
-        const res = await fetch("/api/profile/me", {
+        const res = await fetchWithNetworkHandling("/api/profile/me", {
           method: "POST",
           headers,
           body: JSON.stringify(payload),
         });
 
         if (!res.ok) {
-          const raw = await res.text();
-          let msg = "Impossible de sauvegarder le profil";
-          try {
-            const j = JSON.parse(raw) as { error?: unknown };
-            if (typeof j?.error === "string" && j.error.trim()) msg = j.error.trim();
-          } catch {
-            /* ignore */
-          }
-          throw new Error(msg);
+          throw new ApiError(await parseApiErrorBody(res, "Impossible de sauvegarder le profil"), "http");
         }
         await refreshProfileInner();
+      },
+      uploadProfilePhoto: async (file: File) => {
+        const headers: Record<string, string> = {};
+        if (supabase && accessToken) headers["Authorization"] = `Bearer ${accessToken}`;
+        else Object.assign(headers, getMockHeaders(user?.id ?? null));
+
+        const fd = new FormData();
+        fd.set("file", file);
+
+        const res = await fetchWithNetworkHandling("/api/profile/avatar", {
+          method: "POST",
+          headers,
+          body: fd,
+        });
+
+        if (!res.ok) {
+          throw new ApiError(await parseApiErrorBody(res, "Impossible d’envoyer la photo"), "http");
+        }
+        const data = (await res.json()) as { photo_url?: string };
+        if (!data.photo_url?.trim()) {
+          throw new ApiError("Réponse serveur invalide", "unknown");
+        }
+        return data.photo_url.trim();
       },
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps

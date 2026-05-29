@@ -56,17 +56,17 @@ export default function MesPlansPage() {
 
   return (
     <main className="min-h-screen bg-zinc-50 px-4 py-6 md:py-8">
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         <Link href="/" className="text-sm font-semibold text-zinc-600 hover:text-zinc-900">
           ← Carte des plans
         </Link>
-        <h1 className="mt-3 text-2xl font-bold text-zinc-900">Mes plans</h1>
-        <p className="mt-1 text-sm text-zinc-600">Ceux que tu organises ou auxquels tu participes.</p>
+        <h1 className="mt-3 text-3xl font-bold tracking-tight text-zinc-900">Mes plans</h1>
+        <p className="mt-1 text-sm text-zinc-600">Historique de tes activités publiées et rejoins.</p>
 
         {err ? <div className="mt-4 text-sm text-red-600">{err}</div> : null}
 
         {!busy && !err && plans.length === 0 ? (
-          <div className="mt-6 rounded-2xl border border-dashed border-zinc-300 bg-white p-6 text-center">
+          <div className="mt-6 rounded-2xl border border-dashed border-zinc-300 bg-white p-8 text-center">
             <p className="text-sm text-zinc-600">Aucun plan pour l’instant.</p>
             <Link
               href="/create"
@@ -77,7 +77,7 @@ export default function MesPlansPage() {
           </div>
         ) : null}
 
-        <ul className="mt-6 space-y-3">
+        <ul className="mt-6 grid gap-3 md:grid-cols-2">
           {plans.map((p) => {
             const meta = ACTIVITIES.find((a) => a.id === p.activity);
             const start = new Date(p.start_time);
@@ -90,7 +90,7 @@ export default function MesPlansPage() {
               <li key={p.id}>
                 <Link
                   href={`/plan/${p.id}`}
-                  className="flex items-start justify-between gap-3 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm hover:border-zinc-300 transition-colors"
+                  className="flex h-full items-start justify-between gap-3 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm hover:-translate-y-0.5 hover:shadow-md transition-all"
                 >
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">

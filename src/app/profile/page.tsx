@@ -73,15 +73,37 @@ export default function ProfilePage() {
   return (
     <main className="min-h-screen bg-zinc-50 px-4 py-8">
       <div className="max-w-2xl mx-auto">
-        <div className="rounded-3xl bg-white border border-zinc-200 p-5">
+        <div className="rounded-3xl bg-white border border-zinc-200 p-6 shadow-sm">
           <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
+            <div className="flex min-w-0 items-start gap-4">
+              {(profile?.photo_urls?.length ? profile.photo_urls : profile?.photo_url ? [profile.photo_url] : []).length ? (
+                <div className="flex shrink-0 gap-2">
+                  {(profile?.photo_urls?.length
+                    ? profile.photo_urls.slice(0, 6)
+                    : profile?.photo_url
+                      ? [profile.photo_url]
+                      : []
+                  ).map((src, i) => (
+                    // eslint-disable-next-line @next/next/no-img-element -- URL profil
+                    <img
+                      key={`${src}-${i}`}
+                      src={src}
+                      alt=""
+                      width={64}
+                      height={64}
+                      className="h-16 w-16 rounded-xl border border-zinc-200 object-cover shadow-sm"
+                    />
+                  ))}
+                </div>
+              ) : null}
+              <div className="min-w-0">
               <div className="text-sm text-zinc-600">Profil</div>
               <div className="mt-1 text-xl font-bold text-zinc-900 truncate">
                 {profile?.first_name ?? "—"}
               </div>
               <div className="mt-1 text-sm text-zinc-600">
                 {profile?.age ? `${profile.age} ans` : ""}
+              </div>
               </div>
             </div>
             <button
@@ -128,11 +150,11 @@ export default function ProfilePage() {
           ) : null}
         </div>
 
-        <div className="mt-4 rounded-3xl bg-white border border-zinc-200 p-5">
-          <div className="text-sm font-semibold text-zinc-900">Conseils pour matcher IRL (sans dating)</div>
+        <div className="mt-4 rounded-3xl bg-white border border-zinc-200 p-6 shadow-sm">
+          <div className="text-sm font-semibold text-zinc-900">Conseils pour organiser de belles rencontres IRL</div>
           <ul className="mt-2 text-sm text-zinc-700 list-disc pl-5 space-y-1">
             <li>Plan simple, lieu clair, horaires proches.</li>
-            <li>Max 4 personnes pour éviter l’effet « groupe ».</li>
+            <li>Groupes de 4 à 6 pour un bon équilibre convivial.</li>
             <li>
               Annulation ou retrait possible jusqu’à{" "}
               <span className="font-medium text-zinc-900">24 h avant</span> le début du plan.

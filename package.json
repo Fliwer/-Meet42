@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:push": "npx supabase db push",
+    "db:types": "npx supabase gen types typescript --project-id rpceenobrlknuukyikjg --schema public > src/lib/supabase/database.types.ts",
+    "db:sync": "npm run db:push && npm run db:types",
+    "db:change": "node scripts/db-change.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.100.1",

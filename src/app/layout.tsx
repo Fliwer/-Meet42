@@ -15,23 +15,24 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: { default: "Meet42", template: "%s · Meet42" },
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://meet42.app"),
+  title: { default: "Meet42 — petits groupes, vraies rencontres", template: "%s · Meet42" },
   description:
-    "Petits groupes (4–6), rencontres IRL à Bruxelles et alentours : café, apéro, marche, sans swipe.",
+    "Rejoins des activités IRL en petits groupes (4–6) près de toi. Café, apéro, marche — sans friction. Gratuit pour participer.",
   manifest: "/manifest.webmanifest",
   applicationName: "Meet42",
-  keywords: ["Meet42", "Bruxelles", "Ixelles", "IRL", "rencontre", "apéro", "sortie"],
+  keywords: ["Meet42", "Bruxelles", "Ixelles", "IRL", "rencontre", "apéro", "sortie", "groupe"],
   openGraph: {
     type: "website",
     locale: "fr_BE",
     siteName: "Meet42",
-    title: "Meet42 — rencontres IRL",
-    description: "Plans réels à 4–6 personnes, autour de toi.",
+    title: "Meet42 — Meet people. Do something. Simple.",
+    description: "Plans réels à 4–6 personnes près de toi. Connexion rapide, groupes humains.",
   },
   twitter: {
     card: "summary_large_image",
     title: "Meet42",
-    description: "Plans IRL rapides, petits groupes.",
+    description: "Petits groupes, activités IRL près de toi.",
   },
   appleWebApp: {
     capable: true,
@@ -58,7 +59,7 @@ const jsonLd = {
     "@type": "Offer",
     price: "0",
     priceCurrency: "EUR",
-    description: "Création et participation aux plans IRL (niveau gratuit)",
+    description: "Création et participation aux plans IRL",
   },
   description:
     "Application de plans IRL en petits groupes à Bruxelles, Ixelles et alentours — café, apéro, marche, sans swipe.",

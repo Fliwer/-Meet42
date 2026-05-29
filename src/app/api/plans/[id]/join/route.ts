@@ -6,6 +6,7 @@ import {
   mockJoinPlan,
   mockGetProfile,
   mockCountParticipants,
+  mockSetAttendanceStatus,
 } from "@/lib/mock/mockDb";
 
 function getBearerToken(req: NextRequest) {
@@ -48,6 +49,7 @@ export async function POST(
     const participants_count_before = mockCountParticipants(planId);
     const res = mockJoinPlan(planId, userId);
     if (!res.ok && res.reason === "FULL") return NextResponse.json({ error: "Plan complet" }, { status: 409 });
+    mockSetAttendanceStatus(planId, userId, "pending");
     return NextResponse.json({ ok: true, participants_count: participants_count_before });
   }
 
@@ -66,13 +68,33 @@ export async function POST(
     .eq("plan_id", planId)
     .eq("user_id", userId)
     .maybeSingle();
-  if (alreadyRow.data) return NextResponse.json({ ok: true });
+  if (alreadyRow.data) {
+    await admin.from("plan_attendance").upsert(
+      {
+        plan_id: planId,
+        user_id: userId,
+        status: "pending",
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "plan_id,user_id" }
+    );
+    return NextResponse.json({ ok: true });
+  }
 
   const { data: participantRows } = await admin.from("plan_participants").select("user_id").eq("plan_id", planId);
   const currentCount = (participantRows ?? []).length;
   if (currentCount >= max_participants) return NextResponse.json({ error: "Plan complet" }, { status: 409 });
 
   await admin.from("plan_participants").insert({ plan_id: planId, user_id: userId });
+  await admin.from("plan_attendance").upsert(
+    {
+      plan_id: planId,
+      user_id: userId,
+      status: "pending",
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "plan_id,user_id" }
+  );
   return NextResponse.json({ ok: true });
 }
 

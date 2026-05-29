@@ -24,9 +24,133 @@ html {
 }
 
 body {
-  background: var(--background);
+  background:
+    radial-gradient(1200px 500px at 50% -15%, rgb(24 24 27 / 0.06), transparent 65%),
+    var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+.meet42-event-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.5rem;
+  border: 1px solid rgb(245 240 235 / 0.18);
+  background:
+    radial-gradient(140% 90% at 10% 0%, rgb(255 107 91 / 0.16), transparent 55%),
+    linear-gradient(165deg, #24164a 0%, #1a1035 48%, #150c2d 100%);
+  box-shadow:
+    0 18px 38px rgb(10 6 22 / 0.42),
+    inset 0 1px 0 rgb(245 240 235 / 0.16);
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.meet42-event-card:hover {
+  transform: translateY(-2px);
+  border-color: rgb(255 107 91 / 0.45);
+  box-shadow:
+    0 24px 44px rgb(10 6 22 / 0.5),
+    0 0 0 1px rgb(255 107 91 / 0.2),
+    inset 0 1px 0 rgb(245 240 235 / 0.2);
+}
+
+.meet42-event-card-glow {
+  pointer-events: none;
+  position: absolute;
+  right: -2.5rem;
+  top: -2.5rem;
+  height: 7rem;
+  width: 7rem;
+  border-radius: 9999px;
+  background: rgb(255 107 91 / 0.35);
+  filter: blur(40px);
+}
+
+.meet42-event-emoji {
+  display: grid;
+  height: 3.5rem;
+  width: 3.5rem;
+  place-items: center;
+  border-radius: 1rem;
+  border: 1px solid rgb(245 240 235 / 0.22);
+  background: linear-gradient(180deg, rgb(245 240 235 / 0.16), rgb(245 240 235 / 0.08));
+  font-size: 1.75rem;
+}
+
+.meet42-event-vibe {
+  margin-bottom: 0.25rem;
+  color: rgb(245 240 235 / 0.72);
+  font-size: 0.75rem;
+  font-family: "DM Sans", "Segoe UI", sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.meet42-event-title {
+  color: #f5f0eb;
+  font-size: 1.35rem;
+  line-height: 1.1;
+  font-family: "Clash Display", "DM Sans", "Segoe UI", sans-serif;
+  font-weight: 700;
+}
+
+.meet42-event-meta {
+  margin-top: 0.45rem;
+  color: rgb(245 240 235 / 0.86);
+  font-size: 0.88rem;
+  font-family: "DM Sans", "Segoe UI", sans-serif;
+  font-weight: 400;
+}
+
+.meet42-spots-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  border: 1px solid rgb(255 107 91 / 0.32);
+  background: rgb(255 107 91 / 0.15);
+  padding: 0.35rem 0.65rem;
+  color: #ffd8d3;
+  font-size: 0.75rem;
+  font-family: "DM Sans", "Segoe UI", sans-serif;
+  font-weight: 500;
+}
+
+.meet42-join-btn {
+  min-height: 3rem;
+  width: 100%;
+  border-radius: 1rem;
+  border: 1px solid rgb(255 107 91 / 0.4);
+  background: linear-gradient(180deg, #ff7d6f 0%, #ff6b5b 56%, #f35846 100%);
+  color: #1a1035;
+  font-family: "DM Sans", "Segoe UI", sans-serif;
+  font-size: 0.98rem;
+  font-weight: 700;
+  box-shadow: 0 10px 22px rgb(255 107 91 / 0.28);
+  transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease;
+}
+
+.meet42-join-btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+  box-shadow: 0 14px 26px rgb(255 107 91 / 0.34);
+}
+
+.meet42-join-btn:active {
+  transform: translateY(0);
+}
+
+.meet42-join-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  filter: saturate(0.55);
+  transform: none;
+}
+
+@media (max-width: 640px) {
+  .meet42-event-title {
+    font-size: 1.2rem;
+  }
 }
 
 ::selection {

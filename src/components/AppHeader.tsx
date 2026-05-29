@@ -4,59 +4,76 @@ import React from "react";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth/useAuth";
 import { usePathname } from "next/navigation";
+import { mainNavItems } from "@/components/navItems";
 
 export default function AppHeader() {
-  const { status, profileStatus, profile, signOut } = useAuth();
+  const { status, signOut } = useAuth();
   const pathname = usePathname();
   const onLogin = pathname.startsWith("/login");
 
   if (onLogin) return null;
 
   return (
-    <header className="sticky top-0 z-20 bg-zinc-50/85 backdrop-blur supports-[backdrop-filter]:bg-zinc-50/75 border-b border-zinc-200/80">
-      <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between md:justify-end">
-        <Link href="/" className="font-extrabold text-zinc-900 md:hidden tracking-tight">
-          Meet42
-        </Link>
-
-        <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-end">
-          <Link
-            href="/tarifs"
-            className="hidden sm:inline rounded-full bg-amber-100 px-3 py-1.5 text-sm font-semibold text-amber-950 hover:bg-amber-200"
-          >
-            Tarifs
+    <header className="sticky top-0 z-20 border-b border-zinc-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/90">
+      <div className="max-w-7xl mx-auto px-4 py-3">
+        <div className="flex items-center gap-3">
+          <Link href="/" className="shrink-0 font-extrabold text-zinc-900 tracking-tight inline-flex items-center gap-2">
+            <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" aria-hidden />
+            <span className="text-2xl leading-none">Meet42</span>
           </Link>
-          <Link href="/mes-plans" className="hidden sm:inline text-sm font-semibold text-zinc-900 hover:text-zinc-700">
-            Mes plans
-          </Link>
-          <Link
-            href="/create"
-            className="rounded-full bg-zinc-900 px-3.5 py-1.5 text-sm font-semibold text-white hover:bg-zinc-800"
-          >
-            Créer
-          </Link>
-          <Link href="/profile" className="text-sm font-semibold text-zinc-900 hover:text-zinc-700">
-            Profil
-          </Link>
-          {status === "authenticated" ? (
-            <div className="flex items-center gap-2">
-              <span className="hidden sm:inline text-sm text-zinc-700">
-                {profileStatus === "ready" ? profile?.first_name : "Profil"}
-              </span>
+          <div className="hidden md:flex items-center flex-1 gap-2">
+            <div className="flex items-center gap-2 rounded-full border border-zinc-200 bg-zinc-50 px-4 py-2 text-sm text-zinc-600 w-full max-w-md">
+              <span aria-hidden>🔎</span>
+              <span>Explorer des activités près de Bruxelles</span>
+            </div>
+            <span className="rounded-full bg-zinc-900 text-white px-3 py-1.5 text-xs font-semibold">Bruxelles, BE</span>
+          </div>
+          <div className="ml-auto flex items-center gap-2">
+            {status === "authenticated" ? (
               <button
-                className="text-sm font-semibold text-zinc-900 hover:text-zinc-700"
+                className="rounded-full px-3 py-1.5 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900"
                 onClick={() => signOut()}
                 type="button"
               >
                 Déconnexion
               </button>
-            </div>
-          ) : (
-            <Link href="/login" className="text-sm font-semibold text-zinc-900 hover:text-zinc-700">
-              Connexion
-            </Link>
-          )}
+            ) : (
+              <Link href="/login" className="rounded-full px-3 py-1.5 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900">
+                Connexion
+              </Link>
+            )}
+          </div>
         </div>
+        <nav className="mt-3 hidden md:flex items-center gap-1.5">
+          {mainNavItems.map((it) => {
+            const active = pathname === it.href || (it.href !== "/" && pathname.startsWith(it.href));
+            return (
+              <Link
+                key={it.href}
+                href={it.href}
+                className={
+                  active
+                    ? "inline-flex items-center gap-2 rounded-full bg-zinc-900 px-4 py-2 text-sm font-semibold text-white"
+                    : "inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-100"
+                }
+              >
+                <span aria-hidden>{it.icon}</span>
+                {it.label}
+              </Link>
+            );
+          })}
+          <Link
+            href="/confiance"
+            className={
+              pathname === "/confiance"
+                ? "inline-flex items-center gap-2 rounded-full bg-zinc-900 px-4 py-2 text-sm font-semibold text-white"
+                : "inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-100"
+            }
+          >
+            <span aria-hidden>🛡</span>
+            Confiance
+          </Link>
+        </nav>
       </div>
     </header>
   );

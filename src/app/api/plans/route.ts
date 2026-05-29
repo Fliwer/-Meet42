@@ -11,6 +11,8 @@ import {
   mockCountParticipants,
   mockCreatePlan,
   mockGetProfile,
+  mockListUserIdsForPlan,
+  mockListProfilesByIds,
 } from "@/lib/mock/mockDb";
 
 function getBearerToken(req: NextRequest) {
@@ -54,9 +56,6 @@ export async function GET(req: NextRequest) {
   }
 
   const userId = await resolveUserId(req);
-  if (!userId) {
-    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
-  }
 
   // Mock fallback: on génère des plans autour pour “cold start”.
   if (!isSupabaseConfigured()) {
@@ -75,6 +74,12 @@ export async function GET(req: NextRequest) {
     const summaries = filtered.map((x) => {
       const participants_count = mockCountParticipants(x.plan.id);
       const creator = mockGetCreator(x.plan);
+      const previewIds = mockListUserIdsForPlan(x.plan.id).slice(0, 4);
+      const previewProfiles = mockListProfilesByIds(previewIds);
+      const participant_preview = previewProfiles.map((p) => ({
+        first_name: p.first_name,
+        photo_url: p.photo_url ?? null,
+      }));
       return {
         id: x.plan.id,
         activity: x.plan.activity,
@@ -86,8 +91,9 @@ export async function GET(req: NextRequest) {
         lat: x.plan.lat,
         lng: x.plan.lng,
         creator: creator,
-        is_joined: mockIsUserJoined(x.plan.id, userId),
-        is_creator: x.plan.creator_id === userId,
+        participant_preview,
+        is_joined: userId ? mockIsUserJoined(x.plan.id, userId) : false,
+        is_creator: userId ? x.plan.creator_id === userId : false,
       };
     });
 
@@ -143,19 +149,35 @@ export async function GET(req: NextRequest) {
 
   const counts = new Map<string, number>();
   const joined = new Set<string>();
+  const previewIdsByPlan = new Map<string, string[]>();
   for (const p of (participantRows ?? []) as ParticipantRow[]) {
     const planId = p.plan_id;
     counts.set(planId, (counts.get(planId) ?? 0) + 1);
-    if (p.user_id === userId) joined.add(planId);
+    if (userId && p.user_id === userId) joined.add(planId);
+    const cur = previewIdsByPlan.get(planId) ?? [];
+    if (cur.length < 4) {
+      cur.push(p.user_id);
+      previewIdsByPlan.set(planId, cur);
+    }
   }
 
   const creatorIds = Array.from(new Set(filtered.map((x) => x.row.creator_id)));
-  const { data: profiles } = await admin.from("profiles").select("user_id,first_name,photo_url").in("user_id", creatorIds);
+  const previewUserIds = Array.from(new Set(Array.from(previewIdsByPlan.values()).flat()));
+  const allProfileIds = Array.from(new Set([...creatorIds, ...previewUserIds]));
+  const { data: profiles } = await admin.from("profiles").select("user_id,first_name,photo_url").in("user_id", allProfileIds);
   const profileById = new Map<string, ProfileRow>(((profiles ?? []) as ProfileRow[]).map((p) => [p.user_id, p]));
 
   const summaries = filtered.map((x) => {
     const plan = x.row;
     const creatorRow = profileById.get(plan.creator_id);
+    const prevIds = previewIdsByPlan.get(plan.id) ?? [];
+    const participant_preview = prevIds
+      .map((uid) => profileById.get(uid))
+      .filter(Boolean)
+      .map((row) => ({
+        first_name: row!.first_name,
+        photo_url: row!.photo_url ?? null,
+      }));
     return {
       id: plan.id,
       activity: plan.activity,
@@ -170,8 +192,9 @@ export async function GET(req: NextRequest) {
         first_name: creatorRow?.first_name ?? "Anonyme",
         photo_url: creatorRow?.photo_url ?? null,
       },
-      is_joined: joined.has(plan.id),
-      is_creator: plan.creator_id === userId,
+      participant_preview,
+      is_joined: userId ? joined.has(plan.id) : false,
+      is_creator: userId ? plan.creator_id === userId : false,
     };
   });
 

@@ -6,7 +6,9 @@ type MockProfile = {
   id: string;
   first_name: string;
   age: number;
+  /** 1ʳᵉ photo (affichage cartes) — dérivée de photo_urls si besoin */
   photo_url?: string | null;
+  photo_urls?: string[];
   bio?: string | null;
 };
 
@@ -25,6 +27,9 @@ type MockState = {
   profiles: Map<string, MockProfile>;
   plans: Map<string, MockPlanRow>;
   participants: Set<string>; // `${plan_id}:${user_id}`
+  attendance: Map<string, { status: "pending" | "confirmed" | "cancelled"; created_at: string; updated_at: string }>; // `${plan_id}:${user_id}`
+  checkins: Map<string, { status: "on_my_way" | "arrived"; updated_at: string }>; // `${plan_id}:${user_id}`
+  feedbacks: Map<string, { would_rejoin: boolean; comment: string | null; created_at: string }>; // `${plan_id}:${user_id}`
 };
 
 function getState(): MockState {
@@ -35,6 +40,9 @@ function getState(): MockState {
     profiles: new Map(),
     plans: new Map(),
     participants: new Set(),
+    attendance: new Map(),
+    checkins: new Map(),
+    feedbacks: new Map(),
   };
 
   return g.meet42MockDb;
@@ -202,12 +210,23 @@ export function mockEnsureSeedAround(lat: number, lng: number) {
 
     // Le créateur est automatiquement participant.
     state.participants.add(`${id}:${creator.id}`);
+    const now = new Date().toISOString();
+    state.attendance.set(`${id}:${creator.id}`, {
+      status: "pending",
+      created_at: now,
+      updated_at: now,
+    });
 
     // Ajout de 0..(max-1) participants.
     const additional = randInt(0, maxParticipants - 1);
     for (let j = 0; j < additional; j++) {
       const p = profiles[randInt(0, profiles.length - 1)];
       state.participants.add(`${id}:${p.id}`);
+      state.attendance.set(`${id}:${p.id}`, {
+        status: "pending",
+        created_at: now,
+        updated_at: now,
+      });
     }
   }
 }
@@ -218,7 +237,9 @@ export function mockGetProfile(userId: string): MockProfile | null {
 
 export function mockUpsertProfile(profile: Omit<MockProfile, "id"> & { id: string }) {
   const state = getState();
-  state.profiles.set(profile.id, profile);
+  const urls = (profile.photo_urls ?? []).map((u) => u.trim()).filter(Boolean);
+  const photo_url = urls[0] ?? profile.photo_url?.trim() ?? null;
+  state.profiles.set(profile.id, { ...profile, photo_urls: urls, photo_url });
 }
 
 export function mockCreatePlan(row: {
@@ -244,6 +265,12 @@ export function mockCreatePlan(row: {
   };
   state.plans.set(id, plan);
   state.participants.add(`${id}:${row.creator_id}`);
+  const now = new Date().toISOString();
+  state.attendance.set(`${id}:${row.creator_id}`, {
+    status: "pending",
+    created_at: now,
+    updated_at: now,
+  });
   return { id };
 }
 
@@ -276,12 +303,28 @@ export function mockJoinPlan(planId: string, userId: string) {
   const state = getState();
   const plan = state.plans.get(planId);
   if (!plan) return { ok: false as const, reason: "NOT_FOUND" };
-  if (state.participants.has(`${planId}:${userId}`)) return { ok: true as const };
+  if (state.participants.has(`${planId}:${userId}`)) {
+    const key = `${planId}:${userId}`;
+    const existing = state.attendance.get(key);
+    const now = new Date().toISOString();
+    if (existing) {
+      state.attendance.set(key, { ...existing, status: "pending", updated_at: now });
+    } else {
+      state.attendance.set(key, { status: "pending", created_at: now, updated_at: now });
+    }
+    return { ok: true as const };
+  }
 
   const currentCount = mockCountParticipants(planId);
   if (currentCount >= plan.max_participants) return { ok: false as const, reason: "FULL" };
 
   state.participants.add(`${planId}:${userId}`);
+  const now = new Date().toISOString();
+  state.attendance.set(`${planId}:${userId}`, {
+    status: "pending",
+    created_at: now,
+    updated_at: now,
+  });
   return { ok: true as const };
 }
 
@@ -314,10 +357,98 @@ export function mockLeavePlan(planId: string, userId: string) {
     for (const key of [...state.participants]) {
       if (key.startsWith(`${planId}:`)) state.participants.delete(key);
     }
+    for (const key of [...state.attendance.keys()]) {
+      if (key.startsWith(`${planId}:`)) state.attendance.delete(key);
+    }
+    for (const key of [...state.checkins.keys()]) {
+      if (key.startsWith(`${planId}:`)) state.checkins.delete(key);
+    }
+    for (const key of [...state.feedbacks.keys()]) {
+      if (key.startsWith(`${planId}:`)) state.feedbacks.delete(key);
+    }
   } else {
     state.participants.delete(`${planId}:${userId}`);
+    state.attendance.delete(`${planId}:${userId}`);
+    state.checkins.delete(`${planId}:${userId}`);
+    state.feedbacks.delete(`${planId}:${userId}`);
   }
   return { ok: true as const };
+}
+
+export function mockSetAttendanceStatus(planId: string, userId: string, status: "pending" | "confirmed" | "cancelled") {
+  const state = getState();
+  const plan = state.plans.get(planId);
+  if (!plan) return { ok: false as const, reason: "NOT_FOUND" as const };
+  if (!state.participants.has(`${planId}:${userId}`)) return { ok: false as const, reason: "NOT_JOINED" as const };
+  const key = `${planId}:${userId}`;
+  const now = new Date().toISOString();
+  const existing = state.attendance.get(key);
+  state.attendance.set(key, {
+    status,
+    created_at: existing?.created_at ?? now,
+    updated_at: now,
+  });
+  return { ok: true as const };
+}
+
+export function mockGetAttendanceByPlan(planId: string) {
+  const state = getState();
+  const out: Array<{
+    user_id: string;
+    status: "pending" | "confirmed" | "cancelled";
+    created_at: string;
+    updated_at: string;
+  }> = [];
+  for (const key of state.participants) {
+    const [pId, userId] = key.split(":");
+    if (pId !== planId) continue;
+    const row = state.attendance.get(key);
+    if (row) {
+      out.push({ user_id: userId, status: row.status, created_at: row.created_at, updated_at: row.updated_at });
+    } else {
+      const now = new Date().toISOString();
+      out.push({ user_id: userId, status: "pending", created_at: now, updated_at: now });
+    }
+  }
+  return out;
+}
+
+export function mockSetCheckin(planId: string, userId: string, status: "on_my_way" | "arrived") {
+  const state = getState();
+  const plan = state.plans.get(planId);
+  if (!plan) return { ok: false as const, reason: "NOT_FOUND" as const };
+  if (!state.participants.has(`${planId}:${userId}`)) return { ok: false as const, reason: "NOT_JOINED" as const };
+  state.checkins.set(`${planId}:${userId}`, { status, updated_at: new Date().toISOString() });
+  return { ok: true as const };
+}
+
+export function mockGetCheckin(planId: string, userId: string) {
+  const row = getState().checkins.get(`${planId}:${userId}`);
+  if (!row) return null;
+  return { ...row };
+}
+
+export function mockSetPlanFeedback(
+  planId: string,
+  userId: string,
+  payload: { would_rejoin: boolean; comment: string | null }
+) {
+  const state = getState();
+  const plan = state.plans.get(planId);
+  if (!plan) return { ok: false as const, reason: "NOT_FOUND" as const };
+  if (!state.participants.has(`${planId}:${userId}`)) return { ok: false as const, reason: "NOT_JOINED" as const };
+  state.feedbacks.set(`${planId}:${userId}`, {
+    would_rejoin: payload.would_rejoin,
+    comment: payload.comment,
+    created_at: new Date().toISOString(),
+  });
+  return { ok: true as const };
+}
+
+export function mockGetPlanFeedback(planId: string, userId: string) {
+  const row = getState().feedbacks.get(`${planId}:${userId}`);
+  if (!row) return null;
+  return { ...row };
 }
 
 export function mockListParticipantsByPlans(planIds: string[]) {
@@ -329,6 +460,17 @@ export function mockListParticipantsByPlans(planIds: string[]) {
     if (set.has(plan_id)) rows.push({ plan_id, user_id });
   }
   return rows;
+}
+
+/** User IDs in this plan (order non garanti ; stable pour un état donné). */
+export function mockListUserIdsForPlan(planId: string): string[] {
+  const state = getState();
+  const out: string[] = [];
+  for (const key of state.participants) {
+    const [pId, userId] = key.split(":");
+    if (pId === planId) out.push(userId);
+  }
+  return out;
 }
 
 export function mockListProfilesByIds(ids: string[]) {

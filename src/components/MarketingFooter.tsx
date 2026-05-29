@@ -20,9 +20,6 @@ export default function MarketingFooter() {
             </p>
           </div>
           <nav className="flex flex-wrap gap-x-8 gap-y-3 text-sm" aria-label="Liens pied de page">
-            <Link href="/tarifs" className="font-semibold text-zinc-900 hover:underline underline-offset-2">
-              Tarifs & Pro
-            </Link>
             <Link href="/confiance" className="font-semibold text-zinc-900 hover:underline underline-offset-2">
               Confiance & données
             </Link>
@@ -39,7 +36,7 @@ export default function MarketingFooter() {
           <span>© {year} Meet42</span>
           <span className="text-zinc-400">
             {SITE_CONTACT_EMAIL
-              ? "Offres Pro, lieux partenaires, presse : écris-nous."
+              ? "Presse, partenariats : écris-nous."
               : process.env.NODE_ENV === "development"
                 ? "Dev : définis NEXT_PUBLIC_CONTACT_EMAIL pour le contact mailto."
                 : "Contact dédié : bientôt."}

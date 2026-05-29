@@ -9,9 +9,14 @@ create table if not exists public.profiles (
   first_name text not null,
   age int not null check (age >= 18 and age <= 99),
   photo_url text,
+  photo_urls text[] not null default '{}'::text[],
   bio text,
   created_at timestamptz not null default now()
 );
+
+-- Si la table profiles existe déjà sans la colonne photo_urls :
+alter table public.profiles
+  add column if not exists photo_urls text[] not null default '{}'::text[];
 
 -- Plan IRL (petits groupes)
 create table if not exists public.plans (
@@ -41,11 +46,53 @@ create table if not exists public.plan_participants (
 create index if not exists idx_participants_plan_id on public.plan_participants (plan_id);
 create index if not exists idx_participants_user_id on public.plan_participants (user_id);
 
+-- Gestion de présence (fiabilité des events)
+create table if not exists public.plan_attendance (
+  id uuid primary key default gen_random_uuid(),
+  plan_id uuid not null references public.plans(id) on delete cascade,
+  user_id uuid not null references public.profiles(user_id) on delete cascade,
+  status text not null check (status in ('pending', 'confirmed', 'cancelled', 'maybe')),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (plan_id, user_id)
+);
+
+create index if not exists idx_plan_attendance_plan_id on public.plan_attendance (plan_id);
+create index if not exists idx_plan_attendance_user_id on public.plan_attendance (user_id);
+
+-- Check-in anti no-show (participant -> statut avant/pendant event)
+create table if not exists public.plan_checkins (
+  plan_id uuid not null references public.plans(id) on delete cascade,
+  user_id uuid not null references public.profiles(user_id) on delete cascade,
+  status text not null check (status in ('on_my_way', 'arrived')),
+  updated_at timestamptz not null default now(),
+  primary key (plan_id, user_id)
+);
+
+create index if not exists idx_plan_checkins_plan_id on public.plan_checkins (plan_id);
+create index if not exists idx_plan_checkins_user_id on public.plan_checkins (user_id);
+
+-- Feedback ultra simple post-event (oui/non + commentaire optionnel)
+create table if not exists public.plan_feedback (
+  plan_id uuid not null references public.plans(id) on delete cascade,
+  user_id uuid not null references public.profiles(user_id) on delete cascade,
+  would_rejoin boolean not null,
+  comment text,
+  created_at timestamptz not null default now(),
+  primary key (plan_id, user_id)
+);
+
+create index if not exists idx_plan_feedback_plan_id on public.plan_feedback (plan_id);
+create index if not exists idx_plan_feedback_user_id on public.plan_feedback (user_id);
+
 -- (Optionnel) Policies RLS
 -- Note: notre MVP backend utilise SUPABASE_SERVICE_ROLE_KEY (admin) pour simplifier.
 alter table public.profiles enable row level security;
 alter table public.plans enable row level security;
 alter table public.plan_participants enable row level security;
+alter table public.plan_attendance enable row level security;
+alter table public.plan_checkins enable row level security;
+alter table public.plan_feedback enable row level security;
 
 drop policy if exists "profiles_select_own" on public.profiles;
 create policy "profiles_select_own"
@@ -81,5 +128,53 @@ create policy "participants_select_auth"
 drop policy if exists "participants_insert_self" on public.plan_participants;
 create policy "participants_insert_self"
   on public.plan_participants for insert
+  with check (user_id = auth.uid());
+
+drop policy if exists "attendance_select_auth" on public.plan_attendance;
+create policy "attendance_select_auth"
+  on public.plan_attendance for select
+  using (auth.role() is not null);
+
+drop policy if exists "attendance_insert_self" on public.plan_attendance;
+create policy "attendance_insert_self"
+  on public.plan_attendance for insert
+  with check (user_id = auth.uid());
+
+drop policy if exists "attendance_update_self" on public.plan_attendance;
+create policy "attendance_update_self"
+  on public.plan_attendance for update
+  using (user_id = auth.uid())
+  with check (user_id = auth.uid());
+
+drop policy if exists "checkins_select_self" on public.plan_checkins;
+create policy "checkins_select_self"
+  on public.plan_checkins for select
+  using (user_id = auth.uid());
+
+drop policy if exists "checkins_upsert_self" on public.plan_checkins;
+create policy "checkins_upsert_self"
+  on public.plan_checkins for insert
+  with check (user_id = auth.uid());
+
+drop policy if exists "checkins_update_self" on public.plan_checkins;
+create policy "checkins_update_self"
+  on public.plan_checkins for update
+  using (user_id = auth.uid())
+  with check (user_id = auth.uid());
+
+drop policy if exists "feedback_select_self" on public.plan_feedback;
+create policy "feedback_select_self"
+  on public.plan_feedback for select
+  using (user_id = auth.uid());
+
+drop policy if exists "feedback_upsert_self" on public.plan_feedback;
+create policy "feedback_upsert_self"
+  on public.plan_feedback for insert
+  with check (user_id = auth.uid());
+
+drop policy if exists "feedback_update_self" on public.plan_feedback;
+create policy "feedback_update_self"
+  on public.plan_feedback for update
+  using (user_id = auth.uid())
   with check (user_id = auth.uid());
 

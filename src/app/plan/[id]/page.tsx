@@ -4,7 +4,20 @@ import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth/useAuth";
 import type { PlanSummary } from "@/lib/plans/planTypes";
-import { apiFetchPlanById, apiJoinPlan, apiLeavePlan } from "@/lib/plans/planApi";
+import {
+  apiCancelAttendance,
+  apiConfirmAttendance,
+  apiFetchPlanAttendance,
+  apiFetchMyCheckin,
+  apiFetchMyPlanFeedback,
+  apiFetchPlanById,
+  apiJoinPlan,
+  apiLeavePlan,
+  apiSetMyCheckin,
+  apiSubmitMyPlanFeedback,
+  type AttendanceStatus,
+  type PlanAttendanceParticipant,
+} from "@/lib/plans/planApi";
 import { canCancelOrLeaveBeforeStart, CANCELLATION_POLICY_FR } from "@/lib/plans/cancellation";
 import { ACTIVITIES } from "@/lib/plans/activities";
 
@@ -31,18 +44,14 @@ export default function PlanPage() {
   const [leaving, setLeaving] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
   const [shareNotice, setShareNotice] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (status === "loading") return;
-    if (status !== "authenticated") {
-      router.push("/login");
-      return;
-    }
-    if (profileStatus === "missing") {
-      router.push("/login");
-      return;
-    }
-  }, [profileStatus, router, status]);
+  const [checkinStatus, setCheckinStatus] = useState<"on_my_way" | "arrived" | null>(null);
+  const [checkinBusy, setCheckinBusy] = useState(false);
+  const [feedbackVote, setFeedbackVote] = useState<boolean | null>(null);
+  const [feedbackComment, setFeedbackComment] = useState("");
+  const [feedbackBusy, setFeedbackBusy] = useState(false);
+  const [feedbackDone, setFeedbackDone] = useState(false);
+  const [attendance, setAttendance] = useState<PlanAttendanceParticipant[]>([]);
+  const [attendanceBusy, setAttendanceBusy] = useState(false);
 
   useEffect(() => {
     if (!planId) return;
@@ -57,8 +66,40 @@ export default function PlanPage() {
       .finally(() => setLoading(false));
   }, [accessToken, planId, userId]);
 
+  useEffect(() => {
+    if (status !== "authenticated" || !userId) return;
+    if (!plan?.is_joined) return;
+    apiFetchMyCheckin({ planId: plan.id, accessToken, userId })
+      .then((row) => setCheckinStatus(row?.status ?? null))
+      .catch(() => undefined);
+    apiFetchMyPlanFeedback({ planId: plan.id, accessToken, userId })
+      .then((row) => {
+        if (!row) return;
+        setFeedbackVote(row.would_rejoin);
+        setFeedbackComment(row.comment ?? "");
+        setFeedbackDone(true);
+      })
+      .catch(() => undefined);
+  }, [accessToken, plan?.id, plan?.is_joined, status, userId]);
+
+  useEffect(() => {
+    if (status !== "authenticated" || !userId) return;
+    if (!plan?.id) return;
+    apiFetchPlanAttendance({ planId: plan.id, accessToken, userId })
+      .then((rows) => setAttendance(rows))
+      .catch(() => undefined);
+  }, [accessToken, plan?.id, status, userId]);
+
   async function onJoin() {
     if (!plan) return;
+    if (status !== "authenticated" || !userId) {
+      router.push(`/login?next=${encodeURIComponent(`/plan/${plan.id}`)}`);
+      return;
+    }
+    if (profileStatus === "missing") {
+      router.push("/login");
+      return;
+    }
     setJoining(true);
     setActionError(null);
     setShareNotice(null);
@@ -66,6 +107,8 @@ export default function PlanPage() {
       await apiJoinPlan({ planId: plan.id, accessToken, userId });
       const updated = await apiFetchPlanById({ planId: plan.id, accessToken, userId });
       setPlan(updated);
+      const rows = await apiFetchPlanAttendance({ planId: plan.id, accessToken, userId });
+      setAttendance(rows);
     } catch (err) {
       setActionError(err instanceof Error ? err.message : "Impossible de rejoindre");
     } finally {
@@ -110,11 +153,75 @@ export default function PlanPage() {
     }
   }
 
-  if (status === "loading" || loading) {
+  async function onCheckin(statusValue: "on_my_way" | "arrived") {
+    if (!plan) return;
+    setCheckinBusy(true);
+    setActionError(null);
+    try {
+      await apiSetMyCheckin({ planId: plan.id, status: statusValue, accessToken, userId });
+      setCheckinStatus(statusValue);
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Check-in impossible");
+    } finally {
+      setCheckinBusy(false);
+    }
+  }
+
+  async function onSubmitFeedback() {
+    if (!plan) return;
+    if (feedbackVote === null) {
+      setActionError("Choisis Oui ou Non");
+      return;
+    }
+    setFeedbackBusy(true);
+    setActionError(null);
+    try {
+      await apiSubmitMyPlanFeedback({
+        planId: plan.id,
+        would_rejoin: feedbackVote,
+        comment: feedbackComment,
+        accessToken,
+        userId,
+      });
+      setFeedbackDone(true);
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Feedback impossible");
+    } finally {
+      setFeedbackBusy(false);
+    }
+  }
+
+  async function setAttendanceStatus(next: AttendanceStatus) {
+    if (!plan || !userId) return;
+    setAttendanceBusy(true);
+    setActionError(null);
+    const previous = attendance;
+    setAttendance((curr) =>
+      curr.map((p) => (p.user_id === userId ? { ...p, status: next } : p))
+    );
+    try {
+      if (next === "confirmed") {
+        await apiConfirmAttendance({ planId: plan.id, accessToken, userId });
+      } else {
+        await apiCancelAttendance({ planId: plan.id, accessToken, userId });
+      }
+      const rows = await apiFetchPlanAttendance({ planId: plan.id, accessToken, userId });
+      setAttendance(rows);
+    } catch (err) {
+      setAttendance(previous);
+      setActionError(err instanceof Error ? err.message : "Action impossible");
+    } finally {
+      setAttendanceBusy(false);
+    }
+  }
+
+  if (loading) {
     return (
       <main className="min-h-screen bg-zinc-50 px-4 py-8">
-        <div className="max-w-2xl mx-auto mt-6 rounded-2xl border border-zinc-200 bg-white p-4 text-sm text-zinc-600">
-          Chargement du plan...
+        <div className="max-w-2xl mx-auto mt-6 space-y-3 animate-pulse">
+          <div className="h-10 rounded-2xl bg-zinc-200" />
+          <div className="h-32 rounded-3xl bg-zinc-200" />
+          <div className="h-24 rounded-2xl bg-zinc-100" />
         </div>
       </main>
     );
@@ -136,29 +243,79 @@ export default function PlanPage() {
   const activityMeta = ACTIVITIES.find((a) => a.id === plan.activity);
   const gmaps = mapsUrl(plan.lat, plan.lng, plan.location_text);
   const canStillCancel = canCancelOrLeaveBeforeStart(plan.start_time);
+  const nowMs = Date.now();
+  const startMs = start.getTime();
+  const showCheckin = plan.is_joined && nowMs >= startMs - 3 * 60 * 60 * 1000 && nowMs <= startMs + 3 * 60 * 60 * 1000;
+  const showFeedback = plan.is_joined && nowMs >= startMs - 30 * 60 * 1000;
+  const confirmed = attendance.filter((p) => p.status === "confirmed");
+  const pending = attendance.filter((p) => p.status === "pending" || p.status === "maybe");
+  const cancelled = attendance.filter((p) => p.status === "cancelled");
+  const myAttendanceStatus = attendance.find((p) => p.user_id === userId)?.status ?? null;
+
+  const timelineSteps = [
+    { key: "created", label: "Créé", done: true, current: false },
+    { key: "joined", label: "Inscrit", done: plan.is_joined, current: !plan.is_joined },
+    {
+      key: "checkin",
+      label: "Check-in",
+      done: Boolean(checkinStatus),
+      current: plan.is_joined && !checkinStatus && showCheckin,
+    },
+    {
+      key: "done",
+      label: "Feedback",
+      done: feedbackDone,
+      current: plan.is_joined && showFeedback && !feedbackDone,
+    },
+  ];
 
   return (
-    <main className="min-h-screen bg-zinc-50 px-4 py-8">
-      <div className="max-w-2xl mx-auto mt-6 rounded-2xl border border-zinc-200 bg-white p-4">
+    <main className="min-h-screen bg-zinc-50 px-4 py-8 pb-32 md:pb-10">
+      <div className="max-w-3xl mx-auto mt-3 rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <div className="text-sm text-zinc-600">Plan</div>
-            <h1 className="text-2xl font-bold text-zinc-900 truncate">
+            <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Activité</div>
+            <h1 className="mt-1 text-3xl font-bold tracking-tight text-zinc-900 truncate">
               {activityMeta?.emoji} {activityMeta?.label ?? plan.activity}
             </h1>
-            <div className="mt-1 text-sm text-zinc-600">
+            <div className="mt-2 text-sm text-zinc-600">
               {start.toLocaleDateString("fr-BE", { weekday: "short", day: "numeric", month: "short" })} à{" "}
               {start.toLocaleTimeString("fr-BE", { hour: "2-digit", minute: "2-digit" })}
             </div>
+            <p className="mt-3 text-sm font-medium text-zinc-800 leading-relaxed">
+              {plan.is_joined
+                ? `Tu fais partie d’un groupe de ${plan.participants_count} / ${plan.max_participants} — petit, humain, sans pression.`
+                : `Rejoins un groupe de max ${plan.max_participants} personnes. Ici, on privilégie la qualité à la quantité.`}
+            </p>
           </div>
           <div className="shrink-0">
-            <span className="rounded-full bg-zinc-100 px-3 py-1 text-sm font-semibold text-zinc-700">
+            <span className="rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-sm font-semibold text-zinc-700">
               {plan.participants_count}/{plan.max_participants}
             </span>
           </div>
         </div>
 
-        <div className="mt-4 rounded-2xl bg-zinc-50 border border-zinc-200 p-3">
+        <div className="mt-4 rounded-2xl border border-zinc-100 bg-zinc-50 p-3">
+          <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Parcours</div>
+          <ol className="mt-2 flex flex-wrap gap-2">
+            {timelineSteps.map((s, i) => (
+              <li
+                key={s.key}
+                className={
+                  s.done
+                    ? "rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-bold text-emerald-900"
+                    : s.current
+                      ? "rounded-full bg-zinc-900 px-3 py-1 text-[11px] font-bold text-white"
+                      : "rounded-full bg-white border border-zinc-200 px-3 py-1 text-[11px] font-semibold text-zinc-500"
+                }
+              >
+                {i + 1}. {s.label}
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        <div className="mt-5 rounded-2xl bg-zinc-50 border border-zinc-200 p-4">
           <div className="text-sm font-semibold text-zinc-900">Infos lieu</div>
           <div className="mt-2 text-sm text-zinc-700">{plan.location_text}</div>
           <div className="mt-3 flex gap-2">
@@ -166,14 +323,14 @@ export default function PlanPage() {
               href={gmaps}
               target="_blank"
               rel="noreferrer"
-              className="flex-1 rounded-2xl bg-zinc-900 px-4 py-3 text-center text-sm font-semibold text-white hover:bg-zinc-800 active:bg-zinc-950"
+              className="flex-1 rounded-xl bg-zinc-900 px-4 py-3 text-center text-sm font-semibold text-white hover:bg-zinc-800"
             >
               Ouvrir dans Maps
             </a>
             <button
               type="button"
               onClick={onShare}
-              className="rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm font-semibold text-zinc-900 hover:bg-zinc-50"
+              className="rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm font-semibold text-zinc-900 hover:bg-zinc-50"
             >
               Partager
             </button>
@@ -192,27 +349,219 @@ export default function PlanPage() {
 
         <div className="mt-4 flex items-center justify-between">
           <div className="text-sm text-zinc-600">
-            {plan.is_joined ? "Tu es dans ce plan ✅" : "Rejoins pour voir/partager le lieu"}
+            {status !== "authenticated"
+              ? "Connecte-toi pour rejoindre en un clic."
+              : plan.is_joined
+                ? "Tu es dans ce plan ✅"
+                : "Rejoins pour confirmer ta présence avec le groupe."}
           </div>
         </div>
 
-        <div className="mt-4 flex gap-3">
+        <div className="mt-5 hidden md:flex gap-3">
           <button
-            className="flex-1 rounded-2xl bg-zinc-900 px-5 py-3 text-white font-semibold hover:bg-zinc-800 active:bg-zinc-950 disabled:opacity-50"
+            className="flex-1 rounded-xl bg-zinc-900 px-5 py-3 text-white font-semibold hover:bg-zinc-800 disabled:opacity-50 min-h-[48px]"
             type="button"
             onClick={onJoin}
             disabled={joining || plan.is_joined}
           >
-            {plan.is_joined ? "Déjà rejoint" : joining ? "Rejoindre..." : "Rejoindre"}
+            {status !== "authenticated"
+              ? "Connexion pour rejoindre"
+              : plan.is_joined
+                ? "Déjà inscrit(e)"
+                : joining
+                  ? "…"
+                  : "Rejoindre"}
           </button>
           <button
-            className="rounded-2xl border border-zinc-200 bg-white px-5 py-3 text-zinc-900 font-semibold hover:bg-zinc-50"
+            className="rounded-xl border border-zinc-200 bg-white px-5 py-3 text-zinc-900 font-semibold hover:bg-zinc-50 min-h-[48px]"
             type="button"
             onClick={() => router.push("/")}
           >
             Retour
           </button>
         </div>
+
+        <div className="mt-4 rounded-2xl border border-zinc-200 bg-white p-4">
+          <div className="flex items-center justify-between gap-3">
+            <div className="text-sm font-semibold text-zinc-900">Participants</div>
+            <div className="text-xs font-semibold text-zinc-600">
+              {status === "authenticated" ? `${confirmed.length} confirmés / ${plan.max_participants} max` : `${plan.participants_count} / ${plan.max_participants}`}
+            </div>
+          </div>
+
+          {status !== "authenticated" ? (
+            <div className="mt-3">
+              <div className="flex -space-x-2">
+                {(plan.participant_preview ?? []).slice(0, 4).map((p, i) =>
+                  p.photo_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      key={`pv-${i}`}
+                      src={p.photo_url}
+                      alt=""
+                      width={40}
+                      height={40}
+                      className="h-10 w-10 rounded-full border-2 border-white object-cover ring-1 ring-zinc-200"
+                    />
+                  ) : (
+                    <div
+                      key={`pv-${i}`}
+                      className="grid h-10 w-10 place-items-center rounded-full border-2 border-white bg-zinc-200 text-xs font-bold text-zinc-700 ring-1 ring-zinc-200"
+                    >
+                      {p.first_name.slice(0, 1)}
+                    </div>
+                  )
+                )}
+              </div>
+              <p className="mt-2 text-xs text-zinc-500">Connecte-toi pour voir la liste complète et confirmer ta présence.</p>
+            </div>
+          ) : (
+            <>
+              {plan.is_joined ? (
+                <div className="mt-3 flex gap-2">
+                  <button
+                    type="button"
+                    disabled={attendanceBusy}
+                    onClick={() => setAttendanceStatus("confirmed")}
+                    className={
+                      myAttendanceStatus === "confirmed"
+                        ? "rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white"
+                        : "rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-800"
+                    }
+                  >
+                    Je viens
+                  </button>
+                  <button
+                    type="button"
+                    disabled={attendanceBusy}
+                    onClick={() => setAttendanceStatus("cancelled")}
+                    className={
+                      myAttendanceStatus === "cancelled"
+                        ? "rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white"
+                        : "rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-800"
+                    }
+                  >
+                    Je ne peux plus
+                  </button>
+                </div>
+              ) : null}
+
+              <div className="mt-4 grid gap-3 md:grid-cols-3">
+                <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3">
+                  <div className="text-xs font-semibold uppercase tracking-wide text-emerald-800">Confirmés</div>
+                  <div className="mt-2 space-y-1">
+                    {confirmed.length === 0 ? <div className="text-xs text-emerald-800/80">Aucun</div> : null}
+                    {confirmed.map((p) => (
+                      <div key={`c-${p.user_id}`} className="text-sm text-emerald-900">
+                        {p.first_name}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-3">
+                  <div className="text-xs font-semibold uppercase tracking-wide text-zinc-700">En attente</div>
+                  <div className="mt-2 space-y-1">
+                    {pending.length === 0 ? <div className="text-xs text-zinc-500">Aucun</div> : null}
+                    {pending.map((p) => (
+                      <div key={`p-${p.user_id}`} className="text-sm text-zinc-800">
+                        {p.first_name}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="rounded-xl border border-rose-200 bg-rose-50 p-3">
+                  <div className="text-xs font-semibold uppercase tracking-wide text-rose-800">Annulés</div>
+                  <div className="mt-2 space-y-1">
+                    {cancelled.length === 0 ? <div className="text-xs text-rose-700/70">Aucun</div> : null}
+                    {cancelled.map((p) => (
+                      <div key={`x-${p.user_id}`} className="text-sm text-rose-900">
+                        {p.first_name}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+
+        {showCheckin && status === "authenticated" ? (
+          <div className="mt-4 rounded-2xl border border-zinc-200 bg-zinc-50 p-3">
+            <div className="text-sm font-semibold text-zinc-900">Check-in rapide</div>
+            <div className="mt-1 text-xs text-zinc-600">Dis au groupe où tu en es pour limiter les no-shows.</div>
+            <div className="mt-3 flex gap-2">
+              <button
+                type="button"
+                disabled={checkinBusy}
+                onClick={() => onCheckin("on_my_way")}
+                className={
+                  checkinStatus === "on_my_way"
+                    ? "flex-1 rounded-xl bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-white"
+                    : "flex-1 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm font-semibold text-zinc-800"
+                }
+              >
+                Je suis en route
+              </button>
+              <button
+                type="button"
+                disabled={checkinBusy}
+                onClick={() => onCheckin("arrived")}
+                className={
+                  checkinStatus === "arrived"
+                    ? "flex-1 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white"
+                    : "flex-1 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm font-semibold text-zinc-800"
+                }
+              >
+                Je suis arrivé(e)
+              </button>
+            </div>
+          </div>
+        ) : null}
+
+        {showFeedback && status === "authenticated" ? (
+          <div className="mt-4 rounded-2xl border border-zinc-200 bg-white p-3">
+            <div className="text-sm font-semibold text-zinc-900">Retour qualité</div>
+            <div className="mt-1 text-xs text-zinc-600">Tu referais un event avec ce groupe ?</div>
+            <div className="mt-3 flex gap-2">
+              <button
+                type="button"
+                onClick={() => setFeedbackVote(true)}
+                className={
+                  feedbackVote === true
+                    ? "rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white"
+                    : "rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-800"
+                }
+              >
+                Oui
+              </button>
+              <button
+                type="button"
+                onClick={() => setFeedbackVote(false)}
+                className={
+                  feedbackVote === false
+                    ? "rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white"
+                    : "rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-800"
+                }
+              >
+                Non
+              </button>
+            </div>
+            <textarea
+              className="mt-3 w-full rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-800"
+              placeholder="Optionnel: une phrase pour aider à améliorer la qualité."
+              value={feedbackComment}
+              onChange={(e) => setFeedbackComment(e.target.value.slice(0, 160))}
+            />
+            <button
+              type="button"
+              disabled={feedbackBusy}
+              onClick={onSubmitFeedback}
+              className="mt-3 rounded-xl bg-zinc-900 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-800 disabled:opacity-50"
+            >
+              {feedbackDone ? "Feedback enregistré" : feedbackBusy ? "Envoi..." : "Envoyer mon feedback"}
+            </button>
+          </div>
+        ) : null}
 
         {plan.is_joined ? (
           <div className="mt-5 border-t border-zinc-200 pt-4">
@@ -241,6 +590,32 @@ export default function PlanPage() {
             )}
           </div>
         ) : null}
+      </div>
+
+      <div className="md:hidden fixed bottom-[calc(5.25rem+env(safe-area-inset-bottom))] left-0 right-0 z-20 px-4">
+        <div className="max-w-3xl mx-auto flex gap-2">
+          <button
+            className="flex-1 rounded-2xl bg-zinc-900 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-zinc-900/25 disabled:opacity-50 min-h-[48px]"
+            type="button"
+            onClick={onJoin}
+            disabled={joining || plan.is_joined}
+          >
+            {status !== "authenticated"
+              ? "Connexion pour rejoindre"
+              : plan.is_joined
+                ? "Inscrit(e)"
+                : joining
+                  ? "…"
+                  : "Rejoindre"}
+          </button>
+          <button
+            className="rounded-2xl border border-zinc-200 bg-white px-4 py-3.5 text-sm font-bold text-zinc-900 min-h-[48px]"
+            type="button"
+            onClick={() => router.push("/")}
+          >
+            Accueil
+          </button>
+        </div>
       </div>
     </main>
   );

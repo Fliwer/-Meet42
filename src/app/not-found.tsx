@@ -22,10 +22,10 @@ export default function NotFound() {
           Mes plans
         </Link>
         <Link
-          href="/tarifs"
-          className="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-3 text-sm font-semibold text-amber-950 hover:bg-amber-100"
+          href="/create"
+          className="rounded-2xl border border-zinc-200 bg-white px-5 py-3 text-sm font-semibold text-zinc-900 hover:bg-zinc-50"
         >
-          Tarifs & Pro
+          Créer un plan
         </Link>
       </div>
     </main>

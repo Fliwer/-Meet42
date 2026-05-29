@@ -14,6 +14,11 @@ export type PlanCreator = {
   photo_url?: string | null;
 };
 
+export type PlanParticipantPreview = {
+  first_name: string;
+  photo_url: string | null;
+};
+
 export type PlanSummary = {
   id: string;
   activity: string;
@@ -28,6 +33,8 @@ export type PlanSummary = {
   is_joined: boolean;
   /** Indique si l’utilisateur courant est le créateur du plan. */
   is_creator: boolean;
+  /** Jusqu’à 4 visages pour les cartes (ordre stable côté serveur). */
+  participant_preview?: PlanParticipantPreview[];
 };
 
 export type CreatePlanPayload = {
