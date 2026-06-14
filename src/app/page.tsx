@@ -148,6 +148,27 @@ export default function Home() {
     return { plansToday, peopleToday, happeningNow };
   }, [plans]);
 
+  const featuredPlan = useMemo(() => {
+    const now = Date.now();
+    return (
+      [...plans]
+        .filter((p) => new Date(p.start_time).getTime() >= now)
+        .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())[0] ?? null
+    );
+  }, [plans]);
+
+  const heroFaces = useMemo(() => {
+    const faces: { first_name: string; photo_url: string | null }[] = [];
+    for (const p of plans) {
+      for (const f of p.participant_preview ?? []) {
+        if (faces.length >= 5) break;
+        faces.push(f);
+      }
+      if (faces.length >= 5) break;
+    }
+    return faces;
+  }, [plans]);
+
   const hasPlansToday = todayStats.plansToday > 0;
   const cityLabel = zoneSource === "gps" ? "Près de toi" : `En direct à ${FALLBACK_CITY.name}`;
   const isTonightActive =
@@ -155,7 +176,7 @@ export default function Home() {
 
   if (status === "authenticated" && profileStatus === "missing") {
     return (
-      <main className="min-h-screen bg-zinc-50">
+      <main className="min-h-screen bg-transparent">
         <div className="px-4 py-10">
           <ProfileSetup onDone={() => router.push("/")} />
         </div>
@@ -164,23 +185,23 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-50">
+    <main className="min-h-screen bg-transparent">
       <div className="max-w-7xl mx-auto px-4 pt-4 pb-28 md:pb-12">
         {/* Live strip — signaux réels */}
-        <div className="mb-3 flex flex-wrap items-center gap-2 rounded-2xl border border-emerald-200/80 bg-emerald-50/90 px-3 py-2 text-xs font-semibold text-emerald-950 shadow-sm">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 px-2 py-0.5 text-[11px] font-black uppercase tracking-wide text-white">
-            ● Live
+        <div className="mb-3 meet42-live">
+          <span className="meet42-live-badge">
+            <span className="meet42-live-pulse" aria-hidden /> Live
           </span>
           <span>{cityLabel}</span>
           {hasPlansToday ? (
             <>
-              <span className="text-emerald-700/80" aria-hidden>
+              <span className="meet42-live-sep" aria-hidden>
                 ·
               </span>
               <span>
                 {todayStats.plansToday} {todayStats.plansToday > 1 ? "plans" : "plan"} aujourd’hui
               </span>
-              <span className="text-emerald-700/80" aria-hidden>
+              <span className="meet42-live-sep" aria-hidden>
                 ·
               </span>
               <span>
@@ -189,7 +210,7 @@ export default function Home() {
             </>
           ) : (
             <>
-              <span className="text-emerald-700/80" aria-hidden>
+              <span className="meet42-live-sep" aria-hidden>
                 ·
               </span>
               <span>Sois le premier à lancer un plan aujourd’hui</span>
@@ -197,42 +218,87 @@ export default function Home() {
           )}
         </div>
 
-        <section className="relative overflow-hidden rounded-[1.75rem] border border-zinc-200 bg-gradient-to-br from-zinc-950 via-zinc-900 to-indigo-950 px-5 py-8 md:px-8 md:py-9 text-white shadow-xl">
-          <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-fuchsia-500/15 blur-3xl" />
-          <h1 className="relative text-4xl md:text-5xl font-black tracking-tight leading-[1.05]">
-            Rencontre du monde.
-            <br />
-            Fais quelque chose.
-          </h1>
-          <p className="relative mt-4 max-w-lg text-base md:text-lg text-zinc-200/95 leading-snug">
-            Activités en petit groupe près de toi (4–6 personnes)
-          </p>
+        <section className="meet42-hero meet42-hero--art px-5 py-14 sm:px-8 sm:py-20 md:px-12 md:py-28">
+          <div className="meet42-hero-scrim" aria-hidden />
+          <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
+            <div>
+              <span className="meet42-kicker">
+                <span className="meet42-kicker-dot" aria-hidden /> Bruxelles · rencontres IRL
+              </span>
 
-          {hasPlansToday ? (
-            <p className="relative mt-5 text-sm font-bold text-emerald-300 md:text-base">
-              {todayStats.plansToday} {todayStats.plansToday > 1 ? "plans près de toi" : "plan près de toi"} aujourd’hui · {todayStats.peopleToday} {todayStats.peopleToday > 1 ? "participants" : "participant"}
-            </p>
-          ) : (
-            <p className="relative mt-5 text-sm font-bold text-emerald-300 md:text-base">
-              Propose une sortie, les premiers arrivent en quelques minutes
-            </p>
-          )}
+              <h1 className="font-display mt-5 text-[3rem] leading-[0.94] sm:text-[3.6rem] md:text-[4.6rem] font-semibold tracking-[-0.02em] text-[color:var(--ink)]">
+                Rencontre
+                <br className="hidden sm:block" /> du monde.
+                <span className="block">
+                  <span className="meet42-underline">Fais quelque chose.</span>
+                </span>
+              </h1>
 
-          <div className="relative mt-6 flex flex-col gap-2 sm:flex-row sm:items-center">
-            <button
-              type="button"
-              onClick={() => document.getElementById("plans-feed")?.scrollIntoView({ behavior: "smooth", block: "start" })}
-              className="inline-flex w-full sm:w-auto items-center justify-center rounded-2xl bg-white px-8 py-3.5 text-base font-black text-zinc-900 shadow-lg hover:bg-zinc-100 active:scale-[0.99] transition min-h-[52px]"
-            >
-              Voir les plans près de moi
-            </button>
-            <button
-              type="button"
-              onClick={() => router.push("/create")}
-              className="inline-flex w-full sm:w-auto items-center justify-center rounded-2xl border border-white/20 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white/90 hover:bg-white/10 min-h-[44px] sm:ml-1"
-            >
-              Créer un plan
-            </button>
+              <p className="mt-6 max-w-md text-base sm:text-lg leading-snug text-[color:var(--ink-2)]">
+                Des sorties à 4–6 personnes près de toi — un café, un apéro, une balade. Tu rejoins, tu viens, tu rencontres. Pas de swipe.
+              </p>
+
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+                <button
+                  type="button"
+                  onClick={() => document.getElementById("plans-feed")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                  className="meet42-cta-primary w-full sm:w-auto"
+                >
+                  Voir les plans près de moi
+                </button>
+                <button
+                  type="button"
+                  onClick={() => router.push("/create")}
+                  className="meet42-cta-ghost w-full sm:w-auto"
+                >
+                  + Créer un plan
+                </button>
+              </div>
+
+              <div className="mt-8 flex items-center gap-3">
+                {heroFaces.length > 0 ? (
+                  <div className="flex -space-x-2" aria-hidden>
+                    {heroFaces.map((f, i) =>
+                      f.photo_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element -- URL photo externe utilisateur
+                        <img
+                          key={`${f.first_name}-${i}`}
+                          src={f.photo_url}
+                          alt=""
+                          width={32}
+                          height={32}
+                          className="meet42-avatar"
+                          loading="lazy"
+                          referrerPolicy="no-referrer"
+                        />
+                      ) : (
+                        <span key={`${f.first_name}-${i}`} className="meet42-avatar-fallback">
+                          {f.first_name.slice(0, 1).toUpperCase()}
+                        </span>
+                      )
+                    )}
+                  </div>
+                ) : null}
+                <p className="text-sm font-semibold text-[color:var(--ink-2)]">
+                  {hasPlansToday
+                    ? `${todayStats.peopleToday} participant·es · ${todayStats.plansToday} ${todayStats.plansToday > 1 ? "plans" : "plan"} aujourd’hui`
+                    : "Sois le premier à lancer un plan aujourd’hui."}
+                </p>
+              </div>
+            </div>
+
+            {featuredPlan ? (
+              <div className="hidden lg:block">
+                <span className="meet42-kicker mb-3">
+                  <span className="meet42-kicker-dot" aria-hidden /> À la une · le prochain plan
+                </span>
+                <EventCard
+                  plan={featuredPlan}
+                  onJoin={() => onJoinPlan(featuredPlan)}
+                  disabled={joiningId === featuredPlan.id}
+                />
+              </div>
+            ) : null}
           </div>
         </section>
 
@@ -242,7 +308,13 @@ export default function Home() {
           </div>
         ) : null}
 
-        <section id="plans-feed" className="mt-5 scroll-mt-20">
+        <section id="plans-feed" className="mt-10 scroll-mt-20">
+          <div className="mb-5 flex items-end gap-3">
+            <h2 className="meet42-section-title text-[1.8rem] sm:text-[2.2rem]">
+              {momentFilter === "today" ? "Aujourd’hui" : "Demain"}
+              <span className="text-[color:var(--fire)]"> à Bruxelles</span>
+            </h2>
+          </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
             <div className="flex flex-wrap gap-2" role="group" aria-label="Quand">
               {(
@@ -343,14 +415,23 @@ export default function Home() {
                   <EventCardEmpty onCreate={() => router.push(`/create?format=${QUICK_FORMATS[0]?.id ?? ""}`)} />
                 </div>
               ) : null}
-              {displayPlans.map((p) => (
-                <EventCard key={p.id} plan={p} onJoin={() => onJoinPlan(p)} disabled={joiningId === p.id} />
+              {displayPlans.map((p, idx) => (
+                <div
+                  key={p.id}
+                  className="meet42-rise"
+                  style={{ animationDelay: `${Math.min(idx, 8) * 55}ms` }}
+                >
+                  <EventCard plan={p} onJoin={() => onJoinPlan(p)} disabled={joiningId === p.id} />
+                </div>
               ))}
             </div>
           ) : null}
         </section>
 
-        <div className="mt-10 rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm">
+        <div className="mt-12">
+          <span className="meet42-kicker mb-3">
+            <span className="meet42-kicker-dot" aria-hidden /> Pourquoi c’est safe
+          </span>
           <TrustStrip />
         </div>
       </div>
@@ -360,7 +441,7 @@ export default function Home() {
           <button
             type="button"
             onClick={() => router.push("/create")}
-            className="w-full rounded-2xl bg-[#FF6B5B] px-4 py-3.5 text-sm font-black text-white shadow-xl shadow-[#FF6B5B]/30 active:scale-[0.99] transition"
+            className="w-full rounded-2xl bg-[color:var(--fire)] px-4 py-3.5 text-sm font-black text-[#fff5f1] shadow-xl shadow-[rgb(255_77_46_/_0.35)] active:scale-[0.99] transition"
           >
             Créer un plan
           </button>

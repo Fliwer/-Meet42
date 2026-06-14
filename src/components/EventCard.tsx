@@ -66,11 +66,9 @@ export default function EventCard({ plan, onJoin, disabled }: EventCardProps) {
 
   return (
     <article className="meet42-event-card group">
-      <div className="meet42-event-card-glow" aria-hidden />
-
       <Link
         href={`/plan/${plan.id}`}
-        className="relative block rounded-3xl p-4 sm:p-5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF6B5B]"
+        className="relative block rounded-3xl p-4 sm:p-5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff4d2e]"
       >
         <div className="flex items-start gap-3">
           <span className="meet42-event-emoji" aria-hidden>
@@ -97,27 +95,23 @@ export default function EventCard({ plan, onJoin, disabled }: EventCardProps) {
                     alt=""
                     width={32}
                     height={32}
-                    className="h-8 w-8 rounded-full border-2 border-[#1a1035] object-cover"
+                    className="meet42-avatar"
                     loading="lazy"
                     referrerPolicy="no-referrer"
                   />
                 ) : (
-                  <span
-                    key={`${p.first_name}-${idx}`}
-                    className="grid h-8 w-8 place-items-center rounded-full border-2 border-[#1a1035] bg-[#F5F0EB] text-xs font-semibold text-[#1a1035]"
-                    title={p.first_name}
-                  >
+                  <span key={`${p.first_name}-${idx}`} className="meet42-avatar-fallback" title={p.first_name}>
                     {initials(p.first_name)}
                   </span>
                 )
               )}
               {preview.length === 0 ? (
-                <span className="rounded-full border border-dashed border-[#F5F0EB66] px-2 py-1 text-xs text-[#F5F0EBB3]">
+                <span className="rounded-full border border-dashed border-[color:var(--line-2)] px-2 py-1 text-xs text-[color:var(--ink-3)]">
                   Sois le premier
                 </span>
               ) : null}
             </div>
-            <span className="text-xs font-medium text-[#F5F0EBCC]">
+            <span className="text-xs font-semibold text-[color:var(--ink-2)]">
               {plan.participants_count}/{plan.max_participants}
             </span>
           </div>
@@ -147,14 +141,14 @@ export function EventCardLoading() {
   return (
     <div className="meet42-event-card animate-pulse p-4 sm:p-5" aria-hidden>
       <div className="flex items-start gap-3">
-        <div className="h-14 w-14 rounded-2xl bg-[#F5F0EB26]" />
+        <div className="h-14 w-14 rounded-2xl bg-[color:var(--cream-3)]" />
         <div className="flex-1 space-y-2">
-          <div className="h-3 w-24 rounded bg-[#F5F0EB26]" />
-          <div className="h-5 w-2/3 rounded bg-[#F5F0EB26]" />
-          <div className="h-4 w-full rounded bg-[#F5F0EB1A]" />
+          <div className="h-3 w-24 rounded bg-[color:var(--cream-3)]" />
+          <div className="h-5 w-2/3 rounded bg-[color:var(--cream-3)]" />
+          <div className="h-4 w-full rounded bg-[color:var(--cream-3)]" />
         </div>
       </div>
-      <div className="mt-6 h-12 rounded-2xl bg-[#FF6B5B80]" />
+      <div className="mt-6 h-12 rounded-2xl bg-[rgb(255_77_46_/_0.35)]" />
     </div>
   );
 }
@@ -171,11 +165,11 @@ export function EventCardEmpty({
   onCreate: () => void;
 }) {
   return (
-    <section className="meet42-event-card p-5 sm:p-6 text-center">
+    <section className="meet42-event-card p-6 sm:p-8 text-center">
       <p className="meet42-event-vibe">Meet42 te propose plus</p>
       <h3 className="meet42-event-title">{title}</h3>
-      <p className="mt-2 text-sm text-[#F5F0EBCC]">{description}</p>
-      <button type="button" onClick={onCreate} className="meet42-join-btn mt-5">
+      <p className="mt-2 text-sm text-[color:var(--ink-2)]">{description}</p>
+      <button type="button" onClick={onCreate} className="meet42-join-btn mt-5 sm:w-auto sm:px-8">
         {ctaLabel}
       </button>
     </section>

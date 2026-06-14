@@ -53,7 +53,7 @@ function LoginPageInner() {
         if (!firstName.trim()) throw new Error("Prénom requis");
         if (!Number.isFinite(age) || age < 18 || age > 99) throw new Error("Âge invalide");
         const urls = photoUrls.map((u) => u.trim()).filter(Boolean);
-        if (urls.length < 3) throw new Error("Ajoute au moins 3 photos");
+        if (urls.length < 1) throw new Error("Ajoute au moins 1 photo");
         const parsedPhotos = profilePhotoUrlsSchema.safeParse(urls);
         if (!parsedPhotos.success) throw new Error("Une ou plusieurs photos sont invalides");
         const bio = signupBio.trim();
@@ -233,10 +233,10 @@ function LoginPageInner() {
                 />
               </label>
               <div className="flex flex-col gap-4 rounded-2xl border border-zinc-200 bg-zinc-50/50 p-4">
-                <p className="text-sm font-semibold text-zinc-900">3 photos minimum</p>
+                <p className="text-sm font-semibold text-zinc-900">1 photo minimum</p>
                 <ProfilePhotoField label="Photo 1 *" value={photoUrls[0]} onChange={(u) => patchSignupPhoto(0, u)} />
-                <ProfilePhotoField label="Photo 2 *" value={photoUrls[1]} onChange={(u) => patchSignupPhoto(1, u)} />
-                <ProfilePhotoField label="Photo 3 *" value={photoUrls[2]} onChange={(u) => patchSignupPhoto(2, u)} />
+                <ProfilePhotoField label="Photo 2 (optionnelle)" value={photoUrls[1]} onChange={(u) => patchSignupPhoto(1, u)} />
+                <ProfilePhotoField label="Photo 3 (optionnelle)" value={photoUrls[2]} onChange={(u) => patchSignupPhoto(2, u)} />
               </div>
               <label className="flex flex-col gap-1">
                 <span className="text-sm font-medium text-zinc-900">À propos de toi</span>

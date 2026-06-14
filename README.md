@@ -1,68 +1,58 @@
 # Meet42
 
-Application Next.js pour organiser des activités IRL en petits groupes (4 à 6), avec géolocalisation, création de plans rapides, OAuth social et logique d'annulation 24 h.
+> Connecter 4 à 6 inconnus autour d'une activité réelle en ville.
+
+**[🚀 Demo live](https://meet42-phi.vercel.app)**
+
+---
+
+## Le problème
+
+Les apps sociales sont pensées pour scroller, pas pour se rencontrer. Résultat : des milliers de connexions, zéro vraie rencontre. Meet42 renverse cette logique — pas de matching infini, pas de chat sans fin. Juste un plan, une date, un groupe de 4 à 6 personnes.
+
+## Comment ça marche
+
+1. Tu proposes ou rejoins une activité IRL (escalade, resto, balade, etc.)
+2. Le groupe se forme automatiquement à 4 participants
+3. Si le groupe n'est pas complet 24h avant, le plan est annulé — pas de no-show, pas de faux espoirs
+4. Tout le monde se retrouve au même endroit, au même moment
+
+## Features
+
+- 🗺️ Géolocalisation pour découvrir les activités proches
+- 👥 Groupes fixes de 4 à 6 personnes
+- ⏱️ Logique d'annulation automatique à 24h
+- 🔐 Auth sociale Google & Facebook (OAuth via Supabase)
+- 📱 UI responsive, pensée mobile-first
+
+## Stack technique
+
+| Côté | Techno |
+|------|--------|
+| Frontend | Next.js 14, TypeScript, Tailwind CSS |
+| Backend | Supabase (PostgreSQL, Auth, Realtime) |
+| Auth | OAuth Google + Facebook |
+| Deploy | Vercel |
 
 ## Lancer en local
 
 ```bash
+git clone https://github.com/Fliwer/-Meet42
+cd -Meet42
 npm install
 npm run dev
 ```
 
-Ouvre `http://localhost:3000`.
+Ouvre [http://localhost:3000](http://localhost:3000).
 
-## Variables d'environnement
+Crée un fichier `.env.local` à partir de `.env.example` et configure tes clés Supabase.
 
-Créer un fichier `.env.local` :
+Sans Supabase configuré, l'app tourne en mode mock avec des données locales.
 
-```env
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
-NEXT_PUBLIC_CONTACT_EMAIL=
-```
+## Contexte
 
-Sans Supabase configuré, l'application tourne en mode mock (données locales).
+Meet42 est mon projet de fin d'études dans le cadre de ma formation fullstack JavaScript chez [DigitalCity Bruxelles](https://digitalcity.brussels). L'idée est née d'un constat simple : après un an de van life en Nouvelle-Zélande, les meilleures rencontres se font toujours autour d'une activité concrète, jamais derrière un écran.
 
-## OAuth Google + Facebook (Supabase)
+---
 
-1. Dans Supabase > Authentication > Providers :
-   - activer `Google`
-   - activer `Facebook`
-2. Ajouter dans chaque provider :
-   - `Site URL` : `http://localhost:3000` (dev) puis ton domaine prod
-   - `Redirect URL` :
-     - `https://<PROJECT_REF>.supabase.co/auth/v1/callback`
-3. Configurer les `Client ID / Secret` Google et Facebook dans Supabase.
-4. Dans Google/Facebook console, ajouter les URI de redirection autorisées ci-dessus.
-
-Ensuite les boutons `Continuer avec Google` et `Continuer avec Facebook` de la page login fonctionnent en un clic.
-
-## Schéma Supabase
-
-Le fichier `supabase/schema.sql` contient le schéma de base.
-
-Si la table `plans` existe déjà en version 2-4, exécuter :
-
-```sql
-alter table public.plans
-drop constraint if exists plans_max_participants_check;
-
-alter table public.plans
-add constraint plans_max_participants_check
-check (max_participants >= 4 and max_participants <= 6);
-```
-
-## Mise en ligne GitHub
-
-Après création du repo GitHub (ex: `Meet42`) :
-
-```bash
-git init
-git add .
-git commit -m "feat: social auth + pro UI + venue availability"
-git branch -M main
-git remote add origin https://github.com/<ton-user>/Meet42.git
-git push -u origin main
-```
-
+Construit par [Polo](https://github.com/Fliwer) · Bruxelles, 2026

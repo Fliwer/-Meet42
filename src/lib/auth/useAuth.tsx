@@ -90,7 +90,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         Number.isFinite(p.age) &&
         p.age >= 18 &&
         p.age <= 99 &&
-        photoCount >= 3 &&
+        photoCount >= 1 &&
         bioOk
     );
   }

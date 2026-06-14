@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Fraunces } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth/useAuth";
 import AppShell from "@/components/AppShell";
@@ -12,6 +12,14 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+// Display éditoriale — serif à fort caractère (titres, hero, cartes)
+const fraunces = Fraunces({
+  variable: "--font-display",
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  axes: ["opsz", "SOFT"],
 });
 
 export const metadata: Metadata = {
@@ -73,7 +81,8 @@ export default function RootLayout({
   return (
     <html
       lang="fr"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      data-scroll-behavior="smooth"
+      className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />

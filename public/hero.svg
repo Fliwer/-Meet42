@@ -1,0 +1,117 @@
+<svg viewBox="0 0 1600 1000" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Un groupe d'amis au coucher de soleil, les bras levés">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f7ecd9"/>
+      <stop offset="0.34" stop-color="#ffd9a8"/>
+      <stop offset="0.62" stop-color="#ffb079"/>
+      <stop offset="0.82" stop-color="#ff8a5c"/>
+      <stop offset="1" stop-color="#f4683f"/>
+    </linearGradient>
+    <radialGradient id="sunGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#fff5da" stop-opacity="0.95"/>
+      <stop offset="0.32" stop-color="#ffe2ad" stop-opacity="0.7"/>
+      <stop offset="0.7" stop-color="#ffbf86" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#ffbf86" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="hillBack" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e58a55"/>
+      <stop offset="1" stop-color="#cf6f3f"/>
+    </linearGradient>
+    <linearGradient id="hillMid" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a8542f"/>
+      <stop offset="1" stop-color="#7e3c21"/>
+    </linearGradient>
+    <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2c1a10"/>
+      <stop offset="1" stop-color="#1a0f08"/>
+    </linearGradient>
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" result="n"/>
+      <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.5 0"/>
+    </filter>
+    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="9"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="1000" fill="url(#sky)"/>
+
+  <!-- Soleil + halo -->
+  <circle cx="1040" cy="595" r="430" fill="url(#sunGlow)"/>
+  <circle cx="1040" cy="600" r="128" fill="#ffe9bc" opacity="0.55" filter="url(#soft)"/>
+  <circle cx="1040" cy="602" r="66" fill="#fff6e2" opacity="0.96"/>
+
+  <!-- Bandes de brume chaudes -->
+  <ellipse cx="800" cy="648" rx="900" ry="16" fill="#fff1d6" opacity="0.35"/>
+  <ellipse cx="1040" cy="690" rx="760" ry="13" fill="#ffe6c2" opacity="0.3"/>
+
+  <!-- Oiseaux -->
+  <g stroke="#5a2f1a" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.65">
+    <path d="M430 250 q14 -12 28 0 q14 -12 28 0"/>
+    <path d="M520 300 q10 -9 20 0 q10 -9 20 0"/>
+    <path d="M360 330 q9 -8 18 0 q9 -8 18 0"/>
+  </g>
+
+  <!-- Collines -->
+  <path d="M0 672 C 280 636, 560 654, 840 640 C 1120 626, 1360 660, 1600 642 L1600 1000 L0 1000 Z" fill="url(#hillBack)" opacity="0.92"/>
+  <path d="M0 718 C 320 690, 600 712, 900 700 C 1180 689, 1380 716, 1600 702 L1600 1000 L0 1000 Z" fill="url(#hillMid)"/>
+  <!-- Crête rétroéclairée -->
+  <path d="M0 740 C 360 716, 640 736, 940 726 C 1200 717, 1400 740, 1600 728" fill="none" stroke="#ffb277" stroke-width="2.5" opacity="0.7"/>
+  <path d="M0 742 C 360 718, 640 738, 940 728 C 1200 719, 1400 742, 1600 730 L1600 1000 L0 1000 Z" fill="url(#ground)"/>
+
+  <!-- Groupe de 6 silhouettes (rétroéclairées par le soleil) -->
+  <g fill="#160f08" stroke="#160f08" stroke-linecap="round" stroke-linejoin="round">
+    <!-- F1 — bras en V -->
+    <g transform="translate(742 731) scale(1.02)">
+      <path d="M-13 0 L-8 -58 L-2 -64 L2 -64 L8 -58 L13 0 L5 0 L0 -56 L-5 0 Z"/>
+      <line x1="0" y1="-60" x2="0" y2="-116" stroke-width="19"/>
+      <circle cx="0" cy="-133" r="13"/>
+      <path d="M0 -110 L-26 -150 M0 -110 L26 -150" fill="none" stroke-width="9"/>
+    </g>
+    <!-- F2 — un bras levé (peace), l'autre détendu -->
+    <g transform="translate(862 735) scale(1.12)">
+      <path d="M-13 0 L-8 -58 L-2 -64 L2 -64 L8 -58 L13 0 L5 0 L0 -56 L-5 0 Z"/>
+      <line x1="0" y1="-60" x2="0" y2="-116" stroke-width="19"/>
+      <circle cx="0" cy="-133" r="13"/>
+      <path d="M0 -110 L-19 -158 M0 -108 L15 -80" fill="none" stroke-width="9"/>
+    </g>
+    <!-- F3 — bras grand ouverts -->
+    <g transform="translate(985 729) scale(1.06)">
+      <path d="M-13 0 L-8 -58 L-2 -64 L2 -64 L8 -58 L13 0 L5 0 L0 -56 L-5 0 Z"/>
+      <line x1="0" y1="-60" x2="0" y2="-116" stroke-width="19"/>
+      <circle cx="0" cy="-133" r="13"/>
+      <path d="M0 -112 L-34 -122 M0 -112 L34 -120" fill="none" stroke-width="9"/>
+    </g>
+    <!-- F4 — un bras qui salue, main sur la hanche -->
+    <g transform="translate(1108 733) scale(1.1)">
+      <path d="M-13 0 L-8 -58 L-2 -64 L2 -64 L8 -58 L13 0 L5 0 L0 -56 L-5 0 Z"/>
+      <line x1="0" y1="-60" x2="0" y2="-116" stroke-width="19"/>
+      <circle cx="0" cy="-133" r="13"/>
+      <path d="M0 -110 L25 -152 M0 -104 L-15 -90 L-17 -78" fill="none" stroke-width="9"/>
+    </g>
+    <!-- F5 — bras en V serré -->
+    <g transform="translate(1225 731) scale(1.0)">
+      <path d="M-13 0 L-8 -58 L-2 -64 L2 -64 L8 -58 L13 0 L5 0 L0 -56 L-5 0 Z"/>
+      <line x1="0" y1="-60" x2="0" y2="-116" stroke-width="19"/>
+      <circle cx="0" cy="-133" r="13"/>
+      <path d="M0 -110 L-21 -152 M0 -110 L20 -150" fill="none" stroke-width="9"/>
+    </g>
+    <!-- F6 — bras levés en élan -->
+    <g transform="translate(1332 735) scale(0.96)">
+      <path d="M-13 0 L-8 -58 L-2 -64 L2 -64 L8 -58 L13 0 L5 0 L0 -56 L-5 0 Z"/>
+      <line x1="0" y1="-60" x2="0" y2="-116" stroke-width="19"/>
+      <circle cx="0" cy="-133" r="13"/>
+      <path d="M0 -110 L-16 -158 M0 -110 L19 -150" fill="none" stroke-width="9"/>
+    </g>
+  </g>
+
+  <!-- Herbes au premier plan -->
+  <g stroke="#120b06" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.9">
+    <path d="M120 1000 C 116 940, 130 912, 124 880"/>
+    <path d="M140 1000 C 150 950, 142 918, 152 892"/>
+    <path d="M1500 1000 C 1494 944, 1508 916, 1500 884"/>
+    <path d="M1520 1000 C 1530 952, 1520 920, 1532 896"/>
+  </g>
+
+  <rect width="1600" height="1000" filter="url(#grain)" opacity="0.05"/>
+</svg>

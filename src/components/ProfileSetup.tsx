@@ -63,7 +63,7 @@ export default function ProfileSetup({
       if (trimmedBio.length > BIO_MAX) throw new Error(`Bio trop longue (max ${BIO_MAX} caractères)`);
 
       const urls = photoUrls.map((u) => u.trim()).filter(Boolean);
-      if (urls.length < 3) throw new Error("Ajoute au moins 3 photos différentes");
+      if (urls.length < 1) throw new Error("Ajoute au moins 1 photo");
       const parsed = profilePhotoUrlsSchema.safeParse(urls);
       if (!parsed.success) throw new Error("Une ou plusieurs photos sont invalides");
 
@@ -93,7 +93,7 @@ export default function ProfileSetup({
       <p className="mt-1 text-zinc-600">
         {isEdit
           ? "Mets à jour les infos affichées sur tes plans."
-          : "Trois photos + quelques mots : les gens voient qui tu es avant de venir."}
+          : "Une photo et quelques mots suffisent pour démarrer — tu pourras compléter plus tard."}
       </p>
 
       <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-4">
@@ -121,10 +121,12 @@ export default function ProfileSetup({
         </label>
 
         <div className="flex flex-col gap-5 rounded-2xl border border-zinc-200 bg-zinc-50/50 p-4">
-          <p className="text-sm font-semibold text-zinc-900">3 photos minimum *</p>
+          <p className="text-sm font-semibold text-zinc-900">
+            1 photo minimum <span className="font-normal text-zinc-500">— ajoutes-en plus si tu veux (jusqu&apos;à 6)</span>
+          </p>
           <ProfilePhotoField label="Photo 1 *" value={photoUrls[0]} onChange={(u) => setPhotoAt(0, u)} />
-          <ProfilePhotoField label="Photo 2 *" value={photoUrls[1]} onChange={(u) => setPhotoAt(1, u)} />
-          <ProfilePhotoField label="Photo 3 *" value={photoUrls[2]} onChange={(u) => setPhotoAt(2, u)} />
+          <ProfilePhotoField label="Photo 2 (optionnelle)" value={photoUrls[1]} onChange={(u) => setPhotoAt(1, u)} />
+          <ProfilePhotoField label="Photo 3 (optionnelle)" value={photoUrls[2]} onChange={(u) => setPhotoAt(2, u)} />
         </div>
 
         <label className="flex flex-col gap-1">

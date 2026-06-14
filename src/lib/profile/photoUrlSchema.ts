@@ -19,8 +19,8 @@ export const profilePhotoUrlSchema = z
     { message: "URL de photo invalide" }
   );
 
-/** Profil : au moins 3 photos, au plus 6. */
+/** Profil : au moins 1 photo, au plus 6. */
 export const profilePhotoUrlsSchema = z
   .array(profilePhotoUrlSchema)
-  .min(3, "Ajoute au moins 3 photos")
+  .min(1, "Ajoute au moins 1 photo")
   .max(6, "Maximum 6 photos");
