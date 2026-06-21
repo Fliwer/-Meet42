@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { PlanSummary } from "@/lib/plans/planTypes";
 import { ACTIVITIES } from "@/lib/plans/activities";
+import Avatar from "@/components/Avatar";
 
 const ACTIVITY_VIBES: Record<string, string> = {
   coffee: "Cozy & chill",
@@ -40,10 +41,6 @@ function formatWhen(iso: string) {
         : new Intl.DateTimeFormat("fr-BE", { weekday: "short", day: "numeric", month: "short" }).format(date);
   const hour = new Intl.DateTimeFormat("fr-BE", { hour: "2-digit", minute: "2-digit" }).format(date);
   return `${dayLabel} · ${hour}`;
-}
-
-function initials(firstName: string) {
-  return firstName.slice(0, 1).toUpperCase() || "?";
 }
 
 function spotsLabel(spotsLeft: number) {
@@ -86,25 +83,15 @@ export default function EventCard({ plan, onJoin, disabled }: EventCardProps) {
         <div className="mt-4 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <div className="flex -space-x-2" aria-label="Participants">
-              {preview.slice(0, 4).map((p, idx) =>
-                p.photo_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element -- URL photo externe utilisateur
-                  <img
-                    key={`${p.first_name}-${idx}`}
-                    src={p.photo_url}
-                    alt=""
-                    width={32}
-                    height={32}
-                    className="meet42-avatar"
-                    loading="lazy"
-                    referrerPolicy="no-referrer"
-                  />
-                ) : (
-                  <span key={`${p.first_name}-${idx}`} className="meet42-avatar-fallback" title={p.first_name}>
-                    {initials(p.first_name)}
-                  </span>
-                )
-              )}
+              {preview.slice(0, 4).map((p, idx) => (
+                <Avatar
+                  key={`${p.first_name}-${idx}`}
+                  src={p.photo_url}
+                  name={p.first_name}
+                  className="meet42-avatar"
+                  fallbackClassName="meet42-avatar-fallback"
+                />
+              ))}
               {preview.length === 0 ? (
                 <span className="rounded-full border border-dashed border-[color:var(--line-2)] px-2 py-1 text-xs text-[color:var(--ink-3)]">
                   Sois le premier

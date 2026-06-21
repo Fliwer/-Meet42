@@ -296,8 +296,8 @@ export default function CreatePage() {
 
   if (status === "loading") {
     return (
-      <main className="min-h-screen bg-zinc-50 px-4 py-8">
-        <div className="max-w-2xl mx-auto rounded-2xl border border-zinc-200 bg-white p-4 text-sm text-zinc-600">
+      <main className="min-h-screen bg-[color:var(--cream-3)]/50 px-4 py-8">
+        <div className="max-w-2xl mx-auto rounded-2xl border border-[color:var(--line-2)] bg-[color:var(--cream-2)] p-4 text-sm text-[color:var(--ink-2)]">
           Chargement...
         </div>
       </main>
@@ -305,39 +305,39 @@ export default function CreatePage() {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-50 px-4">
+    <main className="min-h-screen bg-[color:var(--cream-3)]/50 px-4">
       <div className="max-w-3xl mx-auto py-6 md:py-9">
-        <div className="rounded-3xl border border-zinc-200/80 bg-white px-5 py-5 shadow-sm">
-          <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Création rapide</div>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight text-zinc-900">Choisis ton prochain moment</h1>
-          <p className="mt-2 text-sm text-zinc-600">Prends un format standard ou personnalise, puis publie en moins d’une minute.</p>
+        <div className="rounded-3xl border border-[color:var(--line-2)]/80 bg-[color:var(--cream-2)] px-5 py-5 shadow-sm">
+          <div className="text-xs font-semibold uppercase tracking-wide text-[color:var(--ink-3)]">Création rapide</div>
+          <h1 className="mt-2 text-3xl font-bold tracking-tight text-[color:var(--ink)]">Choisis ton prochain moment</h1>
+          <p className="mt-2 text-sm text-[color:var(--ink-2)]">Prends un format standard ou personnalise, puis publie en moins d’une minute.</p>
           <div className="mt-4 flex items-center gap-2">
             {[1, 2].map((n) => (
               <div
                 key={n}
                 className={
                   step === n
-                    ? "grid h-7 w-7 place-items-center rounded-full bg-zinc-900 text-xs font-semibold text-white"
+                    ? "grid h-7 w-7 place-items-center rounded-full bg-[color:var(--espresso)] text-xs font-semibold text-[color:var(--cream)]"
                     : step > n
                       ? "grid h-7 w-7 place-items-center rounded-full bg-emerald-100 text-xs font-semibold text-emerald-800"
-                      : "grid h-7 w-7 place-items-center rounded-full bg-zinc-100 text-xs font-semibold text-zinc-500"
+                      : "grid h-7 w-7 place-items-center rounded-full bg-[color:var(--cream-3)] text-xs font-semibold text-[color:var(--ink-3)]"
                 }
               >
                 {n}
               </div>
             ))}
-            <div className="ml-2 text-xs font-medium text-zinc-500">
+            <div className="ml-2 text-xs font-medium text-[color:var(--ink-3)]">
               {step === 1 ? "Activité" : "Quand & où — publier"}
             </div>
           </div>
         </div>
 
-        <div className="mt-4 rounded-2xl border border-zinc-200 bg-white p-4">
+        <div className="mt-4 rounded-2xl border border-[color:var(--line-2)] bg-[color:var(--cream-2)] p-4">
           {error ? <div className="mb-3 text-sm text-red-600">{error}</div> : null}
 
           {step === 1 ? (
             <>
-              <div className="text-sm font-semibold text-zinc-900">Étape 1: choisis une activité</div>
+              <div className="text-sm font-semibold text-[color:var(--ink)]">Étape 1: choisis une activité</div>
               {firstExperienceMode ? (
                 <div className="mt-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-900">
                   Safe mode premier event: activités publiques et neutres pour maximiser une première expérience réussie.
@@ -349,11 +349,11 @@ export default function CreatePage() {
                     key={f.id}
                     type="button"
                     onClick={() => applyQuickFormat(f.id)}
-                    className="rounded-2xl border border-zinc-200 bg-zinc-50 p-3 text-left hover:bg-zinc-100"
+                    className="rounded-2xl border border-[color:var(--line-2)] bg-[color:var(--cream-3)]/50 p-3 text-left hover:bg-[color:var(--cream-3)]"
                   >
-                    <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Format standard</div>
-                    <div className="mt-1 text-sm font-semibold text-zinc-900">{f.title}</div>
-                    <div className="mt-0.5 text-xs text-zinc-600">{f.subtitle}</div>
+                    <div className="text-xs font-semibold uppercase tracking-wide text-[color:var(--ink-3)]">Format standard</div>
+                    <div className="mt-1 text-sm font-semibold text-[color:var(--ink)]">{f.title}</div>
+                    <div className="mt-0.5 text-xs text-[color:var(--ink-2)]">{f.subtitle}</div>
                   </button>
                 ))}
               </div>
@@ -367,8 +367,8 @@ export default function CreatePage() {
                         onClick={() => setActivity(a.id)}
                         className={
                           activity === a.id
-                            ? "rounded-xl bg-zinc-900 px-3 py-2 text-sm font-semibold text-white"
-                            : "rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm font-semibold text-zinc-800"
+                            ? "rounded-xl bg-[color:var(--espresso)] px-3 py-2 text-sm font-semibold text-[color:var(--cream)]"
+                            : "rounded-xl border border-[color:var(--line-2)] bg-[color:var(--cream-2)] px-3 py-2 text-sm font-semibold text-[color:var(--ink)]"
                         }
                       >
                         {a.emoji} {a.label}
@@ -382,7 +382,7 @@ export default function CreatePage() {
               <div className="mt-4 flex gap-3">
                 <button
                   type="button"
-                  className="rounded-2xl bg-zinc-900 px-5 py-3 text-white font-semibold hover:bg-zinc-800 active:bg-zinc-950 flex-1"
+                  className="rounded-2xl bg-[color:var(--espresso)] px-5 py-3 text-[color:var(--cream)] font-semibold hover:opacity-90 active:opacity-95 flex-1"
                   onClick={() => setStep(2)}
                 >
                   Continuer
@@ -393,15 +393,15 @@ export default function CreatePage() {
 
           {step === 2 ? (
             <>
-              <div className="text-sm font-semibold text-zinc-900">Étape 2: heure & lieu</div>
+              <div className="text-sm font-semibold text-[color:var(--ink)]">Étape 2: heure & lieu</div>
 
-              <div className="mt-4 rounded-2xl bg-zinc-50 border border-zinc-200 p-3">
+              <div className="mt-4 rounded-2xl bg-[color:var(--cream-3)]/50 border border-[color:var(--line-2)] p-3">
                 <div className="flex items-center justify-between">
-                  <div className="text-sm font-semibold text-zinc-900">Heure</div>
-                  <div className="text-xs text-zinc-500">{selectedMeta?.emoji} {selectedMeta?.label}</div>
+                  <div className="text-sm font-semibold text-[color:var(--ink)]">Heure</div>
+                  <div className="text-xs text-[color:var(--ink-3)]">{selectedMeta?.emoji} {selectedMeta?.label}</div>
                 </div>
 
-                <div className="mt-2 text-xs text-zinc-600">Créneaux denses recommandés (mer/ven/dim à 19h)</div>
+                <div className="mt-2 text-xs text-[color:var(--ink-2)]">Créneaux denses recommandés (mer/ven/dim à 19h)</div>
                 <div className="mt-2 grid gap-2 sm:grid-cols-2">
                   {denseSlots.map((slot) => {
                     const value = toDatetimeLocalValue(slot);
@@ -416,8 +416,8 @@ export default function CreatePage() {
                         }}
                         className={
                           selected
-                            ? "rounded-xl bg-zinc-900 px-3 py-2 text-left text-sm font-semibold text-white"
-                            : "rounded-xl border border-zinc-200 bg-white px-3 py-2 text-left text-sm font-semibold text-zinc-800"
+                            ? "rounded-xl bg-[color:var(--espresso)] px-3 py-2 text-left text-sm font-semibold text-[color:var(--cream)]"
+                            : "rounded-xl border border-[color:var(--line-2)] bg-[color:var(--cream-2)] px-3 py-2 text-left text-sm font-semibold text-[color:var(--ink)]"
                         }
                       >
                         {slot.toLocaleDateString("fr-BE", { weekday: "short", day: "2-digit", month: "2-digit" })} ·{" "}
@@ -434,8 +434,8 @@ export default function CreatePage() {
                         type="button"
                         className={
                           useNow
-                            ? "flex-1 rounded-xl bg-zinc-900 text-white py-2 text-sm font-semibold"
-                            : "flex-1 rounded-xl bg-white text-zinc-900 py-2 text-sm font-semibold border border-zinc-200"
+                            ? "flex-1 rounded-xl bg-[color:var(--espresso)] text-[color:var(--cream)] py-2 text-sm font-semibold"
+                            : "flex-1 rounded-xl bg-[color:var(--cream-2)] text-[color:var(--ink)] py-2 text-sm font-semibold border border-[color:var(--line-2)]"
                         }
                         onClick={() => setUseNow(true)}
                       >
@@ -445,8 +445,8 @@ export default function CreatePage() {
                         type="button"
                         className={
                           !useNow
-                            ? "flex-1 rounded-xl bg-zinc-900 text-white py-2 text-sm font-semibold"
-                            : "flex-1 rounded-xl bg-white text-zinc-900 py-2 text-sm font-semibold border border-zinc-200"
+                            ? "flex-1 rounded-xl bg-[color:var(--espresso)] text-[color:var(--cream)] py-2 text-sm font-semibold"
+                            : "flex-1 rounded-xl bg-[color:var(--cream-2)] text-[color:var(--ink)] py-2 text-sm font-semibold border border-[color:var(--line-2)]"
                         }
                         onClick={() => setUseNow(false)}
                       >
@@ -455,10 +455,10 @@ export default function CreatePage() {
                     </div>
                     {!useNow ? (
                       <label className="mt-3 flex flex-col gap-1">
-                        <span className="text-sm font-medium text-zinc-900">Date & heure</span>
+                        <span className="text-sm font-medium text-[color:var(--ink)]">Date & heure</span>
                         <input
                           type="datetime-local"
-                          className="rounded-xl border border-zinc-200 px-3 py-2"
+                          className="rounded-xl border border-[color:var(--line-2)] px-3 py-2"
                           value={datetimeLocal}
                           onChange={(e) => setDatetimeLocal(e.target.value)}
                         />
@@ -470,10 +470,10 @@ export default function CreatePage() {
 
               <div className="mt-4">
                 <label className="flex flex-col gap-2">
-                  <span className="text-sm font-semibold text-zinc-900">Lieu du rendez-vous</span>
-                  <span className="text-xs text-zinc-600">Écris une adresse ou un repère, ou choisis une suggestion ci-dessous.</span>
+                  <span className="text-sm font-semibold text-[color:var(--ink)]">Lieu du rendez-vous</span>
+                  <span className="text-xs text-[color:var(--ink-2)]">Écris une adresse ou un repère, ou choisis une suggestion ci-dessous.</span>
                   <input
-                    className="rounded-xl border-2 border-zinc-200 bg-white px-4 py-3 text-base text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none"
+                    className="rounded-xl border-2 border-[color:var(--line-2)] bg-[color:var(--cream-2)] px-4 py-3 text-base text-[color:var(--ink)] placeholder:text-[color:var(--ink-3)] focus:border-zinc-900 focus:outline-none"
                     value={locationText}
                     onChange={(e) => setLocationText(e.target.value)}
                     placeholder="Ex : Café Belga, Place Flagey, 1050 Ixelles"
@@ -481,8 +481,8 @@ export default function CreatePage() {
                 </label>
 
                 {venueBased ? (
-                  <div className="mt-3 rounded-2xl border border-zinc-200 bg-zinc-50 p-3">
-                    <div className="text-xs font-semibold text-zinc-700">Disponibilités partenaires par commune</div>
+                  <div className="mt-3 rounded-2xl border border-[color:var(--line-2)] bg-[color:var(--cream-3)]/50 p-3">
+                    <div className="text-xs font-semibold text-[color:var(--ink-2)]">Disponibilités partenaires par commune</div>
                     <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
                       {COMMUNES.map((c) => (
                         <button
@@ -491,27 +491,27 @@ export default function CreatePage() {
                           onClick={() => setSelectedCommune(c.id)}
                           className={
                             selectedCommune === c.id
-                              ? "shrink-0 rounded-full bg-zinc-900 px-3 py-1 text-xs font-semibold text-white"
-                              : "shrink-0 rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-semibold text-zinc-700"
+                              ? "shrink-0 rounded-full bg-[color:var(--espresso)] px-3 py-1 text-xs font-semibold text-[color:var(--cream)]"
+                              : "shrink-0 rounded-full border border-[color:var(--line-2)] bg-[color:var(--cream-2)] px-3 py-1 text-xs font-semibold text-[color:var(--ink-2)]"
                           }
                         >
                           {c.label}
                         </button>
                       ))}
                     </div>
-                    {venueBusy ? <div className="mt-3 text-xs text-zinc-500">Chargement des créneaux…</div> : null}
+                    {venueBusy ? <div className="mt-3 text-xs text-[color:var(--ink-3)]">Chargement des créneaux…</div> : null}
                     {venueError ? <div className="mt-3 text-xs text-red-600">{venueError}</div> : null}
                     {!venueBusy && !venueError ? (
                       <div className="mt-3 space-y-2">
                         {slotsByVenue.length === 0 ? (
-                          <div className="text-xs text-zinc-500">
+                          <div className="text-xs text-[color:var(--ink-3)]">
                             Aucun créneau trouvé pour cette commune. Essaie une autre commune.
                           </div>
                         ) : null}
                         {slotsByVenue.map((group) => (
-                          <div key={group.venueName} className="rounded-xl border border-zinc-200 bg-white p-2.5">
-                            <div className="text-xs font-semibold text-zinc-800">{group.venueName}</div>
-                            <div className="text-[11px] text-zinc-500">{group.locationText}</div>
+                          <div key={group.venueName} className="rounded-xl border border-[color:var(--line-2)] bg-[color:var(--cream-2)] p-2.5">
+                            <div className="text-xs font-semibold text-[color:var(--ink)]">{group.venueName}</div>
+                            <div className="text-[11px] text-[color:var(--ink-3)]">{group.locationText}</div>
                             <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
                               {group.slots.map((slot) => {
                                 const d = new Date(slot.slot_start_iso);
@@ -533,7 +533,7 @@ export default function CreatePage() {
                                     }}
                                     className={
                                       full
-                                        ? "shrink-0 rounded-lg border border-zinc-200 bg-zinc-100 px-2 py-1 text-[11px] text-zinc-400"
+                                        ? "shrink-0 rounded-lg border border-[color:var(--line-2)] bg-[color:var(--cream-3)] px-2 py-1 text-[11px] text-[color:var(--ink-3)]"
                                         : "shrink-0 rounded-lg border border-emerald-200 bg-emerald-50 px-2 py-1 text-[11px] font-medium text-emerald-900"
                                     }
                                   >
@@ -548,14 +548,14 @@ export default function CreatePage() {
                     ) : null}
                   </div>
                 ) : (
-                  <div className="mt-4 rounded-2xl border-2 border-zinc-200 bg-gradient-to-b from-white to-zinc-50/90 p-4 shadow-sm">
+                  <div className="mt-4 rounded-2xl border border-[color:var(--line)] bg-[color:var(--cream-2)] p-4">
                     <div className="flex flex-wrap items-baseline justify-between gap-2">
-                      <h3 className="text-base font-bold text-zinc-900">Lieux réels suggérés</h3>
+                      <h3 className="text-base font-bold text-[color:var(--ink)]">Lieux réels suggérés</h3>
                       {activity === "work" ? (
-                        <span className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Travail</span>
+                        <span className="text-xs font-semibold uppercase tracking-wide text-[color:var(--ink-3)]">Travail</span>
                       ) : null}
                     </div>
-                    <p className="mt-1 text-sm text-zinc-600">
+                    <p className="mt-1 text-sm text-[color:var(--ink-2)]">
                       Un clic remplit le champ au-dessus avec l’adresse (tu peux encore l’éditer).
                     </p>
                     <ul className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -567,7 +567,7 @@ export default function CreatePage() {
                               setLocationText(spot.name);
                               setCoords({ lat: spot.lat, lng: spot.lng });
                             }}
-                            className="flex w-full min-h-[3.25rem] items-center rounded-xl border-2 border-zinc-200 bg-white px-3 py-2.5 text-left text-sm font-medium leading-snug text-zinc-900 shadow-sm transition hover:border-zinc-900 hover:bg-zinc-50 active:scale-[0.99]"
+                            className="flex w-full min-h-[3.25rem] items-center rounded-xl border-2 border-[color:var(--line-2)] bg-[color:var(--cream-2)] px-3 py-2.5 text-left text-sm font-medium leading-snug text-[color:var(--ink)] shadow-sm transition hover:border-zinc-900 hover:bg-[color:var(--cream-3)]/50 active:scale-[0.99]"
                           >
                             <span className="mr-2 shrink-0 text-lg" aria-hidden>
                               📍
@@ -581,8 +581,8 @@ export default function CreatePage() {
                 )}
               </div>
 
-              <div className="mt-5 rounded-2xl border border-zinc-200 bg-zinc-50 p-3">
-                <div className="text-sm font-semibold text-zinc-900">Taille du groupe</div>
+              <div className="mt-5 rounded-2xl border border-[color:var(--line-2)] bg-[color:var(--cream-3)]/50 p-3">
+                <div className="text-sm font-semibold text-[color:var(--ink)]">Taille du groupe</div>
                 <div className="mt-2 flex gap-2">
                   {[4, 5, 6].map((n) => (
                     <button
@@ -590,8 +590,8 @@ export default function CreatePage() {
                       type="button"
                       className={
                         maxParticipants === n
-                          ? "flex-1 rounded-xl bg-zinc-900 text-white py-2.5 text-sm font-semibold"
-                          : "flex-1 rounded-xl bg-white text-zinc-900 py-2.5 text-sm font-semibold border border-zinc-200"
+                          ? "flex-1 rounded-xl bg-[color:var(--espresso)] text-[color:var(--cream)] py-2.5 text-sm font-semibold"
+                          : "flex-1 rounded-xl bg-[color:var(--cream-2)] text-[color:var(--ink)] py-2.5 text-sm font-semibold border border-[color:var(--line-2)]"
                       }
                       onClick={() => setMaxParticipants(n as 4 | 5 | 6)}
                     >
@@ -599,26 +599,26 @@ export default function CreatePage() {
                     </button>
                   ))}
                 </div>
-                <p className="mt-2 text-xs text-zinc-500">Petits groupes uniquement — c’est notre promesse.</p>
+                <p className="mt-2 text-xs text-[color:var(--ink-3)]">Petits groupes uniquement — c’est notre promesse.</p>
               </div>
 
-              <div className="mt-4 rounded-2xl border border-dashed border-zinc-300 bg-white p-3">
-                <div className="text-sm font-semibold text-zinc-900">Résumé express</div>
-                <div className="mt-2 text-sm text-zinc-700 space-y-0.5">
+              <div className="mt-4 rounded-2xl border border-dashed border-[color:var(--line-2)] bg-[color:var(--cream-2)] p-3">
+                <div className="text-sm font-semibold text-[color:var(--ink)]">Résumé express</div>
+                <div className="mt-2 text-sm text-[color:var(--ink-2)] space-y-0.5">
                   <div>
                     {selectedMeta?.emoji} {selectedMeta?.label}
                   </div>
                   <div>{useNow ? "Maintenant" : startTimeLabel}</div>
                   <div className="line-clamp-2">{locationText}</div>
-                  <div className="font-medium text-zinc-900">Jusqu’à {maxParticipants} personnes</div>
+                  <div className="font-medium text-[color:var(--ink)]">Jusqu’à {maxParticipants} personnes</div>
                 </div>
-                <p className="mt-3 text-xs text-zinc-600 leading-relaxed border-t border-zinc-100 pt-3">{CANCELLATION_POLICY_FR}</p>
+                <p className="mt-3 text-xs text-[color:var(--ink-2)] leading-relaxed border-t border-[color:var(--line)] pt-3">{CANCELLATION_POLICY_FR}</p>
               </div>
 
               <div className="mt-4 flex flex-col sm:flex-row gap-3">
                 <button
                   type="button"
-                  className="rounded-2xl bg-white px-5 py-3.5 text-zinc-900 font-semibold border border-zinc-200 flex-1 min-h-[48px]"
+                  className="rounded-2xl bg-[color:var(--cream-2)] px-5 py-3.5 text-[color:var(--ink)] font-semibold border border-[color:var(--line-2)] flex-1 min-h-[48px]"
                   onClick={() => setStep(1)}
                 >
                   Retour
@@ -626,7 +626,7 @@ export default function CreatePage() {
                 <button
                   type="button"
                   disabled={creating}
-                  className="rounded-2xl bg-zinc-900 px-5 py-3.5 text-white font-semibold hover:bg-zinc-800 active:bg-zinc-950 disabled:opacity-50 flex-1 min-h-[48px]"
+                  className="rounded-2xl bg-[color:var(--espresso)] px-5 py-3.5 text-[color:var(--cream)] font-semibold hover:opacity-90 active:opacity-95 disabled:opacity-50 flex-1 min-h-[48px]"
                   onClick={onCreate}
                 >
                   {creating ? "Publication…" : "Publier le plan"}

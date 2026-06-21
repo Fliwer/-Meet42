@@ -20,6 +20,7 @@ import {
 } from "@/lib/plans/planApi";
 import { canCancelOrLeaveBeforeStart, CANCELLATION_POLICY_FR } from "@/lib/plans/cancellation";
 import { ACTIVITIES } from "@/lib/plans/activities";
+import Avatar from "@/components/Avatar";
 
 function mapsUrl(lat: number, lng: number, label: string) {
   const coords = `${lat},${lng}`;
@@ -217,11 +218,11 @@ export default function PlanPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-zinc-50 px-4 py-8">
+      <main className="min-h-screen bg-transparent px-4 py-8">
         <div className="max-w-2xl mx-auto mt-6 space-y-3 animate-pulse">
-          <div className="h-10 rounded-2xl bg-zinc-200" />
-          <div className="h-32 rounded-3xl bg-zinc-200" />
-          <div className="h-24 rounded-2xl bg-zinc-100" />
+          <div className="h-10 rounded-2xl bg-[color:var(--cream-3)]" />
+          <div className="h-32 rounded-3xl bg-[color:var(--cream-3)]" />
+          <div className="h-24 rounded-2xl bg-[color:var(--cream-3)]/60" />
         </div>
       </main>
     );
@@ -229,7 +230,7 @@ export default function PlanPage() {
 
   if (error) {
     return (
-      <main className="min-h-screen bg-zinc-50 px-4 py-8">
+      <main className="min-h-screen bg-transparent px-4 py-8">
         <div className="max-w-2xl mx-auto mt-6 rounded-2xl border border-red-200 bg-white p-4 text-sm text-red-700">
           {error}
         </div>
@@ -270,33 +271,33 @@ export default function PlanPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-zinc-50 px-4 py-8 pb-32 md:pb-10">
-      <div className="max-w-3xl mx-auto mt-3 rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm">
+    <main className="min-h-screen bg-transparent px-4 py-8 pb-32 md:pb-10">
+      <div className="max-w-3xl mx-auto mt-3 rounded-3xl border border-[color:var(--line)] bg-[color:var(--cream-2)] p-5 md:p-6">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Activité</div>
-            <h1 className="mt-1 text-3xl font-bold tracking-tight text-zinc-900 truncate">
+            <div className="meet42-event-vibe">Activité</div>
+            <h1 className="font-display mt-1 text-[2.4rem] leading-none font-semibold tracking-[-0.02em] text-[color:var(--ink)] truncate">
               {activityMeta?.emoji} {activityMeta?.label ?? plan.activity}
             </h1>
-            <div className="mt-2 text-sm text-zinc-600">
+            <div className="mt-2 text-sm text-[color:var(--ink-2)]">
               {start.toLocaleDateString("fr-BE", { weekday: "short", day: "numeric", month: "short" })} à{" "}
               {start.toLocaleTimeString("fr-BE", { hour: "2-digit", minute: "2-digit" })}
             </div>
-            <p className="mt-3 text-sm font-medium text-zinc-800 leading-relaxed">
+            <p className="mt-3 text-sm font-medium text-[color:var(--ink)] leading-relaxed">
               {plan.is_joined
                 ? `Tu fais partie d’un groupe de ${plan.participants_count} / ${plan.max_participants} — petit, humain, sans pression.`
                 : `Rejoins un groupe de max ${plan.max_participants} personnes. Ici, on privilégie la qualité à la quantité.`}
             </p>
           </div>
           <div className="shrink-0">
-            <span className="rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-sm font-semibold text-zinc-700">
+            <span className="rounded-full border border-[color:var(--line)] bg-[color:var(--cream-3)] px-3 py-1 text-sm font-semibold text-[color:var(--ink)]">
               {plan.participants_count}/{plan.max_participants}
             </span>
           </div>
         </div>
 
-        <div className="mt-4 rounded-2xl border border-zinc-100 bg-zinc-50 p-3">
-          <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Parcours</div>
+        <div className="mt-4 rounded-2xl border border-[color:var(--line)] bg-[color:var(--cream-3)]/50 p-3">
+          <div className="meet42-event-vibe">Parcours</div>
           <ol className="mt-2 flex flex-wrap gap-2">
             {timelineSteps.map((s, i) => (
               <li
@@ -305,8 +306,8 @@ export default function PlanPage() {
                   s.done
                     ? "rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-bold text-emerald-900"
                     : s.current
-                      ? "rounded-full bg-zinc-900 px-3 py-1 text-[11px] font-bold text-white"
-                      : "rounded-full bg-white border border-zinc-200 px-3 py-1 text-[11px] font-semibold text-zinc-500"
+                      ? "rounded-full bg-[color:var(--espresso)] px-3 py-1 text-[11px] font-bold text-[color:var(--cream)]"
+                      : "rounded-full bg-[color:var(--cream-2)] border border-[color:var(--line)] px-3 py-1 text-[11px] font-semibold text-[color:var(--ink-3)]"
                 }
               >
                 {i + 1}. {s.label}
@@ -315,32 +316,32 @@ export default function PlanPage() {
           </ol>
         </div>
 
-        <div className="mt-5 rounded-2xl bg-zinc-50 border border-zinc-200 p-4">
-          <div className="text-sm font-semibold text-zinc-900">Infos lieu</div>
-          <div className="mt-2 text-sm text-zinc-700">{plan.location_text}</div>
+        <div className="mt-5 rounded-2xl bg-[color:var(--cream-3)]/50 border border-[color:var(--line)] p-4">
+          <div className="text-sm font-semibold text-[color:var(--ink)]">Infos lieu</div>
+          <div className="mt-2 text-sm text-[color:var(--ink-2)]">{plan.location_text}</div>
           <div className="mt-3 flex gap-2">
             <a
               href={gmaps}
               target="_blank"
               rel="noreferrer"
-              className="flex-1 rounded-xl bg-zinc-900 px-4 py-3 text-center text-sm font-semibold text-white hover:bg-zinc-800"
+              className="flex-1 rounded-xl bg-[color:var(--espresso)] px-4 py-3 text-center text-sm font-semibold text-[color:var(--cream)] hover:opacity-90"
             >
               Ouvrir dans Maps
             </a>
             <button
               type="button"
               onClick={onShare}
-              className="rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm font-semibold text-zinc-900 hover:bg-zinc-50"
+              className="rounded-xl border border-[color:var(--line-2)] bg-[color:var(--cream-2)] px-4 py-3 text-sm font-semibold text-[color:var(--ink)] hover:bg-[color:var(--cream-3)]"
             >
               Partager
             </button>
           </div>
-          <div className="mt-2 text-xs text-zinc-500">
+          <div className="mt-2 text-xs text-[color:var(--ink-3)]">
             Rendez-vous sur place — pas de chat obligatoire.
           </div>
         </div>
 
-        <div className="mt-4 rounded-2xl border border-zinc-200 bg-zinc-50 p-3 text-xs text-zinc-600 leading-relaxed">
+        <div className="mt-4 rounded-2xl border border-[color:var(--line)] bg-[color:var(--cream-3)]/50 p-3 text-xs text-[color:var(--ink-2)] leading-relaxed">
           {CANCELLATION_POLICY_FR}
         </div>
 
@@ -348,7 +349,7 @@ export default function PlanPage() {
         {shareNotice ? <div className="mt-3 text-sm text-emerald-700">{shareNotice}</div> : null}
 
         <div className="mt-4 flex items-center justify-between">
-          <div className="text-sm text-zinc-600">
+          <div className="text-sm text-[color:var(--ink-2)]">
             {status !== "authenticated"
               ? "Connecte-toi pour rejoindre en un clic."
               : plan.is_joined
@@ -359,7 +360,7 @@ export default function PlanPage() {
 
         <div className="mt-5 hidden md:flex gap-3">
           <button
-            className="flex-1 rounded-xl bg-zinc-900 px-5 py-3 text-white font-semibold hover:bg-zinc-800 disabled:opacity-50 min-h-[48px]"
+            className="meet42-join-btn flex-1"
             type="button"
             onClick={onJoin}
             disabled={joining || plan.is_joined}
@@ -373,7 +374,7 @@ export default function PlanPage() {
                   : "Rejoindre"}
           </button>
           <button
-            className="rounded-xl border border-zinc-200 bg-white px-5 py-3 text-zinc-900 font-semibold hover:bg-zinc-50 min-h-[48px]"
+            className="rounded-xl border border-[color:var(--line-2)] bg-[color:var(--cream-2)] px-5 py-3 text-[color:var(--ink)] font-semibold hover:bg-[color:var(--cream-3)] min-h-[48px]"
             type="button"
             onClick={() => router.push("/")}
           >
@@ -381,10 +382,10 @@ export default function PlanPage() {
           </button>
         </div>
 
-        <div className="mt-4 rounded-2xl border border-zinc-200 bg-white p-4">
+        <div className="mt-4 rounded-2xl border border-[color:var(--line)] bg-[color:var(--cream-2)] p-4">
           <div className="flex items-center justify-between gap-3">
-            <div className="text-sm font-semibold text-zinc-900">Participants</div>
-            <div className="text-xs font-semibold text-zinc-600">
+            <div className="text-sm font-semibold text-[color:var(--ink)]">Participants</div>
+            <div className="text-xs font-semibold text-[color:var(--ink-2)]">
               {status === "authenticated" ? `${confirmed.length} confirmés / ${plan.max_participants} max` : `${plan.participants_count} / ${plan.max_participants}`}
             </div>
           </div>
@@ -392,28 +393,18 @@ export default function PlanPage() {
           {status !== "authenticated" ? (
             <div className="mt-3">
               <div className="flex -space-x-2">
-                {(plan.participant_preview ?? []).slice(0, 4).map((p, i) =>
-                  p.photo_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      key={`pv-${i}`}
-                      src={p.photo_url}
-                      alt=""
-                      width={40}
-                      height={40}
-                      className="h-10 w-10 rounded-full border-2 border-white object-cover ring-1 ring-zinc-200"
-                    />
-                  ) : (
-                    <div
-                      key={`pv-${i}`}
-                      className="grid h-10 w-10 place-items-center rounded-full border-2 border-white bg-zinc-200 text-xs font-bold text-zinc-700 ring-1 ring-zinc-200"
-                    >
-                      {p.first_name.slice(0, 1)}
-                    </div>
-                  )
-                )}
+                {(plan.participant_preview ?? []).slice(0, 4).map((p, i) => (
+                  <Avatar
+                    key={`pv-${i}`}
+                    src={p.photo_url}
+                    name={p.first_name}
+                    size={40}
+                    className="h-10 w-10 rounded-full border-2 border-[color:var(--cream-2)] object-cover"
+                    fallbackClassName="grid h-10 w-10 place-items-center rounded-full border-2 border-[color:var(--cream-2)] bg-[color:var(--espresso)] text-xs font-bold text-[color:var(--cream)]"
+                  />
+                ))}
               </div>
-              <p className="mt-2 text-xs text-zinc-500">Connecte-toi pour voir la liste complète et confirmer ta présence.</p>
+              <p className="mt-2 text-xs text-[color:var(--ink-3)]">Connecte-toi pour voir la liste complète et confirmer ta présence.</p>
             </div>
           ) : (
             <>
@@ -426,7 +417,7 @@ export default function PlanPage() {
                     className={
                       myAttendanceStatus === "confirmed"
                         ? "rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white"
-                        : "rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-800"
+                        : "rounded-xl border border-[color:var(--line-2)] bg-[color:var(--cream-2)] px-4 py-2 text-sm font-semibold text-[color:var(--ink)]"
                     }
                   >
                     Je viens
@@ -438,7 +429,7 @@ export default function PlanPage() {
                     className={
                       myAttendanceStatus === "cancelled"
                         ? "rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white"
-                        : "rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-800"
+                        : "rounded-xl border border-[color:var(--line-2)] bg-[color:var(--cream-2)] px-4 py-2 text-sm font-semibold text-[color:var(--ink)]"
                     }
                   >
                     Je ne peux plus
@@ -458,12 +449,12 @@ export default function PlanPage() {
                     ))}
                   </div>
                 </div>
-                <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-3">
-                  <div className="text-xs font-semibold uppercase tracking-wide text-zinc-700">En attente</div>
+                <div className="rounded-xl border border-[color:var(--line)] bg-[color:var(--cream-3)]/50 p-3">
+                  <div className="text-xs font-semibold uppercase tracking-wide text-[color:var(--ink-2)]">En attente</div>
                   <div className="mt-2 space-y-1">
-                    {pending.length === 0 ? <div className="text-xs text-zinc-500">Aucun</div> : null}
+                    {pending.length === 0 ? <div className="text-xs text-[color:var(--ink-3)]">Aucun</div> : null}
                     {pending.map((p) => (
-                      <div key={`p-${p.user_id}`} className="text-sm text-zinc-800">
+                      <div key={`p-${p.user_id}`} className="text-sm text-[color:var(--ink)]">
                         {p.first_name}
                       </div>
                     ))}
@@ -486,9 +477,9 @@ export default function PlanPage() {
         </div>
 
         {showCheckin && status === "authenticated" ? (
-          <div className="mt-4 rounded-2xl border border-zinc-200 bg-zinc-50 p-3">
-            <div className="text-sm font-semibold text-zinc-900">Check-in rapide</div>
-            <div className="mt-1 text-xs text-zinc-600">Dis au groupe où tu en es pour limiter les no-shows.</div>
+          <div className="mt-4 rounded-2xl border border-[color:var(--line)] bg-[color:var(--cream-3)]/50 p-3">
+            <div className="text-sm font-semibold text-[color:var(--ink)]">Check-in rapide</div>
+            <div className="mt-1 text-xs text-[color:var(--ink-2)]">Dis au groupe où tu en es pour limiter les no-shows.</div>
             <div className="mt-3 flex gap-2">
               <button
                 type="button"
@@ -496,8 +487,8 @@ export default function PlanPage() {
                 onClick={() => onCheckin("on_my_way")}
                 className={
                   checkinStatus === "on_my_way"
-                    ? "flex-1 rounded-xl bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-white"
-                    : "flex-1 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm font-semibold text-zinc-800"
+                    ? "flex-1 rounded-xl bg-[color:var(--espresso)] px-4 py-2.5 text-sm font-semibold text-[color:var(--cream)]"
+                    : "flex-1 rounded-xl border border-[color:var(--line-2)] bg-[color:var(--cream-2)] px-4 py-2.5 text-sm font-semibold text-[color:var(--ink)]"
                 }
               >
                 Je suis en route
@@ -509,7 +500,7 @@ export default function PlanPage() {
                 className={
                   checkinStatus === "arrived"
                     ? "flex-1 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white"
-                    : "flex-1 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm font-semibold text-zinc-800"
+                    : "flex-1 rounded-xl border border-[color:var(--line-2)] bg-[color:var(--cream-2)] px-4 py-2.5 text-sm font-semibold text-[color:var(--ink)]"
                 }
               >
                 Je suis arrivé(e)
@@ -519,9 +510,9 @@ export default function PlanPage() {
         ) : null}
 
         {showFeedback && status === "authenticated" ? (
-          <div className="mt-4 rounded-2xl border border-zinc-200 bg-white p-3">
-            <div className="text-sm font-semibold text-zinc-900">Retour qualité</div>
-            <div className="mt-1 text-xs text-zinc-600">Tu referais un event avec ce groupe ?</div>
+          <div className="mt-4 rounded-2xl border border-[color:var(--line)] bg-[color:var(--cream-2)] p-3">
+            <div className="text-sm font-semibold text-[color:var(--ink)]">Retour qualité</div>
+            <div className="mt-1 text-xs text-[color:var(--ink-2)]">Tu referais un event avec ce groupe ?</div>
             <div className="mt-3 flex gap-2">
               <button
                 type="button"
@@ -529,7 +520,7 @@ export default function PlanPage() {
                 className={
                   feedbackVote === true
                     ? "rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white"
-                    : "rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-800"
+                    : "rounded-xl border border-[color:var(--line-2)] bg-[color:var(--cream-2)] px-4 py-2 text-sm font-semibold text-[color:var(--ink)]"
                 }
               >
                 Oui
@@ -540,14 +531,14 @@ export default function PlanPage() {
                 className={
                   feedbackVote === false
                     ? "rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white"
-                    : "rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-800"
+                    : "rounded-xl border border-[color:var(--line-2)] bg-[color:var(--cream-2)] px-4 py-2 text-sm font-semibold text-[color:var(--ink)]"
                 }
               >
                 Non
               </button>
             </div>
             <textarea
-              className="mt-3 w-full rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-800"
+              className="mt-3 w-full rounded-xl border border-[color:var(--line-2)] bg-white px-3 py-2 text-sm text-[color:var(--ink)] focus:border-[color:var(--fire)] focus:outline-none"
               placeholder="Optionnel: une phrase pour aider à améliorer la qualité."
               value={feedbackComment}
               onChange={(e) => setFeedbackComment(e.target.value.slice(0, 160))}
@@ -556,7 +547,7 @@ export default function PlanPage() {
               type="button"
               disabled={feedbackBusy}
               onClick={onSubmitFeedback}
-              className="mt-3 rounded-xl bg-zinc-900 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-800 disabled:opacity-50"
+              className="mt-3 rounded-xl bg-[color:var(--espresso)] px-4 py-2 text-sm font-semibold text-[color:var(--cream)] hover:opacity-90 disabled:opacity-50"
             >
               {feedbackDone ? "Feedback enregistré" : feedbackBusy ? "Envoi..." : "Envoyer mon feedback"}
             </button>
@@ -564,7 +555,7 @@ export default function PlanPage() {
         ) : null}
 
         {plan.is_joined ? (
-          <div className="mt-5 border-t border-zinc-200 pt-4">
+          <div className="mt-5 border-t border-[color:var(--line)] pt-4">
             {canStillCancel ? (
               <button
                 type="button"
@@ -573,7 +564,7 @@ export default function PlanPage() {
                 className={
                   plan.is_creator
                     ? "w-full rounded-2xl border border-red-200 bg-red-50 px-5 py-3 text-sm font-semibold text-red-800 hover:bg-red-100 disabled:opacity-50"
-                    : "w-full rounded-2xl border border-zinc-200 bg-white px-5 py-3 text-sm font-semibold text-zinc-900 hover:bg-zinc-50 disabled:opacity-50"
+                    : "w-full rounded-2xl border border-[color:var(--line-2)] bg-[color:var(--cream-2)] px-5 py-3 text-sm font-semibold text-[color:var(--ink)] hover:bg-[color:var(--cream-3)] disabled:opacity-50"
                 }
               >
                 {leaving
@@ -583,7 +574,7 @@ export default function PlanPage() {
                     : "Me retirer du plan"}
               </button>
             ) : (
-              <p className="text-sm text-zinc-600">
+              <p className="text-sm text-[color:var(--ink-2)]">
                 Moins de 24 h avant le début : annulation ou retrait impossible ici. Préviens directement les autres sur
                 place si besoin.
               </p>
@@ -595,7 +586,7 @@ export default function PlanPage() {
       <div className="md:hidden fixed bottom-[calc(5.25rem+env(safe-area-inset-bottom))] left-0 right-0 z-20 px-4">
         <div className="max-w-3xl mx-auto flex gap-2">
           <button
-            className="flex-1 rounded-2xl bg-zinc-900 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-zinc-900/25 disabled:opacity-50 min-h-[48px]"
+            className="meet42-join-btn flex-1"
             type="button"
             onClick={onJoin}
             disabled={joining || plan.is_joined}
@@ -609,7 +600,7 @@ export default function PlanPage() {
                   : "Rejoindre"}
           </button>
           <button
-            className="rounded-2xl border border-zinc-200 bg-white px-4 py-3.5 text-sm font-bold text-zinc-900 min-h-[48px]"
+            className="rounded-2xl border border-[color:var(--line-2)] bg-[color:var(--cream-2)] px-4 py-3.5 text-sm font-bold text-[color:var(--ink)] min-h-[48px]"
             type="button"
             onClick={() => router.push("/")}
           >
@@ -620,4 +611,3 @@ export default function PlanPage() {
     </main>
   );
 }
-

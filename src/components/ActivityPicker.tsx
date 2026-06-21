@@ -20,8 +20,8 @@ export default function ActivityPicker({
           onClick={() => onChange(a.id)}
           className={
             value === a.id
-              ? "rounded-2xl border border-zinc-900 bg-zinc-900 text-white px-3 py-3 text-left"
-              : "rounded-2xl border border-zinc-200 bg-white text-zinc-900 px-3 py-3 text-left hover:bg-zinc-50"
+              ? "rounded-2xl border-2 border-[color:var(--fire)] bg-[color:var(--fire-wash)] text-[color:var(--ink)] px-3 py-3 text-left transition active:scale-[0.98]"
+              : "rounded-2xl border border-[color:var(--line)] bg-[color:var(--cream-2)] text-[color:var(--ink)] px-3 py-3 text-left transition hover:border-[color:var(--line-2)] active:scale-[0.98]"
           }
         >
           <div className="text-2xl" aria-hidden>
@@ -33,4 +33,3 @@ export default function ActivityPicker({
     </div>
   );
 }
-

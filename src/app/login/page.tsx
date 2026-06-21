@@ -113,7 +113,7 @@ function LoginPageInner() {
 
   if (status === "authenticated" && profileStatus === "missing") {
     return (
-      <main className="min-h-screen bg-zinc-50 px-4">
+      <main className="min-h-screen bg-transparent px-4">
         <div className="py-10">
           <ProfileSetup onDone={() => router.push(nextPath)} />
         </div>
@@ -122,14 +122,19 @@ function LoginPageInner() {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-50 px-4">
+    <main className="min-h-screen bg-transparent px-4">
       <div className="max-w-lg mx-auto py-10 md:py-14">
-        <Link href="/" className="text-sm font-semibold text-zinc-600 hover:text-zinc-900">
+        <Link href="/" className="text-sm font-semibold text-[color:var(--ink-2)] hover:text-[color:var(--ink)]">
           ← Accueil
         </Link>
-        <div className="mt-4 rounded-3xl bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 p-5 text-white shadow-lg ring-1 ring-white/10">
-          <h1 className="text-2xl font-bold">Bienvenue sur Meet42</h1>
-          <p className="mt-2 text-sm text-white/80">
+        <div className="mt-4 rounded-3xl border border-[color:var(--line)] bg-[color:var(--cream-2)] p-6">
+          <span className="meet42-kicker">
+            <span className="meet42-kicker-dot" aria-hidden /> Bienvenue
+          </span>
+          <h1 className="font-display mt-3 text-[2rem] leading-none font-semibold tracking-[-0.02em] text-[color:var(--ink)]">
+            Rejoins Meet<span className="text-[color:var(--fire)]">42</span>
+          </h1>
+          <p className="mt-2 text-sm text-[color:var(--ink-2)]">
             Connexion en un clic, puis tu rejoins un plan réel en quelques secondes.
           </p>
           <div
@@ -143,7 +148,7 @@ function LoginPageInner() {
               onClick={onGoogle}
               type="button"
               disabled={busy}
-              className="w-full rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-zinc-900 hover:bg-zinc-100 disabled:opacity-60"
+              className="w-full rounded-2xl border border-[color:var(--line-2)] bg-white px-4 py-3 text-sm font-semibold text-[color:var(--ink)] hover:bg-[color:var(--cream-3)] disabled:opacity-60"
             >
               Continuer avec Google
             </button>
@@ -161,12 +166,12 @@ function LoginPageInner() {
         </div>
 
         <div
-          className="mt-6 flex gap-2 rounded-2xl border border-zinc-200 bg-white p-1"
+          className="mt-6 flex gap-2 rounded-2xl border border-[color:var(--line)] bg-[color:var(--cream-2)] p-1"
           role="group"
           aria-label="Mode de connexion"
         >
           <button
-            className={mode === "login" ? "flex-1 rounded-xl bg-zinc-900 text-white py-2 text-sm font-semibold" : "flex-1 rounded-xl py-2 text-sm font-semibold text-zinc-800"}
+            className={mode === "login" ? "flex-1 rounded-xl bg-[color:var(--espresso)] text-[color:var(--cream)] py-2 text-sm font-semibold" : "flex-1 rounded-xl py-2 text-sm font-semibold text-[color:var(--ink-2)]"}
             onClick={() => setMode("login")}
             type="button"
             aria-pressed={mode === "login"}
@@ -174,7 +179,7 @@ function LoginPageInner() {
             Connexion
           </button>
           <button
-            className={mode === "signup" ? "flex-1 rounded-xl bg-zinc-900 text-white py-2 text-sm font-semibold" : "flex-1 rounded-xl py-2 text-sm font-semibold text-zinc-800"}
+            className={mode === "signup" ? "flex-1 rounded-xl bg-[color:var(--espresso)] text-[color:var(--cream)] py-2 text-sm font-semibold" : "flex-1 rounded-xl py-2 text-sm font-semibold text-[color:var(--ink-2)]"}
             onClick={() => setMode("signup")}
             type="button"
             aria-pressed={mode === "signup"}
@@ -183,11 +188,11 @@ function LoginPageInner() {
           </button>
         </div>
 
-        <form onSubmit={submit} className="mt-5 flex flex-col gap-4 bg-white rounded-2xl border border-zinc-200 p-4 shadow-sm">
+        <form onSubmit={submit} className="mt-5 flex flex-col gap-4 bg-[color:var(--cream-2)] rounded-2xl border border-[color:var(--line)] p-4">
           <label className="flex flex-col gap-1">
-            <span className="text-sm font-medium text-zinc-900">Email</span>
+            <span className="text-sm font-medium text-[color:var(--ink)]">Email</span>
             <input
-              className="rounded-xl border border-zinc-200 px-3 py-2"
+              className="rounded-xl border border-[color:var(--line-2)] bg-white px-3 py-2 text-[color:var(--ink)] focus:border-[color:var(--fire)] focus:outline-none"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               type="email"
@@ -196,9 +201,9 @@ function LoginPageInner() {
             />
           </label>
           <label className="flex flex-col gap-1">
-            <span className="text-sm font-medium text-zinc-900">Mot de passe</span>
+            <span className="text-sm font-medium text-[color:var(--ink)]">Mot de passe</span>
             <input
-              className="rounded-xl border border-zinc-200 px-3 py-2"
+              className="rounded-xl border border-[color:var(--line-2)] bg-white px-3 py-2 text-[color:var(--ink)] focus:border-[color:var(--fire)] focus:outline-none"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               type="password"
@@ -209,45 +214,45 @@ function LoginPageInner() {
 
           {mode === "signup" ? (
             <>
-              <div className="rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-xs font-semibold text-zinc-700">
+              <div className="rounded-xl border border-[color:var(--line)] bg-[color:var(--cream-3)] px-3 py-2 text-xs font-semibold text-[color:var(--ink-2)]">
                 Profil de base (créé pendant l&apos;inscription)
               </div>
               <label className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-zinc-900">Prénom</span>
+                <span className="text-sm font-medium text-[color:var(--ink)]">Prénom</span>
                 <input
-                  className="rounded-xl border border-zinc-200 px-3 py-2"
+                  className="rounded-xl border border-[color:var(--line-2)] bg-white px-3 py-2 text-[color:var(--ink)] focus:border-[color:var(--fire)] focus:outline-none"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                   placeholder="Ex. Lina"
                 />
               </label>
               <label className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-zinc-900">Âge</span>
+                <span className="text-sm font-medium text-[color:var(--ink)]">Âge</span>
                 <input
                   type="number"
                   min={18}
                   max={99}
-                  className="rounded-xl border border-zinc-200 px-3 py-2"
+                  className="rounded-xl border border-[color:var(--line-2)] bg-white px-3 py-2 text-[color:var(--ink)] focus:border-[color:var(--fire)] focus:outline-none"
                   value={age}
                   onChange={(e) => setAge(Number(e.target.value))}
                 />
               </label>
-              <div className="flex flex-col gap-4 rounded-2xl border border-zinc-200 bg-zinc-50/50 p-4">
-                <p className="text-sm font-semibold text-zinc-900">1 photo minimum</p>
+              <div className="flex flex-col gap-4 rounded-2xl border border-[color:var(--line)] bg-[color:var(--cream-3)]/60 p-4">
+                <p className="text-sm font-semibold text-[color:var(--ink)]">1 photo minimum</p>
                 <ProfilePhotoField label="Photo 1 *" value={photoUrls[0]} onChange={(u) => patchSignupPhoto(0, u)} />
                 <ProfilePhotoField label="Photo 2 (optionnelle)" value={photoUrls[1]} onChange={(u) => patchSignupPhoto(1, u)} />
                 <ProfilePhotoField label="Photo 3 (optionnelle)" value={photoUrls[2]} onChange={(u) => patchSignupPhoto(2, u)} />
               </div>
               <label className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-zinc-900">À propos de toi</span>
+                <span className="text-sm font-medium text-[color:var(--ink)]">À propos de toi</span>
                 <textarea
-                  className="min-h-[96px] rounded-xl border border-zinc-200 px-3 py-2 text-sm leading-relaxed"
+                  className="min-h-[96px] rounded-xl border border-[color:var(--line-2)] bg-white px-3 py-2 text-sm leading-relaxed text-[color:var(--ink)] focus:border-[color:var(--fire)] focus:outline-none"
                   value={signupBio}
                   onChange={(e) => setSignupBio(e.target.value.slice(0, SIGNUP_BIO_MAX))}
                   placeholder="Quelques phrases : ce que tu aimes, ce que tu cherches…"
                   maxLength={SIGNUP_BIO_MAX}
                 />
-                <span className="text-xs text-zinc-500">
+                <span className="text-xs text-[color:var(--ink-3)]">
                   {signupBio.trim().length}/{SIGNUP_BIO_MAX} — minimum {SIGNUP_BIO_MIN} caractères
                 </span>
               </label>
@@ -260,21 +265,17 @@ function LoginPageInner() {
             </div>
           ) : null}
 
-          <button
-            type="submit"
-            disabled={busy}
-            className="rounded-2xl bg-zinc-900 px-5 py-3 text-white font-semibold hover:bg-zinc-800 active:bg-zinc-950 disabled:opacity-50"
-          >
+          <button type="submit" disabled={busy} className="meet42-join-btn">
             {busy ? "Patiente..." : mode === "login" ? "Se connecter" : "Créer mon compte"}
           </button>
         </form>
 
-        <div className="mt-3 rounded-xl border border-dashed border-zinc-300 bg-white px-3 py-2 text-xs text-zinc-500">
+        <div className="mt-3 rounded-xl border border-dashed border-[color:var(--line-2)] bg-[color:var(--cream-2)] px-3 py-2 text-xs text-[color:var(--ink-3)]">
           Astuce : le bouton Google ci-dessus ouvre le flux OAuth Google
           {isFacebookLoginEnabled() ? " ; Facebook aussi." : "."}
         </div>
 
-        <p className="mt-4 text-xs text-zinc-500">
+        <p className="mt-4 text-xs text-[color:var(--ink-3)]">
           MVP: si Supabase n’est pas configuré, l’app tourne en mode “mock” (données locales).
         </p>
       </div>
@@ -286,7 +287,7 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <main className="min-h-screen bg-zinc-50 px-4 py-16 text-center text-sm font-medium text-zinc-600">Chargement…</main>
+        <main className="min-h-screen bg-transparent px-4 py-16 text-center text-sm font-medium text-[color:var(--ink-2)]">Chargement…</main>
       }
     >
       <LoginPageInner />

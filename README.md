@@ -2,7 +2,7 @@
 
 > Connecter 4 à 6 inconnus autour d'une activité réelle en ville.
 
-**[🚀 Demo live](https://meet42-phi.vercel.app)**
+**[🚀 Live](https://meet42.app)**
 
 ---
 
@@ -22,17 +22,17 @@ Les apps sociales sont pensées pour scroller, pas pour se rencontrer. Résultat
 - 🗺️ Géolocalisation pour découvrir les activités proches
 - 👥 Groupes fixes de 4 à 6 personnes
 - ⏱️ Logique d'annulation automatique à 24h
-- 🔐 Auth sociale Google & Facebook (OAuth via Supabase)
-- 📱 UI responsive, pensée mobile-first
+- 🔐 Connexion Google (OAuth via Supabase)
+- 📱 UI responsive, pensée mobile-first, direction éditoriale chaude
 
 ## Stack technique
 
 | Côté | Techno |
 |------|--------|
-| Frontend | Next.js 14, TypeScript, Tailwind CSS |
-| Backend | Supabase (PostgreSQL, Auth, Realtime) |
-| Auth | OAuth Google + Facebook |
-| Deploy | Vercel |
+| Frontend | Next.js 16 (App Router), React 19, TypeScript, Tailwind v4 |
+| Backend | Supabase (PostgreSQL + RLS, Auth, Storage) |
+| Auth | OAuth Google |
+| Deploy | Vercel · domaine meet42.app |
 
 ## Lancer en local
 

@@ -35,8 +35,8 @@ export default function ProfilePage() {
 
   if (status === "loading") {
     return (
-      <main className="min-h-screen bg-zinc-50 px-4 py-8">
-        <div className="max-w-2xl mx-auto rounded-2xl border border-zinc-200 bg-white p-4 text-sm text-zinc-600">
+      <main className="min-h-screen bg-[color:var(--cream-3)]/50 px-4 py-8">
+        <div className="max-w-2xl mx-auto rounded-2xl border border-[color:var(--line-2)] bg-[color:var(--cream-2)] p-4 text-sm text-[color:var(--ink-2)]">
           Chargement...
         </div>
       </main>
@@ -47,7 +47,7 @@ export default function ProfilePage() {
 
   if (profileStatus === "missing") {
     return (
-      <main className="min-h-screen bg-zinc-50 px-4 py-8">
+      <main className="min-h-screen bg-[color:var(--cream-3)]/50 px-4 py-8">
         <ProfileSetup onDone={() => router.push("/")} />
       </main>
     );
@@ -55,7 +55,7 @@ export default function ProfilePage() {
 
   if (editing) {
     return (
-      <main className="min-h-screen bg-zinc-50 px-4 py-8">
+      <main className="min-h-screen bg-[color:var(--cream-3)]/50 px-4 py-8">
         <div className="max-w-2xl mx-auto">
           <ProfileSetup
             variant="edit"
@@ -71,9 +71,9 @@ export default function ProfilePage() {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-50 px-4 py-8">
+    <main className="min-h-screen bg-[color:var(--cream-3)]/50 px-4 py-8">
       <div className="max-w-2xl mx-auto">
-        <div className="rounded-3xl bg-white border border-zinc-200 p-6 shadow-sm">
+        <div className="rounded-3xl bg-[color:var(--cream-2)] border border-[color:var(--line-2)] p-6 shadow-sm">
           <div className="flex items-start justify-between gap-3">
             <div className="flex min-w-0 items-start gap-4">
               {(profile?.photo_urls?.length ? profile.photo_urls : profile?.photo_url ? [profile.photo_url] : []).length ? (
@@ -91,17 +91,17 @@ export default function ProfilePage() {
                       alt=""
                       width={64}
                       height={64}
-                      className="h-16 w-16 rounded-xl border border-zinc-200 object-cover shadow-sm"
+                      className="h-16 w-16 rounded-xl border border-[color:var(--line-2)] object-cover shadow-sm"
                     />
                   ))}
                 </div>
               ) : null}
               <div className="min-w-0">
-              <div className="text-sm text-zinc-600">Profil</div>
-              <div className="mt-1 text-xl font-bold text-zinc-900 truncate">
+              <div className="text-sm text-[color:var(--ink-2)]">Profil</div>
+              <div className="mt-1 text-xl font-bold text-[color:var(--ink)] truncate">
                 {profile?.first_name ?? "—"}
               </div>
-              <div className="mt-1 text-sm text-zinc-600">
+              <div className="mt-1 text-sm text-[color:var(--ink-2)]">
                 {profile?.age ? `${profile.age} ans` : ""}
               </div>
               </div>
@@ -109,18 +109,18 @@ export default function ProfilePage() {
             <button
               type="button"
               onClick={() => signOut()}
-              className="rounded-2xl border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-900 hover:bg-zinc-50"
+              className="rounded-2xl border border-[color:var(--line-2)] bg-[color:var(--cream-2)] px-4 py-2 text-sm font-semibold text-[color:var(--ink)] hover:bg-[color:var(--cream-3)]/50"
             >
               Déconnexion
             </button>
           </div>
 
           {profile?.bio ? (
-            <div className="mt-4 rounded-2xl bg-zinc-50 border border-zinc-200 p-3 text-sm text-zinc-700">
+            <div className="mt-4 rounded-2xl bg-[color:var(--cream-3)]/50 border border-[color:var(--line-2)] p-3 text-sm text-[color:var(--ink-2)]">
               {profile.bio}
             </div>
           ) : (
-            <div className="mt-4 text-sm text-zinc-600">
+            <div className="mt-4 text-sm text-[color:var(--ink-2)]">
               Ajoute une bio courte pour que les gens sachent à qui s’attendre.
             </div>
           )}
@@ -129,7 +129,7 @@ export default function ProfilePage() {
             <button
               type="button"
               onClick={() => setEditing(true)}
-              className="flex-1 min-w-[140px] rounded-2xl bg-zinc-900 px-5 py-3 text-white font-semibold hover:bg-zinc-800 active:bg-zinc-950"
+              className="flex-1 min-w-[140px] rounded-2xl bg-[color:var(--espresso)] px-5 py-3 text-[color:var(--cream)] font-semibold hover:opacity-90 active:opacity-95"
             >
               Modifier le profil
             </button>
@@ -137,7 +137,7 @@ export default function ProfilePage() {
               type="button"
               onClick={onRefresh}
               disabled={busy}
-              className="rounded-2xl border border-zinc-200 bg-white px-5 py-3 text-zinc-900 font-semibold hover:bg-zinc-50 disabled:opacity-50"
+              className="rounded-2xl border border-[color:var(--line-2)] bg-[color:var(--cream-2)] px-5 py-3 text-[color:var(--ink)] font-semibold hover:bg-[color:var(--cream-3)]/50 disabled:opacity-50"
             >
               {busy ? "…" : "Rafraîchir"}
             </button>
@@ -150,17 +150,17 @@ export default function ProfilePage() {
           ) : null}
         </div>
 
-        <div className="mt-4 rounded-3xl bg-white border border-zinc-200 p-6 shadow-sm">
-          <div className="text-sm font-semibold text-zinc-900">Conseils pour organiser de belles rencontres IRL</div>
-          <ul className="mt-2 text-sm text-zinc-700 list-disc pl-5 space-y-1">
+        <div className="mt-4 rounded-3xl bg-[color:var(--cream-2)] border border-[color:var(--line-2)] p-6 shadow-sm">
+          <div className="text-sm font-semibold text-[color:var(--ink)]">Conseils pour organiser de belles rencontres IRL</div>
+          <ul className="mt-2 text-sm text-[color:var(--ink-2)] list-disc pl-5 space-y-1">
             <li>Plan simple, lieu clair, horaires proches.</li>
             <li>Groupes de 4 à 6 pour un bon équilibre convivial.</li>
             <li>
               Annulation ou retrait possible jusqu’à{" "}
-              <span className="font-medium text-zinc-900">24 h avant</span> le début du plan.
+              <span className="font-medium text-[color:var(--ink)]">24 h avant</span> le début du plan.
             </li>
           </ul>
-          <Link href="/mes-plans" className="mt-4 inline-block text-sm font-semibold text-zinc-900 underline-offset-2 hover:underline">
+          <Link href="/mes-plans" className="mt-4 inline-block text-sm font-semibold text-[color:var(--ink)] underline-offset-2 hover:underline">
             Voir mes plans →
           </Link>
         </div>

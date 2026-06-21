@@ -109,29 +109,49 @@ body {
   mask-image: linear-gradient(180deg, #000 0%, transparent 70%);
 }
 
-/* Hero variante illustration — SVG golden hour plein cadre + voile crème */
-.meet42-hero--art {
-  border-color: var(--line);
-  background-image: url("/hero.svg");
-  background-size: cover;
-  background-position: center 58%;
+/* Hero variante photo — image next/image plein cadre + voile chaud sombre */
+.meet42-hero--photo {
+  border-color: rgb(255 255 255 / 0.12);
+  color: var(--cream);
 }
-.meet42-hero--art::before,
-.meet42-hero--art::after {
+.meet42-hero--photo::before,
+.meet42-hero--photo::after {
   display: none;
+}
+.meet42-hero-img {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  object-position: center 38%;
 }
 .meet42-hero-scrim {
   position: absolute;
   inset: 0;
   z-index: -1;
   background:
-    linear-gradient(100deg, rgb(243 235 221 / 0.94) 0%, rgb(243 235 221 / 0.72) 30%, rgb(243 235 221 / 0.24) 56%, transparent 74%);
+    linear-gradient(101deg, rgb(28 17 8 / 0.86) 0%, rgb(30 18 9 / 0.58) 44%, rgb(36 22 10 / 0.22) 100%),
+    linear-gradient(0deg, rgb(24 15 7 / 0.5) 0%, transparent 55%);
 }
 @media (max-width: 1023px) {
   .meet42-hero-scrim {
     background:
-      linear-gradient(178deg, rgb(243 235 221 / 0.92) 0%, rgb(243 235 221 / 0.62) 36%, rgb(243 235 221 / 0.14) 62%, transparent 80%);
+      linear-gradient(180deg, rgb(24 15 7 / 0.3) 0%, transparent 30%),
+      linear-gradient(0deg, rgb(24 15 7 / 0.82) 0%, rgb(26 16 8 / 0.5) 42%, transparent 78%);
   }
+}
+.meet42-hero--photo .meet42-kicker {
+  color: rgb(255 246 236 / 0.82);
+}
+.meet42-hero--photo .meet42-cta-ghost {
+  border-color: rgb(255 255 255 / 0.5);
+  color: var(--cream);
+}
+.meet42-hero--photo .meet42-cta-ghost:hover {
+  background: rgb(255 255 255 / 0.12);
+  border-color: #fff;
 }
 
 /* Mot souligné à la main dans le titre */

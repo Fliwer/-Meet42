@@ -36,14 +36,14 @@ export default function ProfilePhotoField({ value, onChange, showUrlFallback = t
 
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-sm font-medium text-zinc-900">{label}</span>
+      <span className="text-sm font-medium text-[color:var(--ink)]">{label}</span>
       <div className="flex flex-wrap items-center gap-4">
-        <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-100 shadow-inner">
+        <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl border border-[color:var(--line)] bg-[color:var(--cream-3)]">
           {value ? (
             // eslint-disable-next-line @next/next/no-img-element -- URL profil / data URL
             <img src={value} alt="" className="h-full w-full object-cover" />
           ) : (
-            <div className="grid h-full w-full place-items-center text-2xl text-zinc-400" aria-hidden>
+            <div className="grid h-full w-full place-items-center text-2xl text-[color:var(--ink-3)]" aria-hidden>
               ?
             </div>
           )}
@@ -53,23 +53,23 @@ export default function ProfilePhotoField({ value, onChange, showUrlFallback = t
             id={inputId}
             type="file"
             accept="image/jpeg,image/png,image/webp"
-            className="block w-full max-w-xs text-sm text-zinc-700 file:mr-3 file:rounded-xl file:border-0 file:bg-zinc-900 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-zinc-800"
+            className="block w-full max-w-xs text-sm text-[color:var(--ink-2)] file:mr-3 file:rounded-xl file:border-0 file:bg-[color:var(--espresso)] file:px-3 file:py-2 file:text-sm file:font-semibold file:text-[color:var(--cream)] hover:file:opacity-90"
             disabled={busy}
             onChange={onPick}
           />
-          <p className="mt-1 text-xs text-zinc-500">JPG, PNG ou WebP — max 2 Mo</p>
+          <p className="mt-1 text-xs text-[color:var(--ink-3)]">JPG, PNG ou WebP — max 2 Mo</p>
         </div>
       </div>
-      {busy ? <p className="text-xs font-medium text-zinc-600">Envoi de la photo…</p> : null}
+      {busy ? <p className="text-xs font-medium text-[color:var(--ink-2)]">Envoi de la photo…</p> : null}
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
 
       {showUrlFallback ? (
-        <details className="rounded-xl border border-zinc-200 bg-zinc-50/80 px-3 py-2 text-sm">
-          <summary className="cursor-pointer font-medium text-zinc-700">Utiliser une URL à la place</summary>
+        <details className="rounded-xl border border-[color:var(--line)] bg-[color:var(--cream-3)]/60 px-3 py-2 text-sm">
+          <summary className="cursor-pointer font-medium text-[color:var(--ink-2)]">Utiliser une URL à la place</summary>
           <label className="mt-2 flex flex-col gap-1">
-            <span className="text-xs text-zinc-500">Lien https vers une image</span>
+            <span className="text-xs text-[color:var(--ink-3)]">Lien https vers une image</span>
             <input
-              className="rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm"
+              className="rounded-xl border border-[color:var(--line-2)] bg-white px-3 py-2 text-sm text-[color:var(--ink)] focus:border-[color:var(--fire)] focus:outline-none"
               value={value.startsWith("data:") ? "" : value}
               onChange={(e) => onChange(e.target.value)}
               placeholder="https://..."

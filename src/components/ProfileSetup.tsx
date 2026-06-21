@@ -86,11 +86,11 @@ export default function ProfileSetup({
   return (
     <div className="w-full max-w-lg mx-auto">
       {isEdit ? (
-        <h2 className="text-2xl font-bold text-zinc-900">Modifier ton profil</h2>
+        <h2 className="font-display text-3xl font-semibold tracking-[-0.02em] text-[color:var(--ink)]">Modifier ton profil</h2>
       ) : (
-        <h1 className="text-2xl font-bold text-zinc-900">Ton profil</h1>
+        <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-[color:var(--ink)]">Ton profil</h1>
       )}
-      <p className="mt-1 text-zinc-600">
+      <p className="mt-1 text-[color:var(--ink-2)]">
         {isEdit
           ? "Mets à jour les infos affichées sur tes plans."
           : "Une photo et quelques mots suffisent pour démarrer — tu pourras compléter plus tard."}
@@ -98,9 +98,9 @@ export default function ProfileSetup({
 
       <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-4">
         <label className="flex flex-col gap-1">
-          <span className="text-sm font-medium text-zinc-900">Prénom</span>
+          <span className="text-sm font-medium text-[color:var(--ink)]">Prénom</span>
           <input
-            className="rounded-xl border border-zinc-200 bg-white px-3 py-2"
+            className="rounded-xl border border-[color:var(--line-2)] bg-white px-3 py-2 text-[color:var(--ink)] focus:border-[color:var(--fire)] focus:outline-none"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
             placeholder="Ex. Lina"
@@ -109,20 +109,20 @@ export default function ProfileSetup({
         </label>
 
         <label className="flex flex-col gap-1">
-          <span className="text-sm font-medium text-zinc-900">Âge</span>
+          <span className="text-sm font-medium text-[color:var(--ink)]">Âge</span>
           <input
             type="number"
             min={18}
             max={99}
-            className="rounded-xl border border-zinc-200 bg-white px-3 py-2"
+            className="rounded-xl border border-[color:var(--line-2)] bg-white px-3 py-2 text-[color:var(--ink)] focus:border-[color:var(--fire)] focus:outline-none"
             value={age}
             onChange={(e) => setAge(Number(e.target.value))}
           />
         </label>
 
-        <div className="flex flex-col gap-5 rounded-2xl border border-zinc-200 bg-zinc-50/50 p-4">
-          <p className="text-sm font-semibold text-zinc-900">
-            1 photo minimum <span className="font-normal text-zinc-500">— ajoutes-en plus si tu veux (jusqu&apos;à 6)</span>
+        <div className="flex flex-col gap-5 rounded-2xl border border-[color:var(--line)] bg-[color:var(--cream-3)]/60 p-4">
+          <p className="text-sm font-semibold text-[color:var(--ink)]">
+            1 photo minimum <span className="font-normal text-[color:var(--ink-3)]">— ajoutes-en plus si tu veux (jusqu&apos;à 6)</span>
           </p>
           <ProfilePhotoField label="Photo 1 *" value={photoUrls[0]} onChange={(u) => setPhotoAt(0, u)} />
           <ProfilePhotoField label="Photo 2 (optionnelle)" value={photoUrls[1]} onChange={(u) => setPhotoAt(1, u)} />
@@ -130,15 +130,15 @@ export default function ProfileSetup({
         </div>
 
         <label className="flex flex-col gap-1">
-          <span className="text-sm font-medium text-zinc-900">À propos de toi *</span>
+          <span className="text-sm font-medium text-[color:var(--ink)]">À propos de toi *</span>
           <textarea
-            className="min-h-[100px] rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm leading-relaxed"
+            className="min-h-[100px] rounded-xl border border-[color:var(--line-2)] bg-white px-3 py-2 text-sm leading-relaxed text-[color:var(--ink)] focus:border-[color:var(--fire)] focus:outline-none"
             value={bio}
             onChange={(e) => setBio(e.target.value.slice(0, BIO_MAX))}
             placeholder="Ex. J’aime les apéros posés et le billard le week-end. Je cherche à élargir mon cercle à Bruxelles."
             maxLength={BIO_MAX}
           />
-          <span className="text-xs text-zinc-500">
+          <span className="text-xs text-[color:var(--ink-3)]">
             {bio.trim().length}/{BIO_MAX} — minimum {BIO_MIN} caractères
           </span>
         </label>
@@ -152,7 +152,7 @@ export default function ProfileSetup({
               type="button"
               onClick={onCancel}
               disabled={saving}
-              className="rounded-2xl border border-zinc-200 bg-white px-5 py-3 font-semibold text-zinc-900 hover:bg-zinc-50 disabled:opacity-50 sm:flex-1"
+              className="rounded-2xl border border-[color:var(--line-2)] bg-[color:var(--cream-2)] px-5 py-3 font-semibold text-[color:var(--ink)] hover:bg-[color:var(--cream-3)] disabled:opacity-50 sm:flex-1"
             >
               Annuler
             </button>
@@ -160,7 +160,7 @@ export default function ProfileSetup({
           <button
             type="submit"
             disabled={saving}
-            className={`rounded-2xl bg-zinc-900 px-5 py-3 text-white font-semibold hover:bg-zinc-800 active:bg-zinc-950 disabled:opacity-50 ${isEdit ? "sm:flex-1" : ""}`}
+            className={`meet42-join-btn ${isEdit ? "sm:flex-1" : ""}`}
           >
             {saving ? "Sauvegarde..." : isEdit ? "Enregistrer" : "Continuer"}
           </button>

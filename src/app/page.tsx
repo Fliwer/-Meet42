@@ -1,11 +1,13 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ApiError, isLikelyNetworkFailure } from "@/lib/api/apiError";
 import { useAuth } from "@/lib/auth/useAuth";
 import { apiFetchPlansAround, apiJoinPlan } from "@/lib/plans/planApi";
 import EventCard, { EventCardEmpty, EventCardLoading } from "@/components/EventCard";
+import Avatar from "@/components/Avatar";
 import ProfileSetup from "@/components/ProfileSetup";
 import { QUICK_FORMATS } from "@/lib/plans/quickFormats";
 import type { PlanSummary } from "@/lib/plans/planTypes";
@@ -218,7 +220,8 @@ export default function Home() {
           )}
         </div>
 
-        <section className="meet42-hero meet42-hero--art px-5 py-14 sm:px-8 sm:py-20 md:px-12 md:py-28">
+        <section className="meet42-hero meet42-hero--photo px-5 py-14 sm:px-8 sm:py-20 md:px-12 md:py-28">
+          <Image src="/hero2.jpg" alt="" fill priority sizes="100vw" className="meet42-hero-img" />
           <div className="meet42-hero-scrim" aria-hidden />
           <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
             <div>
@@ -226,7 +229,7 @@ export default function Home() {
                 <span className="meet42-kicker-dot" aria-hidden /> Bruxelles · rencontres IRL
               </span>
 
-              <h1 className="font-display mt-5 text-[3rem] leading-[0.94] sm:text-[3.6rem] md:text-[4.6rem] font-semibold tracking-[-0.02em] text-[color:var(--ink)]">
+              <h1 className="font-display mt-5 text-[3rem] leading-[0.94] sm:text-[3.6rem] md:text-[4.6rem] font-semibold tracking-[-0.02em] text-[color:var(--cream)]">
                 Rencontre
                 <br className="hidden sm:block" /> du monde.
                 <span className="block">
@@ -234,7 +237,7 @@ export default function Home() {
                 </span>
               </h1>
 
-              <p className="mt-6 max-w-md text-base sm:text-lg leading-snug text-[color:var(--ink-2)]">
+              <p className="mt-6 max-w-md text-base sm:text-lg leading-snug text-[rgb(255_246_236_/_0.88)]">
                 Des sorties à 4–6 personnes près de toi — un café, un apéro, une balade. Tu rejoins, tu viens, tu rencontres. Pas de swipe.
               </p>
 
@@ -258,28 +261,18 @@ export default function Home() {
               <div className="mt-8 flex items-center gap-3">
                 {heroFaces.length > 0 ? (
                   <div className="flex -space-x-2" aria-hidden>
-                    {heroFaces.map((f, i) =>
-                      f.photo_url ? (
-                        // eslint-disable-next-line @next/next/no-img-element -- URL photo externe utilisateur
-                        <img
-                          key={`${f.first_name}-${i}`}
-                          src={f.photo_url}
-                          alt=""
-                          width={32}
-                          height={32}
-                          className="meet42-avatar"
-                          loading="lazy"
-                          referrerPolicy="no-referrer"
-                        />
-                      ) : (
-                        <span key={`${f.first_name}-${i}`} className="meet42-avatar-fallback">
-                          {f.first_name.slice(0, 1).toUpperCase()}
-                        </span>
-                      )
-                    )}
+                    {heroFaces.map((f, i) => (
+                      <Avatar
+                        key={`${f.first_name}-${i}`}
+                        src={f.photo_url}
+                        name={f.first_name}
+                        className="meet42-avatar"
+                        fallbackClassName="meet42-avatar-fallback"
+                      />
+                    ))}
                   </div>
                 ) : null}
-                <p className="text-sm font-semibold text-[color:var(--ink-2)]">
+                <p className="text-sm font-semibold text-[rgb(255_246_236_/_0.9)]">
                   {hasPlansToday
                     ? `${todayStats.peopleToday} participant·es · ${todayStats.plansToday} ${todayStats.plansToday > 1 ? "plans" : "plan"} aujourd’hui`
                     : "Sois le premier à lancer un plan aujourd’hui."}

@@ -1,15 +1,13 @@
 "use client";
 
 /**
- * Écran "Envies" — Phase 1 du modèle TimeLeft de Meet42.
+ * Écran "Envies" — préfiguration du modèle TimeLeft de Meet42.
  *
- * L'utilisateur ne crée plus / ne cherche plus un plan précis : il dit simplement
- * ce qui lui plaît (activités), quand il est dispo et dans quel coin. Il rejoint
- * ainsi un "pool". Le matcher (Phase 2) regroupera ensuite les pools en groupes
- * de 4 à 6 personnes et révélera le lieu + l'heure + les membres (Phase 3).
- *
- * Phase 1 = la sélection + confirmation côté client. Aucune persistance backend
- * pour l'instant (branchement à venir en Phase 2).
+ * L'utilisateur dit ce qui lui plaît (activités), quand il est dispo et dans
+ * quel coin. Le matching automatique (regroupement en pools de 4–6) n'est PAS
+ * encore branché côté backend — c'est annoncé honnêtement. En attendant, on
+ * transforme l'envie en action concrète : créer un plan direct pré-rempli via
+ * le parcours "Plans" qui, lui, fonctionne de bout en bout.
  */
 
 import React, { useMemo, useState } from "react";
@@ -58,34 +56,42 @@ export default function MatchPage() {
       router.push("/login?next=/match");
       return;
     }
-    // Phase 2 : POST vers /api/match/join (création/abonnement au pool).
     setSubmitted(true);
   }
 
-  const whenLabel = WHEN_OPTIONS.find((w) => w.id === when)?.label.toLowerCase() ?? "";
+  function createDirectPlan() {
+    const first = selectedActivities[0]?.id;
+    router.push(first ? `/create?activity=${first}` : "/create");
+  }
+
   const communeLabel = COMMUNES.find((c) => c.id === commune)?.label ?? "";
 
   return (
-    <main className="min-h-screen bg-zinc-50 px-4 pb-32">
+    <main className="min-h-screen bg-transparent px-4 pb-32">
       <div className="mx-auto max-w-2xl py-6 md:py-9">
         {/* Hero */}
-        <div className="rounded-3xl bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 p-6 text-white shadow-lg ring-1 ring-white/10">
-          <div className="text-xs font-semibold uppercase tracking-wide text-white/60">
-            Laisse-toi matcher
-          </div>
-          <h1 className="mt-2 text-3xl font-black tracking-tight">Dis-nous ton envie ✨</h1>
-          <p className="mt-2 text-sm leading-relaxed text-white/80">
-            Tu choisis ce qui te tente, on s&apos;occupe du reste : on te place dans un
-            petit groupe de <span className="font-semibold text-white">4 à 6 personnes</span>.
-            Zéro organisation, juste l&apos;envie de sortir.
+        <div className="rounded-3xl border border-[color:var(--line)] bg-[color:var(--cream-2)] p-6 md:p-8">
+          <span className="meet42-kicker">
+            <span className="meet42-kicker-dot" aria-hidden /> Laisse-toi matcher
+          </span>
+          <h1 className="font-display mt-3 text-[2.4rem] leading-[1.0] font-semibold tracking-[-0.02em] text-[color:var(--ink)]">
+            Dis-nous ton envie
+          </h1>
+          <p className="mt-3 text-sm leading-relaxed text-[color:var(--ink-2)]">
+            Tu choisis ce qui te tente, et on te place dans un petit groupe de{" "}
+            <span className="font-semibold text-[color:var(--ink)]">4 à 6 personnes</span>. Zéro organisation, juste
+            l&apos;envie de sortir.
+          </p>
+          <p className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[color:var(--fire-wash)] px-3 py-1 text-xs font-bold text-[color:var(--fire-ink)]">
+            ✦ Matching automatique — bientôt
           </p>
         </div>
 
         {/* Étape 1 — Activités */}
         <section className="mt-6">
           <div className="flex items-baseline justify-between">
-            <h2 className="text-lg font-bold text-zinc-900">Qu&apos;est-ce qui te tente ?</h2>
-            <span className="text-xs font-medium text-zinc-500">
+            <h2 className="meet42-section-title text-xl">Qu&apos;est-ce qui te tente ?</h2>
+            <span className="text-xs font-medium text-[color:var(--ink-3)]">
               {selected.size > 0 ? `${selected.size} sélectionnée${selected.size > 1 ? "s" : ""}` : "Choisis-en au moins 1"}
             </span>
           </div>
@@ -100,15 +106,15 @@ export default function MatchPage() {
                   aria-pressed={active}
                   className={
                     active
-                      ? "flex items-center gap-2 rounded-2xl border-2 border-[#FF6B5B] bg-[#FF6B5B]/10 px-3 py-3 text-left text-sm font-semibold text-zinc-900 shadow-sm transition active:scale-[0.98]"
-                      : "flex items-center gap-2 rounded-2xl border-2 border-zinc-200 bg-white px-3 py-3 text-left text-sm font-semibold text-zinc-700 transition hover:border-zinc-300 active:scale-[0.98]"
+                      ? "flex items-center gap-2 rounded-2xl border-2 border-[color:var(--fire)] bg-[color:var(--fire-wash)] px-3 py-3 text-left text-sm font-semibold text-[color:var(--ink)] transition active:scale-[0.98]"
+                      : "flex items-center gap-2 rounded-2xl border-2 border-[color:var(--line)] bg-[color:var(--cream-2)] px-3 py-3 text-left text-sm font-semibold text-[color:var(--ink-2)] transition hover:border-[color:var(--line-2)] active:scale-[0.98]"
                   }
                 >
                   <span className="text-xl" aria-hidden>
                     {a.emoji}
                   </span>
                   <span className="min-w-0 flex-1 truncate">{a.label}</span>
-                  {active ? <span className="text-[#FF6B5B]" aria-hidden>✓</span> : null}
+                  {active ? <span className="text-[color:var(--fire)]" aria-hidden>✓</span> : null}
                 </button>
               );
             })}
@@ -117,7 +123,7 @@ export default function MatchPage() {
 
         {/* Étape 2 — Quand */}
         <section className="mt-7">
-          <h2 className="text-lg font-bold text-zinc-900">Quand es-tu dispo ?</h2>
+          <h2 className="meet42-section-title text-xl">Quand es-tu dispo ?</h2>
           <div className="mt-3 grid grid-cols-3 gap-2">
             {WHEN_OPTIONS.map((w) => {
               const active = when === w.id;
@@ -132,12 +138,12 @@ export default function MatchPage() {
                   aria-pressed={active}
                   className={
                     active
-                      ? "rounded-2xl border-2 border-zinc-900 bg-zinc-900 px-3 py-3 text-center text-white shadow-sm transition active:scale-[0.98]"
-                      : "rounded-2xl border-2 border-zinc-200 bg-white px-3 py-3 text-center text-zinc-700 transition hover:border-zinc-300 active:scale-[0.98]"
+                      ? "rounded-2xl border-2 border-[color:var(--espresso)] bg-[color:var(--espresso)] px-3 py-3 text-center text-[color:var(--cream)] transition active:scale-[0.98]"
+                      : "rounded-2xl border-2 border-[color:var(--line)] bg-[color:var(--cream-2)] px-3 py-3 text-center text-[color:var(--ink-2)] transition hover:border-[color:var(--line-2)] active:scale-[0.98]"
                   }
                 >
                   <div className="text-sm font-bold">{w.label}</div>
-                  <div className={active ? "mt-0.5 text-[11px] text-white/70" : "mt-0.5 text-[11px] text-zinc-500"}>
+                  <div className={active ? "mt-0.5 text-[11px] text-[color:var(--cream)]/70" : "mt-0.5 text-[11px] text-[color:var(--ink-3)]"}>
                     {w.hint}
                   </div>
                 </button>
@@ -148,7 +154,7 @@ export default function MatchPage() {
 
         {/* Étape 3 — Où */}
         <section className="mt-7">
-          <h2 className="text-lg font-bold text-zinc-900">Dans quel coin ?</h2>
+          <h2 className="meet42-section-title text-xl">Dans quel coin ?</h2>
           <div className="mt-3 flex flex-wrap gap-2">
             {COMMUNES.map((c) => {
               const active = commune === c.id;
@@ -163,8 +169,8 @@ export default function MatchPage() {
                   aria-pressed={active}
                   className={
                     active
-                      ? "rounded-full border-2 border-zinc-900 bg-zinc-900 px-4 py-2 text-sm font-semibold text-white transition active:scale-[0.98]"
-                      : "rounded-full border-2 border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-700 transition hover:border-zinc-300 active:scale-[0.98]"
+                      ? "rounded-full border-2 border-[color:var(--espresso)] bg-[color:var(--espresso)] px-4 py-2 text-sm font-semibold text-[color:var(--cream)] transition active:scale-[0.98]"
+                      : "rounded-full border-2 border-[color:var(--line)] bg-[color:var(--cream-2)] px-4 py-2 text-sm font-semibold text-[color:var(--ink-2)] transition hover:border-[color:var(--line-2)] active:scale-[0.98]"
                   }
                 >
                   {c.label}
@@ -174,33 +180,42 @@ export default function MatchPage() {
           </div>
         </section>
 
-        {/* Confirmation Phase 1 */}
+        {/* Confirmation honnête — le matching auto n'existe pas encore */}
         {submitted ? (
-          <div className="mt-7 rounded-3xl border-2 border-emerald-200 bg-emerald-50 p-5">
-            <div className="text-base font-bold text-emerald-900">C&apos;est noté ! 🎉</div>
-            <p className="mt-1.5 text-sm leading-relaxed text-emerald-800">
-              On te cherche un groupe pour{" "}
-              <span className="font-semibold">
-                {selectedActivities.map((a) => `${a.emoji} ${a.label.toLowerCase()}`).join(", ")}
+          <div className="mt-7 rounded-3xl border border-[color:var(--line)] bg-[color:var(--cream-2)] p-5">
+            <div className="text-base font-bold text-[color:var(--ink)]">Le matching auto arrive bientôt 🚧</div>
+            <p className="mt-1.5 text-sm leading-relaxed text-[color:var(--ink-2)]">
+              On finalise le moteur qui regroupera automatiquement les envies en groupes de 4 à 6. En attendant, ne reste
+              pas sur ta faim :{" "}
+              <span className="font-semibold text-[color:var(--ink)]">
+                lance un plan direct pour {selectedActivities.map((a) => a.label.toLowerCase()).join(", ")} du côté de {communeLabel}
               </span>{" "}
-              {whenLabel} du côté de <span className="font-semibold">{communeLabel}</span>.
-              Dès qu&apos;un groupe de 4 à 6 se forme, on te prévient avec le lieu et l&apos;heure.
+              — d&apos;autres pourront le rejoindre tout de suite.
             </p>
-            <p className="mt-3 text-xs text-emerald-700">
-              (Le matching automatique arrive très bientôt — pour l&apos;instant ton envie est enregistrée.)
-            </p>
+            <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+              <button type="button" onClick={createDirectPlan} className="meet42-cta-primary flex-1">
+                Créer ce plan en direct
+              </button>
+              <button
+                type="button"
+                onClick={() => router.push("/")}
+                className="meet42-cta-ghost flex-1"
+              >
+                Voir les plans près de moi
+              </button>
+            </div>
           </div>
         ) : null}
       </div>
 
-      {/* CTA fixe */}
-      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-zinc-200 bg-white/95 px-4 py-3 backdrop-blur md:hidden">
+      {/* CTA fixe (mobile) */}
+      <div className="fixed inset-x-0 bottom-[calc(5.25rem+env(safe-area-inset-bottom))] z-20 px-4 md:hidden">
         <div className="mx-auto max-w-2xl">
           <button
             type="button"
             disabled={!canSubmit}
             onClick={onSubmit}
-            className="w-full rounded-2xl bg-[#FF6B5B] px-4 py-3.5 text-sm font-black text-white shadow-xl shadow-[#FF6B5B]/30 transition active:scale-[0.99] disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:shadow-none"
+            className="meet42-join-btn"
           >
             {canSubmit ? "Trouve-moi un groupe" : "Choisis une envie, un moment et un coin"}
           </button>
@@ -208,12 +223,12 @@ export default function MatchPage() {
       </div>
 
       {/* CTA desktop (inline) */}
-      <div className="mx-auto hidden max-w-2xl md:block">
+      <div className="mx-auto mt-2 hidden max-w-2xl md:block">
         <button
           type="button"
           disabled={!canSubmit}
           onClick={onSubmit}
-          className="w-full rounded-2xl bg-[#FF6B5B] px-4 py-4 text-base font-black text-white shadow-xl shadow-[#FF6B5B]/30 transition active:scale-[0.99] disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:shadow-none"
+          className="meet42-join-btn"
         >
           {canSubmit ? "Trouve-moi un groupe" : "Choisis une envie, un moment et un coin"}
         </button>
