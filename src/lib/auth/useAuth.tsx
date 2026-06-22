@@ -95,13 +95,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     );
   }
 
-  async function refreshProfileInner(targetUserId?: string | null) {
+  async function refreshProfileInner(targetUserId?: string | null, tokenOverride?: string | null) {
     const effectiveUserId = targetUserId ?? user?.id ?? null;
+    // Important : au 1er chargement, l'état `accessToken` n'est pas encore à jour
+    // (closure périmée juste après setAccessToken). On accepte donc un token frais
+    // explicite (issu de la session) pour ne pas envoyer la requête sans Bearer → 401.
+    const effectiveToken = tokenOverride ?? accessToken;
     setProfileStatus("unknown");
 
     try {
       const headers: Record<string, string> = {};
-      if (supabase && accessToken) headers["Authorization"] = `Bearer ${accessToken}`;
+      if (supabase && effectiveToken) headers["Authorization"] = `Bearer ${effectiveToken}`;
       else Object.assign(headers, getMockHeaders(effectiveUserId));
 
       const res = await fetch("/api/profile/me", {
@@ -166,7 +170,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setStatus("authenticated");
     setUser(authUser);
     setAccessToken(session.access_token);
-    await refreshProfileInner(authUser.id);
+    await refreshProfileInner(authUser.id, session.access_token);
   }
 
   useEffect(() => {
@@ -194,7 +198,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setStatus("authenticated");
       setUser(authUser);
       setAccessToken(session.access_token);
-      await refreshProfileInner(authUser.id);
+      await refreshProfileInner(authUser.id, session.access_token);
     });
 
     return () => sub.subscription.unsubscribe();
