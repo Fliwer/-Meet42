@@ -172,7 +172,6 @@ export default function Home() {
   }, [plans]);
 
   const hasPlansToday = todayStats.plansToday > 0;
-  const cityLabel = zoneSource === "gps" ? "Près de toi" : `En direct à ${FALLBACK_CITY.name}`;
   const isTonightActive =
     momentFilter === "today" && hasPlansToday && new Date().getHours() >= 15;
 
@@ -188,103 +187,75 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-transparent">
-      <div className="max-w-7xl mx-auto px-4 pt-4 pb-28 md:pb-12">
-        {/* Live strip — signaux réels */}
-        <div className="mb-3 meet42-live">
-          <span className="meet42-live-badge">
-            <span className="meet42-live-pulse" aria-hidden /> Live
+      {/* Hero full-bleed cinématique */}
+      <section className="meet42-hero--photo relative isolate flex min-h-[88vh] items-end overflow-hidden">
+        <Image src="/hero2.jpg" alt="" fill priority sizes="100vw" className="meet42-hero-img" />
+        <div className="meet42-hero-scrim" aria-hidden />
+        <div className="relative w-full max-w-7xl mx-auto px-6 sm:px-10 pt-28 pb-16 md:pb-24">
+          <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-2xl">
+          <span className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-[rgb(255_246_236_/_0.85)]">
+            <span className="meet42-live-pulse" aria-hidden style={{ background: "#15a05c" }} />
+            {hasPlansToday
+              ? `En direct · ${FALLBACK_CITY.name} · ${todayStats.plansToday} ${todayStats.plansToday > 1 ? "plans" : "plan"} ce soir`
+              : `En direct · ${FALLBACK_CITY.name}`}
           </span>
-          <span>{cityLabel}</span>
-          {hasPlansToday ? (
-            <>
-              <span className="meet42-live-sep" aria-hidden>
-                ·
-              </span>
-              <span>
-                {todayStats.plansToday} {todayStats.plansToday > 1 ? "plans" : "plan"} aujourd’hui
-              </span>
-              <span className="meet42-live-sep" aria-hidden>
-                ·
-              </span>
-              <span>
-                {todayStats.peopleToday} {todayStats.peopleToday > 1 ? "participants" : "participant"}
-              </span>
-            </>
-          ) : (
-            <>
-              <span className="meet42-live-sep" aria-hidden>
-                ·
-              </span>
-              <span>Sois le premier à lancer un plan aujourd’hui</span>
-            </>
-          )}
-        </div>
 
-        <section className="meet42-hero meet42-hero--photo px-5 py-14 sm:px-8 sm:py-20 md:px-12 md:py-28">
-          <Image src="/hero2.jpg" alt="" fill priority sizes="100vw" className="meet42-hero-img" />
-          <div className="meet42-hero-scrim" aria-hidden />
-          <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
-            <div>
-              <span className="meet42-kicker">
-                <span className="meet42-kicker-dot" aria-hidden /> Bruxelles · rencontres IRL
-              </span>
+          <h1 className="font-display mt-5 max-w-3xl text-[2.9rem] leading-[0.95] sm:text-[4.2rem] md:text-[5.4rem] font-semibold tracking-[-0.02em] text-[color:var(--cream)]">
+            Rencontre du monde.
+            <span className="block">
+              <span className="meet42-underline">Fais quelque chose.</span>
+            </span>
+          </h1>
 
-              <h1 className="font-display mt-5 text-[3rem] leading-[0.94] sm:text-[3.6rem] md:text-[4.6rem] font-semibold tracking-[-0.02em] text-[color:var(--cream)]">
-                Rencontre
-                <br className="hidden sm:block" /> du monde.
-                <span className="block">
-                  <span className="meet42-underline">Fais quelque chose.</span>
-                </span>
-              </h1>
+          <p className="mt-6 max-w-lg text-base sm:text-xl leading-snug text-[rgb(255_246_236_/_0.9)]">
+            Des sorties à 4–6 personnes près de toi — un café, un apéro, une balade. Tu rejoins, tu viens, tu rencontres. Pas de swipe.
+          </p>
 
-              <p className="mt-6 max-w-md text-base sm:text-lg leading-snug text-[rgb(255_246_236_/_0.88)]">
-                Des sorties à 4–6 personnes près de toi — un café, un apéro, une balade. Tu rejoins, tu viens, tu rencontres. Pas de swipe.
-              </p>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <button
+              type="button"
+              onClick={() => document.getElementById("plans-feed")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+              className="meet42-cta-primary w-full sm:w-auto"
+            >
+              Voir les plans ce soir
+            </button>
+            <button
+              type="button"
+              onClick={() => router.push("/create")}
+              className="meet42-cta-ghost w-full sm:w-auto"
+            >
+              + Créer un plan
+            </button>
+          </div>
 
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-                <button
-                  type="button"
-                  onClick={() => document.getElementById("plans-feed")?.scrollIntoView({ behavior: "smooth", block: "start" })}
-                  className="meet42-cta-primary w-full sm:w-auto"
-                >
-                  Voir les plans près de moi
-                </button>
-                <button
-                  type="button"
-                  onClick={() => router.push("/create")}
-                  className="meet42-cta-ghost w-full sm:w-auto"
-                >
-                  + Créer un plan
-                </button>
+          <div className="mt-8 flex items-center gap-3">
+            {heroFaces.length > 0 ? (
+              <div className="flex -space-x-2" aria-hidden>
+                {heroFaces.map((f, i) => (
+                  <Avatar
+                    key={`${f.first_name}-${i}`}
+                    src={f.photo_url}
+                    name={f.first_name}
+                    className="meet42-avatar"
+                    fallbackClassName="meet42-avatar-fallback"
+                  />
+                ))}
               </div>
-
-              <div className="mt-8 flex items-center gap-3">
-                {heroFaces.length > 0 ? (
-                  <div className="flex -space-x-2" aria-hidden>
-                    {heroFaces.map((f, i) => (
-                      <Avatar
-                        key={`${f.first_name}-${i}`}
-                        src={f.photo_url}
-                        name={f.first_name}
-                        className="meet42-avatar"
-                        fallbackClassName="meet42-avatar-fallback"
-                      />
-                    ))}
-                  </div>
-                ) : null}
-                <p className="text-sm font-semibold text-[rgb(255_246_236_/_0.9)]">
-                  {hasPlansToday
-                    ? `${todayStats.peopleToday} participant·es · ${todayStats.plansToday} ${todayStats.plansToday > 1 ? "plans" : "plan"} aujourd’hui`
-                    : "Sois le premier à lancer un plan aujourd’hui."}
-                </p>
-              </div>
+            ) : null}
+            <p className="text-sm font-semibold text-[rgb(255_246_236_/_0.9)]">
+              {hasPlansToday
+                ? `${todayStats.peopleToday} participant·es · ${todayStats.plansToday} ${todayStats.plansToday > 1 ? "plans" : "plan"} aujourd’hui`
+                : "Sois le premier à lancer un plan aujourd’hui."}
+            </p>
+          </div>
             </div>
 
             {featuredPlan ? (
-              <div className="hidden lg:block">
-                <span className="meet42-kicker mb-3">
-                  <span className="meet42-kicker-dot" aria-hidden /> À la une · le prochain plan
-                </span>
+              <div className="w-full lg:w-[360px] lg:shrink-0">
+                <div className="mb-3 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-[rgb(255_246_236_/_0.85)]">
+                  <span className="meet42-kicker-dot" aria-hidden /> À la une · ce soir
+                </div>
                 <EventCard
                   plan={featuredPlan}
                   onJoin={() => onJoinPlan(featuredPlan)}
@@ -293,7 +264,10 @@ export default function Home() {
               </div>
             ) : null}
           </div>
-        </section>
+        </div>
+      </section>
+
+      <div className="max-w-7xl mx-auto px-4 pb-28 md:pb-12">
 
         {isTonightActive ? (
           <div className="mt-4 rounded-2xl border border-amber-200/90 bg-amber-50 px-3 py-2 text-center text-xs font-bold text-amber-950">

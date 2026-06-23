@@ -48,16 +48,23 @@ export default function Logo({
   size = 34,
   showWord = true,
   className,
+  onDark = false,
 }: {
   size?: number;
   showWord?: boolean;
   className?: string;
+  /** Variante claire (texte crème) pour usage sur photo/fond sombre. */
+  onDark?: boolean;
 }) {
   return (
     <span className={`inline-flex items-center gap-2.5 ${className ?? ""}`}>
       <LogoMark size={size} />
       {showWord ? (
-        <span className="text-[1.6rem] leading-none font-black tracking-tight text-[color:var(--ink)]">
+        <span
+          className={`text-[1.6rem] leading-none font-black tracking-tight ${
+            onDark ? "text-[color:var(--cream)]" : "text-[color:var(--ink)]"
+          }`}
+        >
           Meet
           <span className="text-[color:var(--fire)]">42</span>
         </span>
