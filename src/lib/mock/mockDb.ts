@@ -30,11 +30,15 @@ type MockState = {
   attendance: Map<string, { status: "pending" | "confirmed" | "cancelled"; created_at: string; updated_at: string }>; // `${plan_id}:${user_id}`
   checkins: Map<string, { status: "on_my_way" | "arrived"; updated_at: string }>; // `${plan_id}:${user_id}`
   feedbacks: Map<string, { would_rejoin: boolean; comment: string | null; created_at: string }>; // `${plan_id}:${user_id}`
+  envies: { id: string; user_id: string; activities: string[]; when_slot: string; commune: string; created_at: string }[];
 };
 
 function getState(): MockState {
   const g = globalThis as unknown as { meet42MockDb?: MockState };
-  if (g.meet42MockDb) return g.meet42MockDb;
+  if (g.meet42MockDb) {
+    if (!g.meet42MockDb.envies) g.meet42MockDb.envies = [];
+    return g.meet42MockDb;
+  }
 
   g.meet42MockDb = {
     profiles: new Map(),
@@ -43,6 +47,7 @@ function getState(): MockState {
     attendance: new Map(),
     checkins: new Map(),
     feedbacks: new Map(),
+    envies: [],
   };
 
   return g.meet42MockDb;
@@ -229,6 +234,32 @@ export function mockEnsureSeedAround(lat: number, lng: number) {
       });
     }
   }
+
+  // Seed d'envies (preuve sociale agrégée)
+  const seedCommunes = ["ixelles", "bruxelles-centre", "saint-gilles", "etterbeek", "forest"];
+  const seedWhen = ["tonight", "weekend", "week"];
+  for (let i = 0; i < 14; i++) {
+    const p = profiles[randInt(0, profiles.length - 1)];
+    state.envies.push({
+      id: uuid(),
+      user_id: p.id,
+      activities: [ACTIVITY_IDS[randInt(0, ACTIVITY_IDS.length - 1)]],
+      when_slot: seedWhen[randInt(0, seedWhen.length - 1)],
+      commune: seedCommunes[randInt(0, seedCommunes.length - 1)],
+      created_at: new Date(Date.now() - randInt(0, 600) * 60 * 1000).toISOString(),
+    });
+  }
+}
+
+export function mockAddEnvie(row: { user_id: string; activities: string[]; when_slot: string; commune: string }) {
+  const state = getState();
+  state.envies.push({ id: uuid(), created_at: new Date().toISOString(), ...row });
+}
+
+export function mockCountRecentEnvies(hours = 24): number {
+  const state = getState();
+  const since = Date.now() - hours * 3600 * 1000;
+  return state.envies.filter((e) => new Date(e.created_at).getTime() >= since).length;
 }
 
 export function mockGetProfile(userId: string): MockProfile | null {
