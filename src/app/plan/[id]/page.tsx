@@ -21,6 +21,7 @@ import {
 import { canCancelOrLeaveBeforeStart, CANCELLATION_POLICY_FR } from "@/lib/plans/cancellation";
 import { ACTIVITIES } from "@/lib/plans/activities";
 import Avatar from "@/components/Avatar";
+import GroupReveal from "@/components/GroupReveal";
 
 function mapsUrl(lat: number, lng: number, label: string) {
   const coords = `${lat},${lng}`;
@@ -53,6 +54,7 @@ export default function PlanPage() {
   const [feedbackDone, setFeedbackDone] = useState(false);
   const [attendance, setAttendance] = useState<PlanAttendanceParticipant[]>([]);
   const [attendanceBusy, setAttendanceBusy] = useState(false);
+  const [showReveal, setShowReveal] = useState(false);
 
   useEffect(() => {
     if (!planId) return;
@@ -110,6 +112,8 @@ export default function PlanPage() {
       setPlan(updated);
       const rows = await apiFetchPlanAttendance({ planId: plan.id, accessToken, userId });
       setAttendance(rows);
+      // Group reveal : célébration quand le groupe atteint au moins 4 personnes
+      if (updated.participants_count >= 4) setShowReveal(true);
     } catch (err) {
       setActionError(err instanceof Error ? err.message : "Impossible de rejoindre");
     } finally {
@@ -272,6 +276,14 @@ export default function PlanPage() {
 
   return (
     <main className="min-h-screen bg-transparent px-4 py-8 pb-32 md:pb-10">
+      <GroupReveal
+        open={showReveal}
+        onClose={() => setShowReveal(false)}
+        faces={plan.participant_preview ?? []}
+        count={plan.participants_count}
+        max={plan.max_participants}
+        complete={plan.participants_count >= plan.max_participants}
+      />
       <div className="max-w-3xl mx-auto mt-3 rounded-3xl border border-[color:var(--line)] bg-[color:var(--cream-2)] p-5 md:p-6">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">

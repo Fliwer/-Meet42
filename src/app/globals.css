@@ -434,10 +434,36 @@ body {
   100% { box-shadow: 0 0 0 0 rgb(255 77 46 / 0); }
 }
 
+/* ── Group reveal (animation dopamine) ────────────────── */
+.meet42-reveal-fade { animation: meet42-fadein 260ms ease-out both; }
+.meet42-reveal-face { display: inline-block; animation: meet42-pop 560ms cubic-bezier(.2,1.25,.4,1) both; }
+.meet42-reveal-burst {
+  position: absolute;
+  left: 50%;
+  top: 2.2rem;
+  height: 2px;
+  width: 2px;
+  border-radius: 9999px;
+  transform: translateX(-50%);
+  animation: meet42-burst 900ms ease-out 120ms both;
+}
+@keyframes meet42-fadein { from { opacity: 0; } to { opacity: 1; } }
+@keyframes meet42-pop {
+  0% { opacity: 0; transform: translateY(20px) scale(0.5); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes meet42-burst {
+  0% { box-shadow: 0 0 0 0 rgb(255 77 46 / 0.55); opacity: 1; }
+  100% { box-shadow: 0 0 0 240px rgb(255 77 46 / 0); opacity: 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .meet42-live-pulse,
   .meet42-rise,
-  .meet42-pulse-glow::after {
+  .meet42-pulse-glow::after,
+  .meet42-reveal-face,
+  .meet42-reveal-burst,
+  .meet42-reveal-fade {
     animation: none;
   }
   .meet42-event-card:hover,
