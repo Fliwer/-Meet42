@@ -188,10 +188,10 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-transparent">
       {/* Hero full-bleed cinématique */}
-      <section className="meet42-hero--photo relative isolate flex min-h-[88vh] items-end overflow-hidden">
-        <Image src="/hero2.jpg" alt="" fill priority sizes="100vw" className="meet42-hero-img" />
+      <section className="meet42-hero--photo relative isolate flex min-h-[50vh] sm:min-h-[88vh] items-end overflow-hidden">
+        <Image src="/hero2.jpg" alt="" fill priority sizes="100vw" className="meet42-hero-img object-[92%_38%] sm:object-[center_38%]" />
         <div className="meet42-hero-scrim" aria-hidden />
-        <div className="relative w-full max-w-7xl mx-auto px-6 sm:px-10 pt-28 pb-16 md:pb-24">
+        <div className="relative w-full max-w-7xl mx-auto px-6 sm:px-10 pt-16 pb-10 sm:pt-28 sm:pb-16 md:pb-24">
           <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
           <span className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-[rgb(255_246_236_/_0.85)]">
@@ -201,18 +201,18 @@ export default function Home() {
               : `En direct · ${FALLBACK_CITY.name}`}
           </span>
 
-          <h1 className="font-display mt-5 max-w-3xl text-[2.9rem] leading-[0.95] sm:text-[4.2rem] md:text-[5.4rem] font-semibold tracking-[-0.02em] text-[color:var(--cream)]">
+          <h1 className="font-display mt-4 max-w-3xl text-[1.95rem] leading-[1.0] sm:text-[4.2rem] sm:leading-[0.95] md:text-[5.4rem] font-semibold tracking-[-0.02em] text-[color:var(--cream)]">
             Rencontre du monde.
             <span className="block">
               <span className="meet42-underline">Fais quelque chose.</span>
             </span>
           </h1>
 
-          <p className="mt-6 max-w-lg text-base sm:text-xl leading-snug text-[rgb(255_246_236_/_0.9)]">
+          <p className="mt-3 max-w-lg text-[15px] sm:text-xl leading-snug text-[rgb(255_246_236_/_0.9)]">
             Des sorties à 4–6 personnes près de toi — un café, un apéro, une balade. Tu rejoins, tu viens, tu rencontres. Pas de swipe.
           </p>
 
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="mt-6 flex flex-col gap-2.5 sm:flex-row sm:items-center">
             <button
               type="button"
               onClick={() => document.getElementById("plans-feed")?.scrollIntoView({ behavior: "smooth", block: "start" })}
@@ -229,7 +229,7 @@ export default function Home() {
             </button>
           </div>
 
-          <div className="mt-8 flex items-center gap-3">
+          <div className="mt-5 flex items-center gap-3">
             {heroFaces.length > 0 ? (
               <div className="flex -space-x-2" aria-hidden>
                 {heroFaces.map((f, i) => (
@@ -403,17 +403,6 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="md:hidden fixed bottom-[calc(5.25rem+env(safe-area-inset-bottom))] left-0 right-0 z-20 px-4 pointer-events-none">
-        <div className="max-w-lg mx-auto pointer-events-auto">
-          <button
-            type="button"
-            onClick={() => router.push("/create")}
-            className="w-full rounded-2xl bg-[color:var(--fire)] px-4 py-3.5 text-sm font-black text-[#fff5f1] shadow-xl shadow-[rgb(255_77_46_/_0.35)] active:scale-[0.99] transition"
-          >
-            Créer un plan
-          </button>
-        </div>
-      </div>
     </main>
   );
 }

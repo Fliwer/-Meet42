@@ -125,7 +125,6 @@ body {
   height: 100%;
   width: 100%;
   object-fit: cover;
-  object-position: center 38%;
 }
 .meet42-hero-scrim {
   position: absolute;
@@ -419,9 +418,26 @@ body {
   to { opacity: 1; transform: none; }
 }
 
+/* ── Halo pulsé corail pour CTA majeurs ───────────────── */
+.meet42-pulse-glow { position: relative; }
+.meet42-pulse-glow::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  animation: meet42-glow 2.6s ease-out infinite;
+  pointer-events: none;
+}
+@keyframes meet42-glow {
+  0% { box-shadow: 0 0 0 0 rgb(255 77 46 / 0.5); }
+  70% { box-shadow: 0 0 0 14px rgb(255 77 46 / 0); }
+  100% { box-shadow: 0 0 0 0 rgb(255 77 46 / 0); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .meet42-live-pulse,
-  .meet42-rise {
+  .meet42-rise,
+  .meet42-pulse-glow::after {
     animation: none;
   }
   .meet42-event-card:hover,
