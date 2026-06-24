@@ -150,11 +150,18 @@ export default function Home() {
     return { plansToday, peopleToday, happeningNow };
   }, [plans]);
 
-  const featuredPlan = useMemo(() => {
+  // « Ton 42 » : le meilleur plan du jour choisi pour toi
+  // (à venir, pas déjà rejoint, pas complet, le plus proche dans le temps).
+  const ton42 = useMemo(() => {
     const now = Date.now();
     return (
       [...plans]
-        .filter((p) => new Date(p.start_time).getTime() >= now)
+        .filter(
+          (p) =>
+            new Date(p.start_time).getTime() >= now &&
+            !p.is_joined &&
+            p.participants_count < p.max_participants
+        )
         .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())[0] ?? null
     );
   }, [plans]);
@@ -192,8 +199,6 @@ export default function Home() {
         <Image src="/hero2.jpg" alt="" fill priority sizes="100vw" className="meet42-hero-img object-[92%_38%] sm:object-[center_38%]" />
         <div className="meet42-hero-scrim" aria-hidden />
         <div className="relative w-full max-w-7xl mx-auto px-6 sm:px-10 pt-16 pb-10 sm:pt-28 sm:pb-16 md:pb-24">
-          <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
-            <div className="max-w-2xl">
           <span className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-[rgb(255_246_236_/_0.85)]">
             <span className="meet42-live-pulse" aria-hidden style={{ background: "#15a05c" }} />
             {hasPlansToday
@@ -249,25 +254,29 @@ export default function Home() {
                 : "Sois le premier à lancer un plan aujourd’hui."}
             </p>
           </div>
-            </div>
-
-            {featuredPlan ? (
-              <div className="w-full lg:w-[360px] lg:shrink-0">
-                <div className="mb-3 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-[rgb(255_246_236_/_0.85)]">
-                  <span className="meet42-kicker-dot" aria-hidden /> À la une · ce soir
-                </div>
-                <EventCard
-                  plan={featuredPlan}
-                  onJoin={() => onJoinPlan(featuredPlan)}
-                  disabled={joiningId === featuredPlan.id}
-                />
-              </div>
-            ) : null}
-          </div>
         </div>
       </section>
 
       <div className="max-w-7xl mx-auto px-4 pb-28 md:pb-12">
+
+        {ton42 ? (
+          <section className="pt-8" aria-label="Ton 42 du jour">
+            <div className="mb-4 flex items-end justify-between gap-3">
+              <div>
+                <span className="meet42-kicker">
+                  <span className="meet42-kicker-dot" aria-hidden />
+                  <span className="meet42-kicker-dot -ml-0.5" aria-hidden />
+                  Ton 42 · choisi pour toi
+                </span>
+                <h2 className="meet42-section-title mt-1 text-[1.8rem] sm:text-[2.2rem]">Ta rencontre du jour</h2>
+              </div>
+              <span className="hidden shrink-0 text-xs font-semibold text-[color:var(--ink-3)] sm:inline">1 par jour</span>
+            </div>
+            <div className="rounded-[1.7rem] bg-[linear-gradient(135deg,rgb(255_77_46_/_0.6),rgb(232_144_42_/_0.45))] p-[3px] shadow-[0_18px_40px_-22px_rgba(255,77,46,0.5)]">
+              <EventCard plan={ton42} onJoin={() => onJoinPlan(ton42)} disabled={joiningId === ton42.id} />
+            </div>
+          </section>
+        ) : null}
 
         {isTonightActive ? (
           <div className="mt-4 rounded-2xl border border-amber-200/90 bg-amber-50 px-3 py-2 text-center text-xs font-bold text-amber-950">
