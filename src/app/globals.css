@@ -30,6 +30,25 @@
   --foreground: var(--ink);
 }
 
+/* ── Mode sombre « Espresso » (sortir le soir) ─────────── */
+.dark {
+  --cream: #17100a;        /* fond espresso profond et chaud */
+  --cream-2: #251c13;      /* cartes / surfaces, papier cuit */
+  --cream-3: #2f2419;      /* surfaces enfoncées */
+  --ink: #fcf9f4;          /* texte principal, crème pur */
+  --ink-2: #c8bfae;        /* texte secondaire, sable doux */
+  --ink-3: #948a78;        /* hints */
+  --line: rgb(252 249 244 / 0.10);
+  --line-2: rgb(252 249 244 / 0.18);
+  --fire: #ff6247;         /* corail plus lumineux pour le contraste */
+  --fire-2: #ff4d2e;
+  --fire-ink: #ffb9a6;
+  --fire-wash: rgb(255 98 71 / 0.14);
+  --espresso: #0d0905;
+  --background: var(--cream);
+  --foreground: var(--ink);
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -49,6 +68,7 @@ body {
     var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Display éditoriale */
@@ -112,7 +132,7 @@ body {
 /* Hero variante photo — image next/image plein cadre + voile chaud sombre */
 .meet42-hero--photo {
   border-color: rgb(255 255 255 / 0.12);
-  color: var(--cream);
+  color: #f6efe6;
 }
 .meet42-hero--photo::before,
 .meet42-hero--photo::after {
@@ -146,7 +166,7 @@ body {
 }
 .meet42-hero--photo .meet42-cta-ghost {
   border-color: rgb(255 255 255 / 0.5);
-  color: var(--cream);
+  color: #f6efe6;
 }
 .meet42-hero--photo .meet42-cta-ghost:hover {
   background: rgb(255 255 255 / 0.12);
@@ -354,7 +374,7 @@ body {
   border-radius: 9999px;
   border: 2px solid var(--cream-2);
   background: var(--espresso);
-  color: var(--cream);
+  color: #f6efe6;
   font-size: 0.72rem;
   font-weight: 700;
 }

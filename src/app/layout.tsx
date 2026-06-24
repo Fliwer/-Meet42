@@ -82,9 +82,15 @@ export default function RootLayout({
     <html
       lang="fr"
       data-scroll-behavior="smooth"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{if(localStorage.getItem('meet42-theme')==='dark'){document.documentElement.classList.add('dark');}}catch(e){}})();`,
+          }}
+        />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
         <a href="#contenu-principal" className="skip-link">
           Aller au contenu

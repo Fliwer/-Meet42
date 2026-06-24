@@ -206,7 +206,7 @@ export default function Home() {
               : `En direct · ${FALLBACK_CITY.name}`}
           </span>
 
-          <h1 className="font-display mt-4 max-w-3xl text-[1.95rem] leading-[1.0] sm:text-[4.2rem] sm:leading-[0.95] md:text-[5.4rem] font-semibold tracking-[-0.02em] text-[color:var(--cream)]">
+          <h1 className="font-display mt-4 max-w-3xl text-[1.95rem] leading-[1.0] sm:text-[4.2rem] sm:leading-[0.95] md:text-[5.4rem] font-semibold tracking-[-0.02em] text-[#f6efe6]">
             Rencontre du monde.
             <span className="block">
               <span className="meet42-underline">Fais quelque chose.</span>

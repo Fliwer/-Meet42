@@ -62,7 +62,7 @@ export default function Logo({
       {showWord ? (
         <span
           className={`text-[1.6rem] leading-none font-black tracking-tight ${
-            onDark ? "text-[color:var(--cream)]" : "text-[color:var(--ink)]"
+            onDark ? "text-[#f6efe6]" : "text-[color:var(--ink)]"
           }`}
         >
           Meet

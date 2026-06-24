@@ -6,6 +6,7 @@ import { useAuth } from "@/lib/auth/useAuth";
 import { usePathname } from "next/navigation";
 import { mainNavItems } from "@/components/navItems";
 import Logo from "@/components/Logo";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const NAV_ACTIVE =
   "inline-flex items-center gap-2 rounded-full bg-[color:var(--espresso)] px-3.5 py-2 text-[13px] font-semibold text-[color:var(--cream)] transition-all";
@@ -63,6 +64,7 @@ export default function AppHeader() {
           ) : null}
 
           <div className="ml-auto flex items-center gap-2">
+            <ThemeToggle onDark={onHome} />
             {status === "authenticated" ? (
               <button
                 className={
