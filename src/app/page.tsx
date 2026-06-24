@@ -8,6 +8,7 @@ import { useAuth } from "@/lib/auth/useAuth";
 import { apiFetchPlansAround, apiJoinPlan } from "@/lib/plans/planApi";
 import EventCard, { EventCardEmpty, EventCardLoading } from "@/components/EventCard";
 import Avatar from "@/components/Avatar";
+import EnviePanel from "@/components/EnviePanel";
 import ProfileSetup from "@/components/ProfileSetup";
 import { QUICK_FORMATS } from "@/lib/plans/quickFormats";
 import type { PlanSummary } from "@/lib/plans/planTypes";
@@ -220,17 +221,17 @@ export default function Home() {
           <div className="mt-6 flex flex-col gap-2.5 sm:flex-row sm:items-center">
             <button
               type="button"
-              onClick={() => document.getElementById("plans-feed")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+              onClick={() => document.getElementById("envie-panel")?.scrollIntoView({ behavior: "smooth", block: "start" })}
               className="meet42-cta-primary w-full sm:w-auto"
             >
-              Voir les plans ce soir
+              Dis ton envie ce soir
             </button>
             <button
               type="button"
-              onClick={() => router.push("/create")}
+              onClick={() => document.getElementById("plans-feed")?.scrollIntoView({ behavior: "smooth", block: "start" })}
               className="meet42-cta-ghost w-full sm:w-auto"
             >
-              + Créer un plan
+              Parcourir les plans
             </button>
           </div>
 
@@ -258,6 +259,10 @@ export default function Home() {
       </section>
 
       <div className="max-w-7xl mx-auto px-4 pb-28 md:pb-12">
+
+        <section id="envie-panel" className="pt-8 scroll-mt-24">
+          <EnviePanel />
+        </section>
 
         {ton42 ? (
           <section className="pt-8" aria-label="Ton 42 du jour">

@@ -72,10 +72,12 @@ export default function MatchPage() {
         {/* Hero */}
         <div className="rounded-3xl border border-[color:var(--line)] bg-[color:var(--cream-2)] p-6 md:p-8">
           <span className="meet42-kicker">
-            <span className="meet42-kicker-dot" aria-hidden /> Laisse-toi matcher
+            <span className="meet42-kicker-dot" aria-hidden />
+            <span className="meet42-kicker-dot -ml-0.5" aria-hidden />
+            Ton 42 · on te forme un groupe
           </span>
           <h1 className="font-display mt-3 text-[2.4rem] leading-[1.0] font-semibold tracking-[-0.02em] text-[color:var(--ink)]">
-            Dis-nous ton envie
+            Dis ton envie
           </h1>
           <p className="mt-3 text-sm leading-relaxed text-[color:var(--ink-2)]">
             Tu choisis ce qui te tente, et on te place dans un petit groupe de{" "}
