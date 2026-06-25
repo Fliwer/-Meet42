@@ -253,13 +253,56 @@ export function mockEnsureSeedAround(lat: number, lng: number) {
 
 export function mockAddEnvie(row: { user_id: string; activities: string[]; when_slot: string; commune: string }) {
   const state = getState();
-  state.envies.push({ id: uuid(), created_at: new Date().toISOString(), ...row });
+  const created = { id: uuid(), created_at: new Date().toISOString(), ...row };
+  state.envies.push(created);
+  return created;
 }
 
 export function mockCountRecentEnvies(hours = 24): number {
   const state = getState();
   const since = Date.now() - hours * 3600 * 1000;
   return state.envies.filter((e) => new Date(e.created_at).getTime() >= since).length;
+}
+
+export function mockGetEnvies() {
+  return [...getState().envies];
+}
+
+export function mockDeleteEnvies(ids: string[]) {
+  const state = getState();
+  const set = new Set(ids);
+  state.envies = state.envies.filter((e) => !set.has(e.id));
+}
+
+/** Crée un plan à partir d'un groupe matché + inscrit tous les participants. */
+export function mockFormGroupPlan(fields: {
+  activity: string;
+  start_time: string;
+  max_participants: number;
+  location_text: string;
+  lat: number;
+  lng: number;
+  creator_id: string;
+  participant_ids: string[];
+}): string {
+  const state = getState();
+  const id = uuid();
+  state.plans.set(id, {
+    id,
+    activity: fields.activity,
+    start_time: fields.start_time,
+    max_participants: fields.max_participants,
+    location_text: fields.location_text,
+    lat: fields.lat,
+    lng: fields.lng,
+    creator_id: fields.creator_id,
+  });
+  const now = new Date().toISOString();
+  for (const uid of fields.participant_ids) {
+    state.participants.add(`${id}:${uid}`);
+    state.attendance.set(`${id}:${uid}`, { status: "confirmed", created_at: now, updated_at: now });
+  }
+  return id;
 }
 
 export function mockGetProfile(userId: string): MockProfile | null {

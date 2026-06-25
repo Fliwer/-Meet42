@@ -30,6 +30,7 @@ export default function EnviePanel() {
   const [submitted, setSubmitted] = useState(false);
   const [busy, setBusy] = useState(false);
   const [count, setCount] = useState<number | null>(null);
+  const [matchedPlanId, setMatchedPlanId] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -66,7 +67,7 @@ export default function EnviePanel() {
     }
     setBusy(true);
     try {
-      await fetch("/api/envies", {
+      const res = await fetch("/api/envies", {
         method: "POST",
         headers: {
           "content-type": "application/json",
@@ -78,6 +79,8 @@ export default function EnviePanel() {
           commune,
         }),
       });
+      const data = (await res.json().catch(() => ({}))) as { matched?: boolean; planId?: string };
+      if (data?.matched && data?.planId) setMatchedPlanId(data.planId);
       setSubmitted(true);
       setCount((c) => (c ?? 0) + 1);
     } catch {
@@ -183,6 +186,16 @@ export default function EnviePanel() {
         <button type="button" disabled={!canSubmit || busy} onClick={onSubmit} className="meet42-join-btn mt-6">
           {busy ? "On enregistre…" : canSubmit ? "Trouve-moi un groupe" : "Choisis une envie et un coin"}
         </button>
+      ) : matchedPlanId ? (
+        <div className="mt-6 rounded-2xl border-2 border-[color:var(--fire)] bg-[color:var(--fire-wash)] p-4">
+          <div className="text-base font-bold text-[color:var(--ink)]">🎉 Ton groupe est formé !</div>
+          <p className="mt-1 text-sm leading-relaxed text-[color:var(--ink-2)]">
+            On t&apos;a trouvé un groupe pour <span className="font-semibold text-[color:var(--ink)]">{selectedActivities.map((a) => a.label.toLowerCase()).join(", ")}</span> du côté de {communeLabel}. Ça se passe en vrai — découvre qui en est.
+          </p>
+          <button type="button" onClick={() => router.push(`/plan/${matchedPlanId}`)} className="meet42-cta-primary mt-3 w-full">
+            Voir mon groupe
+          </button>
+        </div>
       ) : (
         <div className="mt-6 rounded-2xl border border-[color:var(--line)] bg-[color:var(--cream-3)]/50 p-4">
           <div className="text-sm font-bold text-[color:var(--ink)]">C&apos;est noté 🎯</div>
