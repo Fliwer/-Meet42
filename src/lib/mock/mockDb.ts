@@ -249,6 +249,21 @@ export function mockEnsureSeedAround(lat: number, lng: number) {
       created_at: new Date(Date.now() - randInt(0, 600) * 60 * 1000).toISOString(),
     });
   }
+
+  // Panier de démo : 3 envies « café » et 3 « apéro » · ce soir · Ixelles → ta 4e forme le groupe
+  for (const demoAct of ["coffee", "drinks"]) {
+    for (let i = 0; i < 3; i++) {
+      const p = profiles[randInt(0, profiles.length - 1)];
+      state.envies.push({
+        id: uuid(),
+        user_id: p.id,
+        activities: [demoAct],
+        when_slot: "tonight",
+        commune: "ixelles",
+        created_at: new Date().toISOString(),
+      });
+    }
+  }
 }
 
 export function mockAddEnvie(row: { user_id: string; activities: string[]; when_slot: string; commune: string }) {

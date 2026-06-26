@@ -118,7 +118,7 @@ export default function EnviePanel() {
       <p className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-[color:var(--fire-ink)]">
         {count !== null && count > 0 ? (
           <>
-            <span aria-hidden>🔥</span> {count} Bruxellois{count > 1 ? "" : ""} ont dit leur envie aujourd&apos;hui
+            <span aria-hidden>🔥</span> {count} Bruxellois ont dit leur envie aujourd&apos;hui
           </>
         ) : (
           <>

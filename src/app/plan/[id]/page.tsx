@@ -308,25 +308,22 @@ export default function PlanPage() {
           </div>
         </div>
 
-        <div className="mt-4 rounded-2xl border border-[color:var(--line)] bg-[color:var(--cream-3)]/50 p-3">
-          <div className="meet42-event-vibe">Parcours</div>
-          <ol className="mt-2 flex flex-wrap gap-2">
-            {timelineSteps.map((s, i) => (
-              <li
-                key={s.key}
-                className={
-                  s.done
-                    ? "rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-bold text-emerald-900"
-                    : s.current
-                      ? "rounded-full bg-[color:var(--espresso)] px-3 py-1 text-[11px] font-bold text-[color:var(--cream)]"
-                      : "rounded-full bg-[color:var(--cream-2)] border border-[color:var(--line)] px-3 py-1 text-[11px] font-semibold text-[color:var(--ink-3)]"
-                }
-              >
-                {i + 1}. {s.label}
-              </li>
-            ))}
-          </ol>
-        </div>
+        <ol className="mt-4 flex flex-wrap items-center gap-1.5">
+          {timelineSteps.map((s) => (
+            <li
+              key={s.key}
+              className={
+                s.done
+                  ? "rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-semibold text-emerald-900"
+                  : s.current
+                    ? "rounded-full bg-[color:var(--espresso)] px-2.5 py-1 text-[11px] font-semibold text-[color:var(--cream)]"
+                    : "rounded-full px-2.5 py-1 text-[11px] font-semibold text-[color:var(--ink-3)]"
+              }
+            >
+              {s.label}
+            </li>
+          ))}
+        </ol>
 
         <div className="mt-5 rounded-2xl bg-[color:var(--cream-3)]/50 border border-[color:var(--line)] p-4">
           <div className="text-sm font-semibold text-[color:var(--ink)]">Infos lieu</div>
@@ -353,50 +350,40 @@ export default function PlanPage() {
           </div>
         </div>
 
-        <div className="mt-4 rounded-2xl border border-[color:var(--line)] bg-[color:var(--cream-3)]/50 p-3 text-xs text-[color:var(--ink-2)] leading-relaxed">
-          {CANCELLATION_POLICY_FR}
-        </div>
+        <p className="mt-3 text-xs leading-relaxed text-[color:var(--ink-3)]">{CANCELLATION_POLICY_FR}</p>
 
         {actionError ? <div className="mt-3 text-sm text-red-600">{actionError}</div> : null}
         {shareNotice ? <div className="mt-3 text-sm text-emerald-700">{shareNotice}</div> : null}
 
-        <div className="mt-4 flex items-center justify-between">
-          <div className="text-sm text-[color:var(--ink-2)]">
-            {status !== "authenticated"
-              ? "Connecte-toi pour rejoindre en un clic."
-              : plan.is_joined
-                ? "Tu es dans ce plan ✅"
-                : "Rejoins pour confirmer ta présence avec le groupe."}
+        {plan.is_joined ? (
+          <div className="mt-5 flex items-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-900">
+            <span aria-hidden>✅</span> Tu es dans ce groupe — on se retrouve sur place.
           </div>
-        </div>
-
-        <div className="mt-5 hidden md:flex gap-3">
-          <button
-            className="meet42-join-btn flex-1"
-            type="button"
-            onClick={onJoin}
-            disabled={joining || plan.is_joined}
-          >
-            {status !== "authenticated"
-              ? "Connexion pour rejoindre"
-              : plan.is_joined
-                ? "Déjà inscrit(e)"
-                : joining
-                  ? "…"
-                  : "Rejoindre"}
-          </button>
-          <button
-            className="rounded-xl border border-[color:var(--line-2)] bg-[color:var(--cream-2)] px-5 py-3 text-[color:var(--ink)] font-semibold hover:bg-[color:var(--cream-3)] min-h-[48px]"
-            type="button"
-            onClick={() => router.push("/")}
-          >
-            Retour
-          </button>
-        </div>
+        ) : (
+          <>
+            <p className="mt-4 text-sm text-[color:var(--ink-2)]">
+              {status !== "authenticated"
+                ? "Connecte-toi pour rejoindre en un clic."
+                : "Rejoins pour confirmer ta présence avec le groupe."}
+            </p>
+            <div className="mt-4 hidden md:flex gap-3">
+              <button className="meet42-join-btn flex-1" type="button" onClick={onJoin} disabled={joining}>
+                {status !== "authenticated" ? "Connexion pour rejoindre" : joining ? "…" : "Rejoindre ce groupe"}
+              </button>
+              <button
+                className="rounded-xl border border-[color:var(--line-2)] bg-[color:var(--cream-2)] px-5 py-3 text-[color:var(--ink)] font-semibold hover:bg-[color:var(--cream-3)] min-h-[48px]"
+                type="button"
+                onClick={() => router.push("/")}
+              >
+                Retour
+              </button>
+            </div>
+          </>
+        )}
 
         <div className="mt-4 rounded-2xl border border-[color:var(--line)] bg-[color:var(--cream-2)] p-4">
           <div className="flex items-center justify-between gap-3">
-            <div className="text-sm font-semibold text-[color:var(--ink)]">Participants</div>
+            <h2 className="font-display text-xl font-semibold text-[color:var(--ink)]">Ton groupe</h2>
             <div className="text-xs font-semibold text-[color:var(--ink-2)]">
               {status === "authenticated" ? `${confirmed.length} confirmés / ${plan.max_participants} max` : `${plan.participants_count} / ${plan.max_participants}`}
             </div>
@@ -449,41 +436,45 @@ export default function PlanPage() {
                 </div>
               ) : null}
 
-              <div className="mt-4 grid gap-3 md:grid-cols-3">
-                <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3">
-                  <div className="text-xs font-semibold uppercase tracking-wide text-emerald-800">Confirmés</div>
-                  <div className="mt-2 space-y-1">
-                    {confirmed.length === 0 ? <div className="text-xs text-emerald-800/80">Aucun</div> : null}
-                    {confirmed.map((p) => (
-                      <div key={`c-${p.user_id}`} className="text-sm text-emerald-900">
-                        {p.first_name}
-                      </div>
-                    ))}
+              <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4">
+                {confirmed.map((p) => (
+                  <div key={`c-${p.user_id}`} className="flex flex-col items-center gap-1.5 text-center">
+                    <span className="relative">
+                      <Avatar
+                        src={p.photo_url}
+                        name={p.first_name}
+                        size={64}
+                        className="h-16 w-16 rounded-full border-2 border-[color:var(--cream-2)] object-cover shadow-sm"
+                        fallbackClassName="grid h-16 w-16 place-items-center rounded-full border-2 border-[color:var(--cream-2)] bg-[color:var(--espresso)] text-base font-bold text-[color:var(--cream)] shadow-sm"
+                      />
+                      <span
+                        className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full border-2 border-[color:var(--cream-2)] bg-emerald-500"
+                        title="Confirmé"
+                      />
+                    </span>
+                    <span className="max-w-full truncate text-xs font-semibold text-[color:var(--ink)]">
+                      {p.first_name?.trim() || "Membre"}
+                    </span>
                   </div>
-                </div>
-                <div className="rounded-xl border border-[color:var(--line)] bg-[color:var(--cream-3)]/50 p-3">
-                  <div className="text-xs font-semibold uppercase tracking-wide text-[color:var(--ink-2)]">En attente</div>
-                  <div className="mt-2 space-y-1">
-                    {pending.length === 0 ? <div className="text-xs text-[color:var(--ink-3)]">Aucun</div> : null}
-                    {pending.map((p) => (
-                      <div key={`p-${p.user_id}`} className="text-sm text-[color:var(--ink)]">
-                        {p.first_name}
-                      </div>
-                    ))}
+                ))}
+                {Array.from({ length: Math.max(0, plan.max_participants - confirmed.length) }).map((_, i) => (
+                  <div key={`empty-${i}`} className="flex flex-col items-center gap-1.5 text-center">
+                    <span className="grid h-16 w-16 place-items-center rounded-full border-2 border-dashed border-[color:var(--line-2)] text-xl text-[color:var(--ink-3)]">
+                      +
+                    </span>
+                    <span className="text-xs text-[color:var(--ink-3)]">Libre</span>
                   </div>
-                </div>
-                <div className="rounded-xl border border-rose-200 bg-rose-50 p-3">
-                  <div className="text-xs font-semibold uppercase tracking-wide text-rose-800">Annulés</div>
-                  <div className="mt-2 space-y-1">
-                    {cancelled.length === 0 ? <div className="text-xs text-rose-700/70">Aucun</div> : null}
-                    {cancelled.map((p) => (
-                      <div key={`x-${p.user_id}`} className="text-sm text-rose-900">
-                        {p.first_name}
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                ))}
               </div>
+
+              {pending.length > 0 || cancelled.length > 0 ? (
+                <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-xs font-medium text-[color:var(--ink-3)]">
+                  {pending.length > 0 ? <span>⏳ {pending.length} en attente</span> : null}
+                  {cancelled.length > 0 ? (
+                    <span>✕ {cancelled.length} annulé{cancelled.length > 1 ? "s" : ""}</span>
+                  ) : null}
+                </div>
+              ) : null}
             </>
           )}
         </div>
@@ -595,31 +586,22 @@ export default function PlanPage() {
         ) : null}
       </div>
 
-      <div className="md:hidden fixed bottom-[calc(5.25rem+env(safe-area-inset-bottom))] left-0 right-0 z-20 px-4">
-        <div className="max-w-3xl mx-auto flex gap-2">
-          <button
-            className="meet42-join-btn flex-1"
-            type="button"
-            onClick={onJoin}
-            disabled={joining || plan.is_joined}
-          >
-            {status !== "authenticated"
-              ? "Connexion pour rejoindre"
-              : plan.is_joined
-                ? "Inscrit(e)"
-                : joining
-                  ? "…"
-                  : "Rejoindre"}
-          </button>
-          <button
-            className="rounded-2xl border border-[color:var(--line-2)] bg-[color:var(--cream-2)] px-4 py-3.5 text-sm font-bold text-[color:var(--ink)] min-h-[48px]"
-            type="button"
-            onClick={() => router.push("/")}
-          >
-            Accueil
-          </button>
+      {!plan.is_joined ? (
+        <div className="md:hidden fixed bottom-[calc(5.25rem+env(safe-area-inset-bottom))] left-0 right-0 z-20 px-4">
+          <div className="max-w-3xl mx-auto flex gap-2">
+            <button className="meet42-join-btn flex-1" type="button" onClick={onJoin} disabled={joining}>
+              {status !== "authenticated" ? "Connexion pour rejoindre" : joining ? "…" : "Rejoindre"}
+            </button>
+            <button
+              className="rounded-2xl border border-[color:var(--line-2)] bg-[color:var(--cream-2)] px-4 py-3.5 text-sm font-bold text-[color:var(--ink)] min-h-[48px]"
+              type="button"
+              onClick={() => router.push("/")}
+            >
+              Accueil
+            </button>
+          </div>
         </div>
-      </div>
+      ) : null}
     </main>
   );
 }

@@ -9,7 +9,6 @@ import { apiFetchPlansAround, apiJoinPlan } from "@/lib/plans/planApi";
 import EventCard, { EventCardEmpty, EventCardLoading } from "@/components/EventCard";
 import Avatar from "@/components/Avatar";
 import EnviePanel from "@/components/EnviePanel";
-import ProfileSetup from "@/components/ProfileSetup";
 import { QUICK_FORMATS } from "@/lib/plans/quickFormats";
 import type { PlanSummary } from "@/lib/plans/planTypes";
 import { matchesMoment, type MomentFilter } from "@/lib/plans/feed";
@@ -182,16 +181,6 @@ export default function Home() {
   const hasPlansToday = todayStats.plansToday > 0;
   const isTonightActive =
     momentFilter === "today" && hasPlansToday && new Date().getHours() >= 15;
-
-  if (status === "authenticated" && profileStatus === "missing") {
-    return (
-      <main className="min-h-screen bg-transparent">
-        <div className="px-4 py-10">
-          <ProfileSetup onDone={() => router.push("/")} />
-        </div>
-      </main>
-    );
-  }
 
   return (
     <main className="min-h-screen bg-transparent">
