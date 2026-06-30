@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth/useAuth";
 import { getAuthHeaders } from "@/lib/plans/planApi";
@@ -13,6 +13,54 @@ const WHEN_OPTIONS = [
   { id: "week", label: "Cette semaine" },
 ] as const;
 type WhenId = (typeof WHEN_OPTIONS)[number]["id"];
+
+// Brouillon d'envie persisté pour survivre au détour par /login (y compris le
+// round-trip OAuth Google). Sans ça, l'utilisateur non connecté perd toute sa
+// sélection au moment de « Trouve-moi un groupe » — la fuite nº1 du tunnel.
+const DRAFT_KEY = "meet42:envie-draft";
+const DRAFT_TTL_MS = 30 * 60 * 1000;
+
+type EnvieDraft = {
+  activities: ActivityId[];
+  when: WhenId;
+  commune: CommuneId | null;
+  replay: boolean;
+  ts: number;
+};
+
+function readDraft(): EnvieDraft | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(DRAFT_KEY);
+    if (!raw) return null;
+    const d = JSON.parse(raw) as EnvieDraft;
+    if (!d || typeof d.ts !== "number" || Date.now() - d.ts > DRAFT_TTL_MS) {
+      window.localStorage.removeItem(DRAFT_KEY);
+      return null;
+    }
+    return d;
+  } catch {
+    return null;
+  }
+}
+
+function writeDraft(d: Omit<EnvieDraft, "ts">) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(DRAFT_KEY, JSON.stringify({ ...d, ts: Date.now() }));
+  } catch {
+    // quota/private mode — on dégrade silencieusement
+  }
+}
+
+function clearDraft() {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.removeItem(DRAFT_KEY);
+  } catch {
+    // ignore
+  }
+}
 
 /**
  * Panneau « Dis ton envie » embarqué sur le home — l'entrée principale
@@ -31,6 +79,10 @@ export default function EnviePanel() {
   const [busy, setBusy] = useState(false);
   const [count, setCount] = useState<number | null>(null);
   const [matchedPlanId, setMatchedPlanId] = useState<string | null>(null);
+  // Vrai une fois le brouillon localStorage relu — garde le replay de se
+  // déclencher avant que la sélection sauvegardée soit réhydratée.
+  const [hydrated, setHydrated] = useState(false);
+  const replayPending = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -43,6 +95,18 @@ export default function EnviePanel() {
     return () => {
       cancelled = true;
     };
+  }, []);
+
+  // Réhydrate le brouillon au montage (retour depuis /login, refresh…).
+  useEffect(() => {
+    const d = readDraft();
+    if (d) {
+      setSelected(new Set(d.activities));
+      setWhen(d.when);
+      setCommune(d.commune);
+      if (d.replay) replayPending.current = true;
+    }
+    setHydrated(true);
   }, []);
 
   function toggle(id: ActivityId) {
@@ -59,12 +123,8 @@ export default function EnviePanel() {
   const canSubmit = selected.size >= 1 && commune !== null;
   const communeLabel = COMMUNES.find((c) => c.id === commune)?.label ?? "";
 
-  async function onSubmit() {
-    if (!canSubmit || busy) return;
-    if (status !== "authenticated") {
-      router.push("/login?next=/");
-      return;
-    }
+  const submitEnvie = useCallback(async () => {
+    if (selected.size < 1 || commune === null) return;
     setBusy(true);
     try {
       const res = await fetch("/api/envies", {
@@ -74,7 +134,7 @@ export default function EnviePanel() {
           ...getAuthHeaders({ accessToken, userId: user?.id ?? null }),
         },
         body: JSON.stringify({
-          activities: selectedActivities.map((a) => a.id),
+          activities: ACTIVITIES.filter((a) => selected.has(a.id)).map((a) => a.id),
           when_slot: when,
           commune,
         }),
@@ -83,13 +143,40 @@ export default function EnviePanel() {
       if (data?.matched && data?.planId) setMatchedPlanId(data.planId);
       setSubmitted(true);
       setCount((c) => (c ?? 0) + 1);
+      clearDraft();
     } catch {
       // on confirme quand même côté UX (l'envie sera retentée plus tard)
       setSubmitted(true);
     } finally {
       setBusy(false);
     }
+  }, [accessToken, commune, selected, user?.id, when]);
+
+  async function onSubmit() {
+    if (!canSubmit || busy) return;
+    if (status !== "authenticated") {
+      // On sauvegarde l'envie AVANT de partir au login pour la rejouer au retour.
+      writeDraft({ activities: [...selected], when, commune, replay: true });
+      router.push("/login?next=" + encodeURIComponent("/#envie-panel"));
+      return;
+    }
+    await submitEnvie();
   }
+
+  // Au retour du login : si un replay est en attente et qu'on est authentifié,
+  // on envoie l'envie automatiquement — l'utilisateur retrouve son groupe sans
+  // refaire la sélection.
+  useEffect(() => {
+    if (!hydrated || !replayPending.current) return;
+    if (status !== "authenticated") return;
+    if (selected.size < 1 || commune === null) {
+      replayPending.current = false;
+      clearDraft();
+      return;
+    }
+    replayPending.current = false;
+    void submitEnvie();
+  }, [hydrated, status, selected, commune, submitEnvie]);
 
   function createDirect() {
     const first = selectedActivities[0]?.id;

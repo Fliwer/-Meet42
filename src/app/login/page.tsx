@@ -270,13 +270,8 @@ function LoginPageInner() {
           </button>
         </form>
 
-        <div className="mt-3 rounded-xl border border-dashed border-[color:var(--line-2)] bg-[color:var(--cream-2)] px-3 py-2 text-xs text-[color:var(--ink-3)]">
-          Astuce : le bouton Google ci-dessus ouvre le flux OAuth Google
-          {isFacebookLoginEnabled() ? " ; Facebook aussi." : "."}
-        </div>
-
-        <p className="mt-4 text-xs text-[color:var(--ink-3)]">
-          MVP: si Supabase n’est pas configuré, l’app tourne en mode “mock” (données locales).
+        <p className="mt-5 text-center text-xs leading-relaxed text-[color:var(--ink-3)]">
+          On ne publie jamais rien en ton nom. Tes infos servent juste à former ton groupe.
         </p>
       </div>
     </main>
