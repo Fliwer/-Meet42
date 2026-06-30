@@ -95,3 +95,87 @@ export function planFieldsFromMatch(match: Match) {
     participant_ids: match.userIds,
   };
 }
+
+// ───────────────────────────────────────────────────────────────────────────
+// Filet anti cold-start : tant que la demande est faible, une envie ne forme
+// presque jamais un groupe de 4 d'un coup. Plutôt que de la laisser dans le
+// vide, on la fait REJOINDRE un plan compatible en formation, ou GRAINER un
+// nouveau plan que d'autres (et les futures envies) rempliront.
+// ───────────────────────────────────────────────────────────────────────────
+
+export type JoinablePlanRow = {
+  id: string;
+  activity: string;
+  start_time: string;
+  max_participants: number;
+  lat: number;
+  lng: number;
+};
+
+function kmBetween(aLat: number, aLng: number, bLat: number, bLng: number): number {
+  const R = 6371;
+  const dLat = ((bLat - aLat) * Math.PI) / 180;
+  const dLng = ((bLng - aLng) * Math.PI) / 180;
+  const la1 = (aLat * Math.PI) / 180;
+  const la2 = (bLat * Math.PI) / 180;
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(la1) * Math.cos(la2) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
+}
+
+/** Fenêtre temporelle (offset depuis maintenant) acceptée pour un créneau. */
+function slotWindowMs(slot: string): { min: number; max: number } {
+  const H = 3600 * 1000;
+  if (slot === "weekend") return { min: 24 * H, max: 10 * 24 * H };
+  if (slot === "week") return { min: 0, max: 6 * 24 * H };
+  return { min: 0, max: 16 * H }; // tonight
+}
+
+const JOIN_RADIUS_KM = 2.5;
+
+/**
+ * Cherche un plan déjà ouvert que cette envie peut rejoindre : même activité,
+ * proche de la commune visée, dans la bonne fenêtre temporelle, pas complet.
+ * On privilégie le plan le plus rempli (le plus proche d'un vrai groupe).
+ */
+export function pickJoinablePlan(
+  plans: JoinablePlanRow[],
+  envie: EnvieRow,
+  countOf: (planId: string) => number
+): JoinablePlanRow | null {
+  const center = COMMUNE_CENTERS[envie.commune] ?? COMMUNE_CENTERS["bruxelles-centre"];
+  const now = Date.now();
+  const win = slotWindowMs(envie.when_slot);
+
+  const candidates = plans.filter((p) => {
+    if (!envie.activities.includes(p.activity)) return false;
+    const t = new Date(p.start_time).getTime();
+    if (t < now + win.min || t > now + win.max) return false;
+    if (countOf(p.id) >= p.max_participants) return false;
+    if (kmBetween(p.lat, p.lng, center.lat, center.lng) > JOIN_RADIUS_KM) return false;
+    return true;
+  });
+
+  candidates.sort((a, b) => {
+    const fa = countOf(a.id);
+    const fb = countOf(b.id);
+    if (fb !== fa) return fb - fa; // le plus rempli d'abord
+    return new Date(a.start_time).getTime() - new Date(b.start_time).getTime();
+  });
+
+  return candidates[0] ?? null;
+}
+
+/** Champs d'un plan « graine » créé à partir d'une seule envie. */
+export function planFieldsFromEnvie(envie: EnvieRow) {
+  const center = COMMUNE_CENTERS[envie.commune] ?? COMMUNE_CENTERS["bruxelles-centre"];
+  return {
+    activity: envie.activities[0],
+    start_time: whenSlotToStartIso(envie.when_slot),
+    max_participants: GROUP_MAX,
+    location_text: `À confirmer ensemble · ${center.label}`,
+    lat: center.lat,
+    lng: center.lng,
+    creator_id: envie.user_id,
+    participant_ids: [envie.user_id],
+  };
+}

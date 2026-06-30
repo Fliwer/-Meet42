@@ -14,6 +14,10 @@ const WHEN_OPTIONS = [
 ] as const;
 type WhenId = (typeof WHEN_OPTIONS)[number]["id"];
 
+// État renvoyé par l'API après une envie : groupe complet, plan rejoint,
+// plan graine créé, ou simplement mis en attente (pas de profil / hors-ligne).
+type EnvieResultState = "formed" | "joined" | "seeded" | "pending";
+
 // Brouillon d'envie persisté pour survivre au détour par /login (y compris le
 // round-trip OAuth Google). Sans ça, l'utilisateur non connecté perd toute sa
 // sélection au moment de « Trouve-moi un groupe » — la fuite nº1 du tunnel.
@@ -78,7 +82,9 @@ export default function EnviePanel() {
   const [submitted, setSubmitted] = useState(false);
   const [busy, setBusy] = useState(false);
   const [count, setCount] = useState<number | null>(null);
-  const [matchedPlanId, setMatchedPlanId] = useState<string | null>(null);
+  const [resultPlanId, setResultPlanId] = useState<string | null>(null);
+  const [resultState, setResultState] = useState<EnvieResultState | null>(null);
+  const [shareNote, setShareNote] = useState<string | null>(null);
   // Vrai une fois le brouillon localStorage relu — garde le replay de se
   // déclencher avant que la sélection sauvegardée soit réhydratée.
   const [hydrated, setHydrated] = useState(false);
@@ -120,6 +126,10 @@ export default function EnviePanel() {
   }
 
   const selectedActivities = useMemo(() => ACTIVITIES.filter((a) => selected.has(a.id)), [selected]);
+  const activitiesLabel = useMemo(
+    () => selectedActivities.map((a) => a.label.toLowerCase()).join(", "),
+    [selectedActivities]
+  );
   const canSubmit = selected.size >= 1 && commune !== null;
   const communeLabel = COMMUNES.find((c) => c.id === commune)?.label ?? "";
 
@@ -139,18 +149,43 @@ export default function EnviePanel() {
           commune,
         }),
       });
-      const data = (await res.json().catch(() => ({}))) as { matched?: boolean; planId?: string };
-      if (data?.matched && data?.planId) setMatchedPlanId(data.planId);
+      const data = (await res.json().catch(() => ({}))) as {
+        matched?: boolean;
+        planId?: string;
+        state?: EnvieResultState;
+      };
+      const state: EnvieResultState = data?.state ?? (data?.matched ? "formed" : "pending");
+      setResultState(state);
+      setResultPlanId(data?.planId ?? null);
       setSubmitted(true);
       setCount((c) => (c ?? 0) + 1);
       clearDraft();
     } catch {
       // on confirme quand même côté UX (l'envie sera retentée plus tard)
+      setResultState("pending");
       setSubmitted(true);
     } finally {
       setBusy(false);
     }
   }, [accessToken, commune, selected, user?.id, when]);
+
+  // Partage natif (mobile) avec repli copie de lien — moteur d'invitation.
+  const sharePlan = useCallback(async () => {
+    if (!resultPlanId) return;
+    const url = `${window.location.origin}/plan/${resultPlanId}`;
+    const text = "J'ai lancé un plan sur Meet42, viens compléter le groupe 👇";
+    try {
+      const nav = navigator as Navigator & { share?: (d: ShareData) => Promise<void> };
+      if (nav.share) {
+        await nav.share({ title: "Meet42", text, url });
+        return;
+      }
+      await navigator.clipboard.writeText(url);
+      setShareNote("Lien copié — envoie-le à tes potes !");
+    } catch {
+      // partage annulé / indisponible — silencieux
+    }
+  }, [resultPlanId]);
 
   async function onSubmit() {
     if (!canSubmit || busy) return;
@@ -273,21 +308,47 @@ export default function EnviePanel() {
         <button type="button" disabled={!canSubmit || busy} onClick={onSubmit} className="meet42-join-btn mt-6">
           {busy ? "On enregistre…" : canSubmit ? "Trouve-moi un groupe" : "Choisis une envie et un coin"}
         </button>
-      ) : matchedPlanId ? (
+      ) : resultState === "formed" && resultPlanId ? (
         <div className="mt-6 rounded-2xl border-2 border-[color:var(--fire)] bg-[color:var(--fire-wash)] p-4">
           <div className="text-base font-bold text-[color:var(--ink)]">🎉 Ton groupe est formé !</div>
           <p className="mt-1 text-sm leading-relaxed text-[color:var(--ink-2)]">
-            On t&apos;a trouvé un groupe pour <span className="font-semibold text-[color:var(--ink)]">{selectedActivities.map((a) => a.label.toLowerCase()).join(", ")}</span> du côté de {communeLabel}. Ça se passe en vrai — découvre qui en est.
+            On t&apos;a trouvé un groupe pour <span className="font-semibold text-[color:var(--ink)]">{activitiesLabel}</span> du côté de {communeLabel}. Ça se passe en vrai — découvre qui en est.
           </p>
-          <button type="button" onClick={() => router.push(`/plan/${matchedPlanId}`)} className="meet42-cta-primary mt-3 w-full">
+          <button type="button" onClick={() => router.push(`/plan/${resultPlanId}`)} className="meet42-cta-primary mt-3 w-full">
             Voir mon groupe
           </button>
+        </div>
+      ) : (resultState === "joined" || resultState === "seeded") && resultPlanId ? (
+        <div className="mt-6 rounded-2xl border-2 border-[color:var(--fire)] bg-[color:var(--fire-wash)] p-4">
+          <div className="text-base font-bold text-[color:var(--ink)]">
+            {resultState === "joined" ? "🙌 Tu as rejoint un groupe en formation" : "🚀 Ton plan est lancé"}
+          </div>
+          <p className="mt-1 text-sm leading-relaxed text-[color:var(--ink-2)]">
+            {resultState === "joined" ? (
+              <>
+                D&apos;autres veulent <span className="font-semibold text-[color:var(--ink)]">{activitiesLabel}</span> à {communeLabel} — tu es des leurs. Plus on est, mieux c&apos;est : ramène un pote.
+              </>
+            ) : (
+              <>
+                On a créé ton plan <span className="font-semibold text-[color:var(--ink)]">{activitiesLabel}</span> à {communeLabel}. Il s&apos;ouvre aux autres dès maintenant — invite un pote pour le remplir plus vite.
+              </>
+            )}
+          </p>
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+            <button type="button" onClick={() => router.push(`/plan/${resultPlanId}`)} className="meet42-cta-primary w-full sm:flex-1">
+              Voir mon plan
+            </button>
+            <button type="button" onClick={sharePlan} className="meet42-cta-ghost w-full sm:flex-1">
+              Inviter un pote
+            </button>
+          </div>
+          {shareNote ? <p className="mt-2 text-xs font-semibold text-emerald-700">{shareNote}</p> : null}
         </div>
       ) : (
         <div className="mt-6 rounded-2xl border border-[color:var(--line)] bg-[color:var(--cream-3)]/50 p-4">
           <div className="text-sm font-bold text-[color:var(--ink)]">C&apos;est noté 🎯</div>
           <p className="mt-1 text-sm leading-relaxed text-[color:var(--ink-2)]">
-            On te cherche un groupe pour <span className="font-semibold text-[color:var(--ink)]">{selectedActivities.map((a) => a.label.toLowerCase()).join(", ")}</span> du côté de {communeLabel}. Le matching automatique arrive — en attendant, lance le plan toi-même, d&apos;autres pourront le rejoindre tout de suite.
+            On te cherche un groupe pour <span className="font-semibold text-[color:var(--ink)]">{activitiesLabel}</span> du côté de {communeLabel}. En attendant, lance le plan toi-même — d&apos;autres pourront le rejoindre tout de suite.
           </p>
           <button type="button" onClick={createDirect} className="meet42-cta-primary mt-3 w-full">
             Créer ce plan en direct
