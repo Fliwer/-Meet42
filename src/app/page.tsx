@@ -398,12 +398,65 @@ export default function Home() {
           ) : null}
         </section>
 
+        {/* Comment ça marche — pour le visiteur qui découvre */}
+        <section className="mt-14" aria-label="Comment ça marche">
+          <span className="meet42-kicker">
+            <span className="meet42-kicker-dot" aria-hidden /> Simple comme un plan entre potes
+          </span>
+          <h2 className="meet42-section-title mt-1 text-[1.8rem] sm:text-[2.2rem]">Comment ça marche</h2>
+          <div className="mt-5 grid gap-4 sm:grid-cols-3">
+            {[
+              {
+                n: "1",
+                title: "Dis ton envie",
+                text: "Café, apéro, balade… Tu choisis quoi, quand et dans quel coin. 30 secondes, montre en main.",
+              },
+              {
+                n: "2",
+                title: "On te forme un groupe",
+                text: "4 à 6 personnes qui veulent la même chose, au même moment, près de chez toi. Zéro organisation.",
+              },
+              {
+                n: "3",
+                title: "Vous vous retrouvez en vrai",
+                text: "Un lieu, une heure, des vraies personnes. Pas de swipe, pas de blabla infini — une rencontre.",
+              },
+            ].map((s) => (
+              <div key={s.n} className="rounded-3xl border border-[color:var(--line)] bg-[color:var(--cream-2)] p-5">
+                <div className="grid h-10 w-10 place-items-center rounded-full bg-[color:var(--fire)] font-display text-lg font-bold text-white">
+                  {s.n}
+                </div>
+                <h3 className="font-display mt-3 text-xl font-semibold text-[color:var(--ink)]">{s.title}</h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-[color:var(--ink-2)]">{s.text}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
         <div className="mt-12">
           <span className="meet42-kicker mb-3">
             <span className="meet42-kicker-dot" aria-hidden /> Pourquoi c’est safe
           </span>
           <TrustStrip />
         </div>
+
+        {/* CTA final — dernière chance de convertir avant de partir */}
+        <section className="mt-14 rounded-[2rem] bg-[color:var(--espresso)] px-6 py-10 text-center sm:px-10 sm:py-14">
+          <h2 className="font-display text-[1.9rem] leading-tight font-semibold tracking-[-0.02em] text-[#f6efe6] sm:text-[2.6rem]">
+            Ce soir, il se passe quelque chose
+            <span className="block text-[color:var(--fire)]">près de chez toi.</span>
+          </h2>
+          <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-[rgb(246_239_230_/_0.75)] sm:text-base">
+            Dis ton envie, on s&apos;occupe du reste. Gratuit, sans swipe, et ça se passe en vrai.
+          </p>
+          <button
+            type="button"
+            onClick={() => document.getElementById("envie-panel")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+            className="meet42-cta-primary mx-auto mt-6"
+          >
+            Dis ton envie maintenant
+          </button>
+        </section>
       </div>
 
     </main>
