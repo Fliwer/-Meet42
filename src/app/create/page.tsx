@@ -473,7 +473,7 @@ export default function CreatePage() {
                   <span className="text-sm font-semibold text-[color:var(--ink)]">Lieu du rendez-vous</span>
                   <span className="text-xs text-[color:var(--ink-2)]">Écris une adresse ou un repère, ou choisis une suggestion ci-dessous.</span>
                   <input
-                    className="rounded-xl border-2 border-[color:var(--line-2)] bg-[color:var(--cream-2)] px-4 py-3 text-base text-[color:var(--ink)] placeholder:text-[color:var(--ink-3)] focus:border-zinc-900 focus:outline-none"
+                    className="rounded-xl border-2 border-[color:var(--line-2)] bg-[color:var(--cream-2)] px-4 py-3 text-base text-[color:var(--ink)] placeholder:text-[color:var(--ink-3)] focus:border-[color:var(--fire)] focus:outline-none"
                     value={locationText}
                     onChange={(e) => setLocationText(e.target.value)}
                     placeholder="Ex : Café Belga, Place Flagey, 1050 Ixelles"
@@ -567,7 +567,7 @@ export default function CreatePage() {
                               setLocationText(spot.name);
                               setCoords({ lat: spot.lat, lng: spot.lng });
                             }}
-                            className="flex w-full min-h-[3.25rem] items-center rounded-xl border-2 border-[color:var(--line-2)] bg-[color:var(--cream-2)] px-3 py-2.5 text-left text-sm font-medium leading-snug text-[color:var(--ink)] shadow-sm transition hover:border-zinc-900 hover:bg-[color:var(--cream-3)]/50 active:scale-[0.99]"
+                            className="flex w-full min-h-[3.25rem] items-center rounded-xl border-2 border-[color:var(--line-2)] bg-[color:var(--cream-2)] px-3 py-2.5 text-left text-sm font-medium leading-snug text-[color:var(--ink)] shadow-sm transition hover:border-[color:var(--espresso)] hover:bg-[color:var(--cream-3)]/50 active:scale-[0.99]"
                           >
                             <span className="mr-2 shrink-0 text-lg" aria-hidden>
                               📍

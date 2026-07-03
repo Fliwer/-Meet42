@@ -71,6 +71,22 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* Grain papier éditorial — texture subtile sur tout le site (imprimé, pas écran) */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  pointer-events: none;
+  opacity: 0.26;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E");
+}
+.dark body::after {
+  opacity: 0.1;
+  mix-blend-mode: screen;
+}
+
 /* Display éditoriale */
 .font-display {
   font-family: var(--font-display), "Fraunces", Georgia, "Times New Roman", serif;
@@ -255,10 +271,15 @@ body {
 .meet42-event-card {
   position: relative;
   overflow: hidden;
-  border-radius: 1.5rem;
+  border-radius: 1.6rem;
   border: 1px solid var(--line);
-  background: var(--cream-2);
-  box-shadow: 0 1px 0 rgb(255 255 255 / 0.6) inset, 0 10px 24px -18px rgb(29 22 13 / 0.4);
+  background:
+    radial-gradient(420px 190px at 100% 0%, rgb(255 77 46 / 0.05), transparent 60%),
+    var(--cream-2);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.65) inset,
+    0 2px 4px -2px rgb(29 22 13 / 0.14),
+    0 14px 30px -20px rgb(29 22 13 / 0.45);
   transition: transform 200ms cubic-bezier(.2,.7,.2,1), box-shadow 200ms ease, border-color 200ms ease;
 }
 .meet42-event-card:hover {
@@ -286,11 +307,39 @@ body {
   height: 3.5rem;
   width: 3.5rem;
   place-items: center;
-  border-radius: 1rem;
-  border: 1px solid var(--line);
-  background: var(--cream-3);
+  border-radius: 1.1rem;
+  border: 1px solid rgb(255 77 46 / 0.2);
+  background: linear-gradient(135deg, var(--fire-wash), var(--cream-3) 78%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.85), 0 8px 16px -12px rgb(29 22 13 / 0.45);
   font-size: 1.75rem;
+  transform: rotate(-4deg);
+  transition: transform 220ms cubic-bezier(.2,.7,.2,1);
 }
+.meet42-event-card:hover .meet42-event-emoji {
+  transform: rotate(3deg) scale(1.08);
+}
+
+/* Perforation façon ticket entre le contenu et le CTA (les encoches se font
+   couper par l'overflow:hidden de la carte → demi-cercles) */
+.meet42-ticket-sep {
+  position: relative;
+  border-top: 2px dashed rgb(29 22 13 / 0.14);
+  margin: 0.15rem 1rem 0.9rem;
+}
+.dark .meet42-ticket-sep { border-top-color: rgb(252 249 244 / 0.14); }
+.meet42-ticket-sep::before,
+.meet42-ticket-sep::after {
+  content: "";
+  position: absolute;
+  top: -10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  background: var(--cream);
+  border: 1px solid var(--line);
+}
+.meet42-ticket-sep::before { left: -1.7rem; }
+.meet42-ticket-sep::after { right: -1.7rem; }
 
 .meet42-event-vibe {
   margin-bottom: 0.3rem;

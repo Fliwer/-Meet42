@@ -17,7 +17,7 @@ export default function TrustStrip({ compact }: { compact?: boolean }) {
           className="flex items-center gap-3 rounded-2xl border border-[color:var(--line)] bg-[color:var(--cream-2)] px-4 py-3"
         >
           <span
-            className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[color:var(--fire-wash)] text-base text-[color:var(--fire-ink)]"
+            className="grid h-10 w-10 shrink-0 -rotate-3 place-items-center rounded-xl border border-[rgb(255_77_46_/_0.2)] bg-[linear-gradient(135deg,var(--fire-wash),var(--cream-3))] text-base text-[color:var(--fire-ink)] shadow-[inset_0_1px_0_rgb(255_255_255_/_0.8)]"
             aria-hidden
           >
             {it.icon}

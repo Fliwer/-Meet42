@@ -102,9 +102,16 @@ export default function EventCard({ plan, onJoin, disabled }: EventCardProps) {
               {plan.participants_count}/{plan.max_participants}
             </span>
           </div>
-          <span className="meet42-spots-chip">{spotsLabel(spotsLeft)}</span>
+          <span className="meet42-spots-chip">
+            {spotsLeft > 0 && spotsLeft <= 2 ? (
+              <span className="meet42-live-pulse" style={{ background: "var(--fire)" }} aria-hidden />
+            ) : null}
+            {spotsLabel(spotsLeft)}
+          </span>
         </div>
       </Link>
+
+      <div className="meet42-ticket-sep" aria-hidden />
 
       <div className="relative px-4 pb-4 sm:px-5 sm:pb-5">
         <button
@@ -141,9 +148,9 @@ export function EventCardLoading() {
 }
 
 export function EventCardEmpty({
-  title = "Aucune sortie pour ce filtre",
-  description = "Essaie une autre catégorie ou crée ta propre sortie en 30 secondes.",
-  ctaLabel = "Créer une sortie",
+  title = "Rien de prévu ici… pour l'instant",
+  description = "Sois celui ou celle qui lance le plan — 30 secondes, et les autres n'ont plus qu'à te rejoindre.",
+  ctaLabel = "Lancer le plan",
   onCreate,
 }: {
   title?: string;
@@ -153,7 +160,7 @@ export function EventCardEmpty({
 }) {
   return (
     <section className="meet42-event-card p-6 sm:p-8 text-center">
-      <p className="meet42-event-vibe">Meet42 te propose plus</p>
+      <p className="meet42-event-vibe">À toi de jouer</p>
       <h3 className="meet42-event-title">{title}</h3>
       <p className="mt-2 text-sm text-[color:var(--ink-2)]">{description}</p>
       <button type="button" onClick={onCreate} className="meet42-join-btn mt-5 sm:w-auto sm:px-8">

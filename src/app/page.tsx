@@ -273,8 +273,8 @@ export default function Home() {
         ) : null}
 
         {isTonightActive ? (
-          <div className="mt-4 rounded-2xl border border-amber-200/90 bg-amber-50 px-3 py-2 text-center text-xs font-bold text-amber-950">
-            Ce soir, c’est chaud — la plupart des plans sont aujourd’hui
+          <div className="mt-4 rounded-2xl border border-[rgb(255_77_46_/_0.3)] bg-[color:var(--fire-wash)] px-3 py-2 text-center text-xs font-bold text-[color:var(--fire-ink)]">
+            🔥 Ce soir, c’est chaud — la plupart des plans sont aujourd’hui
           </div>
         ) : null}
 
@@ -299,8 +299,8 @@ export default function Home() {
                   onClick={() => setMomentFilter(m.id)}
                   className={
                     momentFilter === m.id
-                      ? "rounded-full border border-zinc-900 bg-zinc-900 px-4 py-2 text-sm font-black text-white"
-                      : "rounded-full border border-zinc-200 bg-white px-4 py-2 text-sm font-bold text-zinc-700 hover:bg-zinc-50"
+                      ? "rounded-full border-2 border-[color:var(--espresso)] bg-[color:var(--espresso)] px-4 py-2 text-sm font-bold text-[color:var(--cream)]"
+                      : "rounded-full border-2 border-[color:var(--line)] bg-[color:var(--cream-2)] px-4 py-2 text-sm font-semibold text-[color:var(--ink-2)] hover:border-[color:var(--line-2)]"
                   }
                 >
                   {m.label}
@@ -315,8 +315,8 @@ export default function Home() {
                   onClick={() => setActivityFilter(a.id)}
                   className={
                     activityFilter === a.id
-                      ? "rounded-full border border-zinc-900 bg-zinc-900 px-3 py-2 text-sm font-black text-white"
-                      : "rounded-full border border-zinc-200 bg-white px-3 py-2 text-sm font-bold text-zinc-700 hover:bg-zinc-50"
+                      ? "rounded-full border-2 border-[color:var(--espresso)] bg-[color:var(--espresso)] px-3 py-2 text-sm font-bold text-[color:var(--cream)]"
+                      : "rounded-full border-2 border-[color:var(--line)] bg-[color:var(--cream-2)] px-3 py-2 text-sm font-semibold text-[color:var(--ink-2)] hover:border-[color:var(--line-2)]"
                   }
                 >
                   <span aria-hidden>{a.emoji}</span> {a.label}
@@ -325,8 +325,8 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-zinc-500">
-            <span className="font-semibold text-zinc-700">
+          <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-[color:var(--ink-3)]">
+            <span className="font-semibold text-[color:var(--ink-2)]">
               {zoneSource === "gps" ? "Autour de ta position" : `Autour de ${FALLBACK_CITY.name}`}
             </span>
             <span aria-hidden>·</span>
@@ -334,7 +334,7 @@ export default function Home() {
               type="button"
               onClick={requestLocation}
               disabled={geoBusy}
-              className="font-bold text-zinc-900 underline-offset-2 hover:underline disabled:opacity-50"
+              className="font-bold text-[color:var(--ink)] underline-offset-2 hover:underline disabled:opacity-50"
             >
               {geoBusy ? "…" : "Utiliser ma position"}
             </button>
