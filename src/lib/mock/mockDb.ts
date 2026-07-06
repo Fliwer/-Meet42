@@ -23,6 +23,16 @@ type MockPlanRow = {
   creator_id: string;
 };
 
+type MockReservation = {
+  id: string;
+  user_id: string;
+  ritual_id: string;
+  occurs_at: string; // ISO
+  status: "pending" | "matched" | "cancelled";
+  plan_id: string | null;
+  created_at: string;
+};
+
 type MockState = {
   profiles: Map<string, MockProfile>;
   plans: Map<string, MockPlanRow>;
@@ -31,12 +41,14 @@ type MockState = {
   checkins: Map<string, { status: "on_my_way" | "arrived"; updated_at: string }>; // `${plan_id}:${user_id}`
   feedbacks: Map<string, { would_rejoin: boolean; comment: string | null; created_at: string }>; // `${plan_id}:${user_id}`
   envies: { id: string; user_id: string; activities: string[]; when_slot: string; commune: string; created_at: string }[];
+  reservations: MockReservation[];
 };
 
 function getState(): MockState {
   const g = globalThis as unknown as { meet42MockDb?: MockState };
   if (g.meet42MockDb) {
     if (!g.meet42MockDb.envies) g.meet42MockDb.envies = [];
+    if (!g.meet42MockDb.reservations) g.meet42MockDb.reservations = [];
     return g.meet42MockDb;
   }
 
@@ -48,6 +60,7 @@ function getState(): MockState {
     checkins: new Map(),
     feedbacks: new Map(),
     envies: [],
+    reservations: [],
   };
 
   return g.meet42MockDb;
@@ -263,6 +276,88 @@ export function mockEnsureSeedAround(lat: number, lng: number) {
         created_at: new Date().toISOString(),
       });
     }
+  }
+}
+
+// ── Réservations de rituels ──
+
+/** Réserve une place (idempotent : réactive une réservation annulée). */
+export function mockReserve(row: { user_id: string; ritual_id: string; occurs_at: string }):
+  | { ok: true; reservation: MockReservation }
+  | { ok: false; reason: "ALREADY" } {
+  const state = getState();
+  const existing = state.reservations.find(
+    (r) => r.user_id === row.user_id && r.ritual_id === row.ritual_id && r.occurs_at === row.occurs_at
+  );
+  if (existing) {
+    if (existing.status === "cancelled") {
+      existing.status = "pending";
+      return { ok: true, reservation: existing };
+    }
+    return { ok: false, reason: "ALREADY" };
+  }
+  const reservation: MockReservation = {
+    id: uuid(),
+    status: "pending",
+    plan_id: null,
+    created_at: new Date().toISOString(),
+    ...row,
+  };
+  state.reservations.push(reservation);
+  return { ok: true, reservation };
+}
+
+export function mockCancelReservation(userId: string, ritualId: string, occursAt: string): boolean {
+  const state = getState();
+  const r = state.reservations.find(
+    (x) => x.user_id === userId && x.ritual_id === ritualId && x.occurs_at === occursAt && x.status === "pending"
+  );
+  if (!r) return false;
+  r.status = "cancelled";
+  return true;
+}
+
+/** Réservations en attente pour un créneau (pour l'affichage + le matching batch). */
+export function mockGetSlotReservations(ritualId: string, occursAt: string): MockReservation[] {
+  return getState().reservations.filter(
+    (r) => r.ritual_id === ritualId && r.occurs_at === occursAt && r.status === "pending"
+  );
+}
+
+export function mockGetUserReservation(userId: string, ritualId: string, occursAt: string): MockReservation | null {
+  return (
+    getState().reservations.find(
+      (r) => r.user_id === userId && r.ritual_id === ritualId && r.occurs_at === occursAt && r.status !== "cancelled"
+    ) ?? null
+  );
+}
+
+export function mockMarkReservationsMatched(ids: string[], planId: string) {
+  const set = new Set(ids);
+  for (const r of getState().reservations) {
+    if (set.has(r.id)) {
+      r.status = "matched";
+      r.plan_id = planId;
+    }
+  }
+}
+
+/** Seed de démo : quelques réservations sur le prochain créneau pour la preuve sociale. */
+export function mockSeedReservations(ritualId: string, occursAt: string, count: number) {
+  const state = getState();
+  const already = state.reservations.some((r) => r.ritual_id === ritualId && r.occurs_at === occursAt);
+  if (already) return;
+  const profiles = [...state.profiles.values()];
+  for (let i = 0; i < count && i < profiles.length; i++) {
+    state.reservations.push({
+      id: uuid(),
+      user_id: profiles[i].id,
+      ritual_id: ritualId,
+      occurs_at: occursAt,
+      status: "pending",
+      plan_id: null,
+      created_at: new Date(Date.now() - randInt(1, 48) * 3600 * 1000).toISOString(),
+    });
   }
 }
 
