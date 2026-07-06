@@ -1,18 +1,17 @@
 "use client";
 
 import React from "react";
-import EnviePanel from "@/components/EnviePanel";
+import RitualsSection from "@/components/RitualsSection";
 
 /**
- * Onglet « Ton 42 » — la page dédiée pour dire son envie et se faire former
- * un groupe. Réutilise le même EnviePanel que le home (un seul code, le vrai
- * matcher partout). Plus de sélecteur dupliqué ni de copie « bientôt ».
+ * Onglet « Ton 42 » — réserver sa place sur les rituels de la semaine.
+ * Même composant que le home : un seul code, le vrai moteur partout.
  */
 export default function MatchPage() {
   return (
     <main className="min-h-screen bg-transparent px-4 pb-32">
-      <div className="mx-auto max-w-2xl py-6 md:py-9">
-        <EnviePanel />
+      <div className="mx-auto max-w-3xl py-6 md:py-9">
+        <RitualsSection />
       </div>
     </main>
   );

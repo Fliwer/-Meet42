@@ -8,7 +8,7 @@ import { useAuth } from "@/lib/auth/useAuth";
 import { apiFetchPlansAround, apiJoinPlan } from "@/lib/plans/planApi";
 import EventCard, { EventCardEmpty, EventCardLoading } from "@/components/EventCard";
 import Avatar from "@/components/Avatar";
-import EnviePanel from "@/components/EnviePanel";
+import RitualsSection from "@/components/RitualsSection";
 import { QUICK_FORMATS } from "@/lib/plans/quickFormats";
 import type { PlanSummary } from "@/lib/plans/planTypes";
 import { matchesMoment, type MomentFilter } from "@/lib/plans/feed";
@@ -150,22 +150,6 @@ export default function Home() {
     return { plansToday, peopleToday, happeningNow };
   }, [plans]);
 
-  // « Ton 42 » : le meilleur plan du jour choisi pour toi
-  // (à venir, pas déjà rejoint, pas complet, le plus proche dans le temps).
-  const ton42 = useMemo(() => {
-    const now = Date.now();
-    return (
-      [...plans]
-        .filter(
-          (p) =>
-            new Date(p.start_time).getTime() >= now &&
-            !p.is_joined &&
-            p.participants_count < p.max_participants
-        )
-        .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())[0] ?? null
-    );
-  }, [plans]);
-
   const heroFaces = useMemo(() => {
     const faces: { first_name: string; photo_url: string | null }[] = [];
     for (const p of plans) {
@@ -210,10 +194,10 @@ export default function Home() {
           <div className="mt-6 flex flex-col gap-2.5 sm:flex-row sm:items-center">
             <button
               type="button"
-              onClick={() => document.getElementById("envie-panel")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+              onClick={() => document.getElementById("rituels")?.scrollIntoView({ behavior: "smooth", block: "start" })}
               className="meet42-cta-primary w-full sm:w-auto"
             >
-              Dis ton envie ce soir
+              Réserve ton 42
             </button>
             <button
               type="button"
@@ -249,28 +233,9 @@ export default function Home() {
 
       <div className="max-w-7xl mx-auto px-4 pb-28 md:pb-12">
 
-        <section id="envie-panel" className="pt-8 scroll-mt-24">
-          <EnviePanel />
+        <section id="rituels" className="pt-8 scroll-mt-24">
+          <RitualsSection />
         </section>
-
-        {ton42 ? (
-          <section className="pt-8" aria-label="Ton 42 du jour">
-            <div className="mb-4 flex items-end justify-between gap-3">
-              <div>
-                <span className="meet42-kicker">
-                  <span className="meet42-kicker-dot" aria-hidden />
-                  <span className="meet42-kicker-dot -ml-0.5" aria-hidden />
-                  Ton 42 · choisi pour toi
-                </span>
-                <h2 className="meet42-section-title mt-1 text-[1.8rem] sm:text-[2.2rem]">Ta rencontre du jour</h2>
-              </div>
-              <span className="hidden shrink-0 text-xs font-semibold text-[color:var(--ink-3)] sm:inline">1 par jour</span>
-            </div>
-            <div className="rounded-[1.7rem] bg-[linear-gradient(135deg,rgb(255_77_46_/_0.6),rgb(232_144_42_/_0.45))] p-[3px] shadow-[0_18px_40px_-22px_rgba(255,77,46,0.5)]">
-              <EventCard plan={ton42} onJoin={() => onJoinPlan(ton42)} disabled={joiningId === ton42.id} />
-            </div>
-          </section>
-        ) : null}
 
         {isTonightActive ? (
           <div className="mt-4 rounded-2xl border border-[rgb(255_77_46_/_0.3)] bg-[color:var(--fire-wash)] px-3 py-2 text-center text-xs font-bold text-[color:var(--fire-ink)]">
@@ -278,13 +243,15 @@ export default function Home() {
           </div>
         ) : null}
 
-        <section id="plans-feed" className="mt-10 scroll-mt-20">
-          <div className="mb-5 flex items-end gap-3">
+        <section id="plans-feed" className="mt-12 scroll-mt-20">
+          <div className="mb-1 flex items-end gap-3">
             <h2 className="meet42-section-title text-[1.8rem] sm:text-[2.2rem]">
-              {momentFilter === "today" ? "Aujourd’hui" : "Demain"}
-              <span className="text-[color:var(--fire)]"> à Bruxelles</span>
+              En ce moment <span className="text-[color:var(--fire)]">autour de toi</span>
             </h2>
           </div>
+          <p className="mb-5 text-sm text-[color:var(--ink-2)]">
+            Des plans lancés librement par des membres — rejoins-les, ou lance le tien.
+          </p>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
             <div className="flex flex-wrap gap-2" role="group" aria-label="Quand">
               {(
@@ -408,18 +375,18 @@ export default function Home() {
             {[
               {
                 n: "1",
-                title: "Dis ton envie",
-                text: "Café, apéro, balade… Tu choisis quoi, quand et dans quel coin. 30 secondes, montre en main.",
+                title: "Réserve ta place",
+                text: "Un tap, c'est tout. Tu choisis ton 42 de la semaine — l'apéro du jeudi ou la balade du dimanche.",
               },
               {
                 n: "2",
-                title: "On te forme un groupe",
-                text: "4 à 6 personnes qui veulent la même chose, au même moment, près de chez toi. Zéro organisation.",
+                title: "La veille midi : le Reveal",
+                text: "Tu découvres ton groupe de 4 à 6, le lieu, vos points communs et de quoi briser la glace.",
               },
               {
                 n: "3",
                 title: "Vous vous retrouvez en vrai",
-                text: "Un lieu, une heure, des vraies personnes. Pas de swipe, pas de blabla infini — une rencontre.",
+                text: "Un bar, une heure, des vraies personnes. Pas de swipe, pas de blabla infini — une rencontre.",
               },
             ].map((s) => (
               <div key={s.n} className="rounded-3xl border border-[color:var(--line)] bg-[color:var(--cream-2)] p-5">
@@ -447,14 +414,14 @@ export default function Home() {
             <span className="block text-[color:var(--fire)]">près de chez toi.</span>
           </h2>
           <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-[rgb(246_239_230_/_0.75)] sm:text-base">
-            Dis ton envie, on s&apos;occupe du reste. Gratuit, sans swipe, et ça se passe en vrai.
+            Réserve ta place, on s&apos;occupe du reste. Gratuit, sans swipe, et ça se passe en vrai.
           </p>
           <button
             type="button"
-            onClick={() => document.getElementById("envie-panel")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+            onClick={() => document.getElementById("rituels")?.scrollIntoView({ behavior: "smooth", block: "start" })}
             className="meet42-cta-primary mx-auto mt-6"
           >
-            Dis ton envie maintenant
+            Réserve ton 42
           </button>
         </section>
       </div>
