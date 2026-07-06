@@ -27,6 +27,8 @@ export function proxy(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
   if (ALLOWLIST.has(pathname)) return NextResponse.next();
+  // Les crons Vercel doivent passer même site verrouillé (auth CRON_SECRET côté route)
+  if (pathname.startsWith("/api/cron/")) return NextResponse.next();
 
   // Déjà déverrouillé ?
   const cookie = request.cookies.get(GATE_COOKIE)?.value;

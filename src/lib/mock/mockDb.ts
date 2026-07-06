@@ -21,6 +21,8 @@ type MockPlanRow = {
   lat: number;
   lng: number;
   creator_id: string;
+  /** "ritual" = groupe privé formé par le matching (hors feed public) */
+  source?: "open" | "ritual";
 };
 
 type MockReservation = {
@@ -406,6 +408,7 @@ export function mockFormGroupPlan(fields: {
     lat: fields.lat,
     lng: fields.lng,
     creator_id: fields.creator_id,
+    source: "ritual",
   });
   const now = new Date().toISOString();
   for (const uid of fields.participant_ids) {

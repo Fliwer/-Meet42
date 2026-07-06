@@ -63,6 +63,7 @@ export async function GET(req: NextRequest) {
     const { plans } = mockListPlans();
 
     const filtered = plans
+      .filter((p) => p.source !== "ritual")
       .map((p) => {
         const distance_km = haversineKm(lat, lng, p.lat, p.lng);
         return { plan: p, distance_km };
@@ -131,10 +132,13 @@ export async function GET(req: NextRequest) {
     .limit(500);
 
   if (error) return NextResponse.json({ error: "Erreur plans" }, { status: 500 });
-  const candidates = ((rows ?? []) as PlanRow[]).map((r) => {
-    const distance_km = haversineKm(lat, lng, Number(r.lat), Number(r.lng));
-    return { row: r, distance_km };
-  });
+  const candidates = ((rows ?? []) as (PlanRow & { source?: string })[])
+    // Les groupes formés par le matching de rituel sont privés → jamais dans le feed
+    .filter((r) => r.source !== "ritual")
+    .map((r) => {
+      const distance_km = haversineKm(lat, lng, Number(r.lat), Number(r.lng));
+      return { row: r, distance_km };
+    });
 
   const filtered = candidates
     .filter((x) => x.distance_km <= radiusKm)
