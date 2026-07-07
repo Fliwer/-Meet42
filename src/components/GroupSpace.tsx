@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/lib/auth/useAuth";
 import { getAuthHeaders, apiFetchMyCheckin, apiSetMyCheckin } from "@/lib/plans/planApi";
+import { track } from "@/lib/analytics";
 import Avatar from "@/components/Avatar";
 import type { GroupDto } from "@/app/api/plans/[id]/group/route";
 
@@ -49,6 +50,11 @@ export default function GroupSpace({ planId, initialGroup }: { planId: string; i
     () => searchParams.get("reveal") === "1" && initialGroup.phase !== "after"
   );
 
+  useEffect(() => {
+    if (searchParams.get("reveal") === "1") track("group_revealed", { plan_id: planId });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const refresh = useCallback(async () => {
     try {
       const res = await fetch(`/api/plans/${planId}/group`, { headers: { ...getAuthHeaders({ accessToken, userId: user?.id ?? null }) } });
@@ -74,6 +80,7 @@ export default function GroupSpace({ planId, initialGroup }: { planId: string; i
   async function toggleHype() {
     setHypeBusy(true);
     setGroup((g) => ({ ...g, i_am_hyped: !g.i_am_hyped, hype_count: g.hype_count + (g.i_am_hyped ? -1 : 1) }));
+    if (!group.i_am_hyped) track("hype_clicked", { plan_id: planId });
     try {
       await fetch(`/api/plans/${planId}/hype`, { method: "POST", headers });
     } finally {
@@ -88,6 +95,7 @@ export default function GroupSpace({ planId, initialGroup }: { planId: string; i
       ...g,
       belles_given: currentlyKept ? g.belles_given.filter((u) => u !== toUser) : [...g.belles_given, toUser],
     }));
+    if (!currentlyKept) track("belle_rencontre_kept", { plan_id: planId });
     try {
       await fetch(`/api/plans/${planId}/belle-rencontre`, {
         method: "POST",

@@ -5,6 +5,7 @@ import { useAuth, type Meet42Profile } from "@/lib/auth/useAuth";
 import { profilePhotoUrlsSchema } from "@/lib/profile/photoUrlSchema";
 import ProfilePhotoField from "@/components/ProfilePhotoField";
 import { INTERESTS } from "@/lib/profile/interests";
+import { track, identify } from "@/lib/analytics";
 
 const BIO_MIN = 20;
 const BIO_MAX = 240;
@@ -29,7 +30,7 @@ export default function ProfileSetup({
   onCancel?: () => void;
   variant?: "setup" | "edit";
 }) {
-  const { updateProfile, profile, profileStatus } = useAuth();
+  const { updateProfile, profile, profileStatus, user } = useAuth();
 
   const [firstName, setFirstName] = useState(profile?.first_name ?? "");
   const [age, setAge] = useState<number>(profile?.age ?? 22);
@@ -89,6 +90,10 @@ export default function ProfileSetup({
         bio: trimmedBio,
         interests: [...interests],
       });
+      if (variant === "setup") {
+        if (user?.id) identify(user.id);
+        track("profile_completed", { interests: interests.size });
+      }
       onDone?.();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur");

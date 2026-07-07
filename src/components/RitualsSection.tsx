@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth/useAuth";
 import { getAuthHeaders } from "@/lib/plans/planApi";
+import { track } from "@/lib/analytics";
 import type { RitualSlotDto } from "@/app/api/rituals/route";
 
 /**
@@ -126,6 +127,7 @@ export default function RitualsSection() {
         if (res.ok) {
           clearDraft();
           setNotice(null);
+          track("reserve_42", { ritual_id: ritualId });
           await load();
         } else {
           setNotice("Impossible de réserver, réessaie dans un instant.");
