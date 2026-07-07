@@ -339,6 +339,11 @@ export function mockGetSlotReservations(ritualId: string, occursAt: string): Moc
   );
 }
 
+/** Toutes les réservations d'un utilisateur (pour le Carnet). */
+export function mockGetUserReservationsAll(userId: string): MockReservation[] {
+  return getState().reservations.filter((r) => r.user_id === userId);
+}
+
 export function mockGetUserReservation(userId: string, ritualId: string, occursAt: string): MockReservation | null {
   return (
     getState().reservations.find(
