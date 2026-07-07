@@ -104,6 +104,25 @@
 
 | # | Action | Bloque quoi |
 |---|--------|-------------|
-| 10.1 | Appliquer la migration SQL (fournie dans le chat) dans Supabase → SQL Editor | Le mode réel des réservations |
-| 10.2 | Créer un compte resend.com et me donner la clé API | Tous les e-mails (confirmation, Reveal, rappels) |
-| 10.3 | Confirmer les ⏳ ci-dessus (2.2, 2.6, 3.2, 7.4, 7.5) | Le home définitif |
+| 10.1 | Appliquer les **3 migrations** (voir RUNBOOK §Migrations) dans Supabase → SQL Editor | Le mode réel : réservations, graphe, hype |
+| 10.2 | Ajouter `RESEND_API_KEY` sur Vercel (compte gratuit resend.com) | Tous les e-mails (réservé, Reveal, rappels, après-42) |
+| 10.3 | Ajouter `CRON_SECRET` sur Vercel | Protection des crons (fonctionne sans, mais ouvert) |
+| 10.4 | Confirmer les ⏳ ci-dessus (2.2, 2.6, 3.2, 7.4, 7.5) | Rien de bloquant — décisions de polish |
+
+## 11. Construit (session autonome 2026-07-07 → 08)
+
+Le moteur complet du 42 est en place et vérifié en mock. Détail dans **RUNBOOK.md**.
+
+- ✅ Rituels + réservation 1-tap (`/api/rituals`, `RitualsSection`)
+- ✅ Matching batch J-1 + report auto + Fil rouge (`/api/cron/match`, `composeGroups`)
+- ✅ E-mails voix du 42 (Resend, no-op sans clé) : réservé, Reveal, rappel, après, report
+- ✅ Espace de groupe : Reveal animé, points communs, brise-glace, J'ai hâte, check-in, Belle rencontre (`GroupSpace`, `/api/plans/[id]/group|hype|belle-rencontre`)
+- ✅ Graphe social : `encounters` (co-présence) + `belles_rencontres` (double opt-in, mutualité)
+- ✅ Intérêts au profil (12 puces, min 3) → alimentent points communs + brise-glace
+- ✅ Carnet : historique + rencontres + cercle + jalons (`/api/me/carnet`)
+- ✅ Home pivoté « Ton prochain 42 », nav vocabulaire 42
+- ✅ Analytics funnel PostHog (env-gated)
+- ✅ OpenGraph + SEO + montée en gamme visuelle (grain, cartes ticket)
+
+Migrations ajoutées : `20260707100000_rituals_graph`, `20260708090000_plan_source`,
+`20260708140000_hype`.
