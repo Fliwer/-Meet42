@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
+import { type SupabaseClient } from "@supabase/supabase-js";
 import { getServerSupabaseAdmin, getServerSupabaseWithAccessToken, isSupabaseConfigured } from "@/lib/supabase/client";
 import { profilePhotoUrlsSchema } from "@/lib/profile/photoUrlSchema";
 import {
@@ -35,6 +36,7 @@ const ProfilePayloadSchema = z.object({
   age: z.number().int().min(18).max(99),
   photo_urls: profilePhotoUrlsSchema,
   bio: z.string().min(20).max(240),
+  interests: z.array(z.string().min(1).max(30)).max(12).optional(),
 });
 
 function jsonProfileFromMock(p: NonNullable<ReturnType<typeof mockGetProfile>>) {
@@ -46,6 +48,7 @@ function jsonProfileFromMock(p: NonNullable<ReturnType<typeof mockGetProfile>>) 
     photo_url: p.photo_url ?? urls[0] ?? null,
     photo_urls: urls,
     bio: p.bio,
+    interests: p.interests ?? [],
   };
 }
 
@@ -75,6 +78,11 @@ export async function GET(req: NextRequest) {
     urls = [data.photo_url as string];
   }
 
+  const interestsRaw = (data as Record<string, unknown>).interests;
+  const interests = Array.isArray(interestsRaw)
+    ? interestsRaw.filter((i): i is string => typeof i === "string")
+    : [];
+
   return NextResponse.json({
     id: data.user_id,
     first_name: data.first_name,
@@ -82,6 +90,7 @@ export async function GET(req: NextRequest) {
     photo_url: (data.photo_url as string | null) ?? urls[0] ?? null,
     photo_urls: urls,
     bio: data.bio,
+    interests,
   });
 }
 
@@ -95,6 +104,7 @@ export async function POST(req: NextRequest) {
   }
 
   const photo_urls = payload.data.photo_urls.map((u) => u.trim());
+  const interests = (payload.data.interests ?? []).map((i) => i.trim()).filter(Boolean);
 
   if (!isSupabaseConfigured()) {
     mockUpsertProfile({
@@ -103,24 +113,27 @@ export async function POST(req: NextRequest) {
       age: payload.data.age,
       photo_urls,
       bio: payload.data.bio,
+      interests,
     });
     return NextResponse.json({ ok: true });
   }
 
-  const admin = getServerSupabaseAdmin();
-  const { error } = await admin
-    .from("profiles")
-    .upsert(
-      {
-        user_id: userId,
-        first_name: payload.data.first_name,
-        age: payload.data.age,
-        photo_url: photo_urls[0],
-        photo_urls,
-        bio: payload.data.bio,
-      },
-      { onConflict: "user_id" }
-    );
+  // Cast souple : database.types.ts ne contient pas encore `interests`.
+  const admin = getServerSupabaseAdmin() as unknown as SupabaseClient;
+  // interests peut manquer si la migration n'est pas encore appliquée → on
+  // réessaie sans la colonne plutôt que d'échouer.
+  const base = {
+    user_id: userId,
+    first_name: payload.data.first_name,
+    age: payload.data.age,
+    photo_url: photo_urls[0],
+    photo_urls,
+    bio: payload.data.bio,
+  };
+  let error = (await admin.from("profiles").upsert({ ...base, interests }, { onConflict: "user_id" })).error;
+  if (error) {
+    error = (await admin.from("profiles").upsert(base, { onConflict: "user_id" })).error;
+  }
 
   if (error) return NextResponse.json({ error: "Erreur sauvegarde" }, { status: 500 });
   return NextResponse.json({ ok: true });

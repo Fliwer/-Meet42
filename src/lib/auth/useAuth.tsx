@@ -14,6 +14,8 @@ export type Meet42Profile = {
   /** Au moins 3 en prod */
   photo_urls?: string[];
   bio?: string | null;
+  /** Centres d'intérêt (points communs + brise-glace du Reveal) */
+  interests?: string[];
 };
 
 type AuthUser = {
@@ -38,6 +40,7 @@ type AuthContextValue = {
     age: number;
     photo_urls: string[];
     bio: string;
+    interests?: string[];
   }) => Promise<void>;
   uploadProfilePhoto: (file: File) => Promise<string>;
 };

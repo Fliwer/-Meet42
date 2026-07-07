@@ -4,9 +4,11 @@ import React, { useEffect, useState } from "react";
 import { useAuth, type Meet42Profile } from "@/lib/auth/useAuth";
 import { profilePhotoUrlsSchema } from "@/lib/profile/photoUrlSchema";
 import ProfilePhotoField from "@/components/ProfilePhotoField";
+import { INTERESTS } from "@/lib/profile/interests";
 
 const BIO_MIN = 20;
 const BIO_MAX = 240;
+const INTERESTS_MIN = 3;
 
 function threeSlotsFromProfile(profile: Meet42Profile | null): [string, string, string] {
   const listed = profile?.photo_urls?.filter((u) => u?.trim()) ?? [];
@@ -33,6 +35,7 @@ export default function ProfileSetup({
   const [age, setAge] = useState<number>(profile?.age ?? 22);
   const [photoUrls, setPhotoUrls] = useState<[string, string, string]>(() => threeSlotsFromProfile(profile));
   const [bio, setBio] = useState(profile?.bio ?? "");
+  const [interests, setInterests] = useState<Set<string>>(new Set(profile?.interests ?? []));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -41,7 +44,17 @@ export default function ProfileSetup({
     setAge(profile?.age ?? 22);
     setPhotoUrls(threeSlotsFromProfile(profile));
     setBio(profile?.bio ?? "");
+    setInterests(new Set(profile?.interests ?? []));
   }, [profile]);
+
+  function toggleInterest(id: string) {
+    setInterests((prev) => {
+      const n = new Set(prev);
+      if (n.has(id)) n.delete(id);
+      else n.add(id);
+      return n;
+    });
+  }
 
   function setPhotoAt(index: 0 | 1 | 2, url: string) {
     setPhotoUrls((prev) => {
@@ -67,11 +80,14 @@ export default function ProfileSetup({
       const parsed = profilePhotoUrlsSchema.safeParse(urls);
       if (!parsed.success) throw new Error("Une ou plusieurs photos sont invalides");
 
+      if (interests.size < INTERESTS_MIN) throw new Error(`Choisis au moins ${INTERESTS_MIN} centres d'intérêt`);
+
       await updateProfile({
         first_name: firstName.trim(),
         age,
         photo_urls: parsed.data,
         bio: trimmedBio,
+        interests: [...interests],
       });
       onDone?.();
     } catch (err) {
@@ -127,6 +143,36 @@ export default function ProfileSetup({
           <ProfilePhotoField label="Photo 1 *" value={photoUrls[0]} onChange={(u) => setPhotoAt(0, u)} />
           <ProfilePhotoField label="Photo 2 (optionnelle)" value={photoUrls[1]} onChange={(u) => setPhotoAt(1, u)} />
           <ProfilePhotoField label="Photo 3 (optionnelle)" value={photoUrls[2]} onChange={(u) => setPhotoAt(2, u)} />
+        </div>
+
+        <div className="flex flex-col gap-2.5">
+          <div>
+            <span className="text-sm font-medium text-[color:var(--ink)]">Ce qui te fait vibrer *</span>
+            <p className="text-xs text-[color:var(--ink-3)]">
+              Au moins {INTERESTS_MIN} — c&apos;est ce qui crée les points communs et brise-glace de ton groupe.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {INTERESTS.map((it) => {
+              const on = interests.has(it.id);
+              return (
+                <button
+                  key={it.id}
+                  type="button"
+                  onClick={() => toggleInterest(it.id)}
+                  aria-pressed={on}
+                  className={
+                    on
+                      ? "inline-flex items-center gap-1.5 rounded-full border-2 border-[color:var(--fire)] bg-[color:var(--fire-wash)] px-3.5 py-1.5 text-sm font-semibold text-[color:var(--ink)] transition active:scale-95"
+                      : "inline-flex items-center gap-1.5 rounded-full border-2 border-[color:var(--line)] bg-[color:var(--cream-2)] px-3.5 py-1.5 text-sm font-semibold text-[color:var(--ink-2)] transition hover:border-[color:var(--line-2)] active:scale-95"
+                  }
+                >
+                  <span aria-hidden>{it.emoji}</span> {it.label}
+                </button>
+              );
+            })}
+          </div>
+          <span className="text-xs text-[color:var(--ink-3)]">{interests.size} sélectionné·s</span>
         </div>
 
         <label className="flex flex-col gap-1">

@@ -10,6 +10,7 @@ type MockProfile = {
   photo_url?: string | null;
   photo_urls?: string[];
   bio?: string | null;
+  interests?: string[];
 };
 
 type MockPlanRow = {
@@ -44,6 +45,9 @@ type MockState = {
   feedbacks: Map<string, { would_rejoin: boolean; comment: string | null; created_at: string }>; // `${plan_id}:${user_id}`
   envies: { id: string; user_id: string; activities: string[]; when_slot: string; commune: string; created_at: string }[];
   reservations: MockReservation[];
+  hype: Set<string>; // `${plan_id}:${user_id}`
+  belles: { from_user: string; to_user: string; plan_id: string | null }[];
+  encounters: { plan_id: string; user_a: string; user_b: string }[];
 };
 
 function getState(): MockState {
@@ -51,6 +55,9 @@ function getState(): MockState {
   if (g.meet42MockDb) {
     if (!g.meet42MockDb.envies) g.meet42MockDb.envies = [];
     if (!g.meet42MockDb.reservations) g.meet42MockDb.reservations = [];
+    if (!g.meet42MockDb.hype) g.meet42MockDb.hype = new Set();
+    if (!g.meet42MockDb.belles) g.meet42MockDb.belles = [];
+    if (!g.meet42MockDb.encounters) g.meet42MockDb.encounters = [];
     return g.meet42MockDb;
   }
 
@@ -63,6 +70,9 @@ function getState(): MockState {
     feedbacks: new Map(),
     envies: [],
     reservations: [],
+    hype: new Set(),
+    belles: [],
+    encounters: [],
   };
 
   return g.meet42MockDb;
@@ -189,12 +199,15 @@ export function mockEnsureSeedAround(lat: number, lng: number) {
     const id = uuid();
     const firstNames = ["Lina", "Amine", "Sophie", "Nora", "Julien", "Maya", "Yanis", "Chloé", "Samir", "Camille"];
     const first_name = firstNames[i % firstNames.length];
+    const allInterests = ["voyage", "food", "sport", "musique", "cine", "lecture", "tech", "nature", "art", "jeux", "langues", "entreprendre"];
+    const shuffled = [...allInterests].sort(() => Math.random() - 0.5);
     const profile: MockProfile = {
       id,
       first_name,
       age: randInt(18, 32),
       photo_url: null,
       bio: "On se capte vite pour une activité simple.",
+      interests: shuffled.slice(0, randInt(3, 5)),
     };
     profiles.push(profile);
     state.profiles.set(id, profile);
@@ -418,6 +431,54 @@ export function mockFormGroupPlan(fields: {
   return id;
 }
 
+// ── « J'ai hâte » ──
+export function mockToggleHype(planId: string, userId: string): boolean {
+  const state = getState();
+  const key = `${planId}:${userId}`;
+  if (state.hype.has(key)) {
+    state.hype.delete(key);
+    return false;
+  }
+  state.hype.add(key);
+  return true;
+}
+
+export function mockGetHype(planId: string): { count: number; users: string[] } {
+  const state = getState();
+  const users: string[] = [];
+  for (const key of state.hype) {
+    const [pId, uId] = key.split(":");
+    if (pId === planId) users.push(uId);
+  }
+  return { count: users.length, users };
+}
+
+// ── Belles rencontres (graphe) ──
+export function mockAddBelle(fromUser: string, toUser: string, planId: string | null) {
+  const state = getState();
+  if (!state.belles.some((b) => b.from_user === fromUser && b.to_user === toUser)) {
+    state.belles.push({ from_user: fromUser, to_user: toUser, plan_id: planId });
+  }
+}
+
+export function mockRemoveBelle(fromUser: string, toUser: string) {
+  const state = getState();
+  state.belles = state.belles.filter((b) => !(b.from_user === fromUser && b.to_user === toUser));
+}
+
+/** Les personnes que `fromUser` a marquées « belle rencontre ». */
+export function mockGetBellesFrom(fromUser: string): string[] {
+  return getState().belles.filter((b) => b.from_user === fromUser).map((b) => b.to_user);
+}
+
+/** Vrai si les deux sens existent (rencontre mutuelle). */
+export function mockIsMutual(a: string, b: string): boolean {
+  const state = getState();
+  const ab = state.belles.some((x) => x.from_user === a && x.to_user === b);
+  const ba = state.belles.some((x) => x.from_user === b && x.to_user === a);
+  return ab && ba;
+}
+
 export function mockGetProfile(userId: string): MockProfile | null {
   return getState().profiles.get(userId) ?? null;
 }
@@ -426,7 +487,7 @@ export function mockUpsertProfile(profile: Omit<MockProfile, "id"> & { id: strin
   const state = getState();
   const urls = (profile.photo_urls ?? []).map((u) => u.trim()).filter(Boolean);
   const photo_url = urls[0] ?? profile.photo_url?.trim() ?? null;
-  state.profiles.set(profile.id, { ...profile, photo_urls: urls, photo_url });
+  state.profiles.set(profile.id, { ...profile, photo_urls: urls, photo_url, interests: profile.interests ?? [] });
 }
 
 export function mockCreatePlan(row: {

@@ -22,6 +22,9 @@ import { canCancelOrLeaveBeforeStart, CANCELLATION_POLICY_FR } from "@/lib/plans
 import { ACTIVITIES } from "@/lib/plans/activities";
 import Avatar from "@/components/Avatar";
 import GroupReveal from "@/components/GroupReveal";
+import GroupSpace from "@/components/GroupSpace";
+import { getAuthHeaders } from "@/lib/plans/planApi";
+import type { GroupDto } from "@/app/api/plans/[id]/group/route";
 
 function mapsUrl(lat: number, lng: number, label: string) {
   const coords = `${lat},${lng}`;
@@ -55,6 +58,28 @@ export default function PlanPage() {
   const [attendance, setAttendance] = useState<PlanAttendanceParticipant[]>([]);
   const [attendanceBusy, setAttendanceBusy] = useState(false);
   const [showReveal, setShowReveal] = useState(false);
+  // Groupe de rituel : rendu par l'expérience GroupSpace dédiée.
+  const [group, setGroup] = useState<GroupDto | null>(null);
+  const [groupResolved, setGroupResolved] = useState(false);
+
+  useEffect(() => {
+    if (!planId) return;
+    let cancelled = false;
+    fetch(`/api/plans/${planId}/group`, { headers: { ...getAuthHeaders({ accessToken, userId }) } })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((g: GroupDto | null) => {
+        if (!cancelled) setGroup(g);
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        if (!cancelled) setGroupResolved(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [planId, accessToken, userId]);
+
+  const showGroupSpace = Boolean(group && group.is_ritual && group.is_member);
 
   useEffect(() => {
     if (!planId) return;
@@ -220,7 +245,12 @@ export default function PlanPage() {
     }
   }
 
-  if (loading) {
+  // Groupe de rituel dont je suis membre → l'expérience GroupSpace dédiée.
+  if (showGroupSpace && group) {
+    return <GroupSpace planId={planId} initialGroup={group} />;
+  }
+
+  if (loading || !groupResolved) {
     return (
       <main className="min-h-screen bg-transparent px-4 py-8">
         <div className="max-w-2xl mx-auto mt-6 space-y-3 animate-pulse">
