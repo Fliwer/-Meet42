@@ -35,7 +35,8 @@ const ProfilePayloadSchema = z.object({
   first_name: z.string().min(1).max(40),
   age: z.number().int().min(18).max(99),
   photo_urls: profilePhotoUrlsSchema,
-  bio: z.string().min(20).max(240),
+  // La bio est optionnelle (retirée de la création — dispo en édition)
+  bio: z.string().max(240).optional().default(""),
   interests: z.array(z.string().min(1).max(30)).max(12).optional(),
 });
 
@@ -112,7 +113,7 @@ export async function POST(req: NextRequest) {
       first_name: payload.data.first_name,
       age: payload.data.age,
       photo_urls,
-      bio: payload.data.bio,
+      bio: payload.data.bio.trim() || null,
       interests,
     });
     return NextResponse.json({ ok: true });
@@ -128,7 +129,7 @@ export async function POST(req: NextRequest) {
     age: payload.data.age,
     photo_url: photo_urls[0],
     photo_urls,
-    bio: payload.data.bio,
+    bio: payload.data.bio.trim() || null,
   };
   let error = (await admin.from("profiles").upsert({ ...base, interests }, { onConflict: "user_id" })).error;
   if (error) {

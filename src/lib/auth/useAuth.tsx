@@ -39,7 +39,7 @@ type AuthContextValue = {
     first_name: string;
     age: number;
     photo_urls: string[];
-    bio: string;
+    bio?: string;
     interests?: string[];
   }) => Promise<void>;
   uploadProfilePhoto: (file: File) => Promise<string>;
@@ -85,7 +85,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profileStatus, setProfileStatus] = useState<AuthContextValue["profileStatus"]>("unknown");
 
   function isProfileComplete(p: Meet42Profile) {
-    const bioOk = (p.bio?.trim().length ?? 0) >= 20;
+    // Bio non requise (retirée de la création) — photo + prénom + âge suffisent.
     const listed = (p.photo_urls ?? []).filter((u) => u?.trim());
     const photoCount = listed.length > 0 ? listed.length : p.photo_url?.trim() ? 1 : 0;
     return Boolean(
@@ -93,8 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         Number.isFinite(p.age) &&
         p.age >= 18 &&
         p.age <= 99 &&
-        photoCount >= 1 &&
-        bioOk
+        photoCount >= 1
     );
   }
 

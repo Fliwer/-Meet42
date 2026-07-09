@@ -6,7 +6,6 @@ import { profilePhotoUrlsSchema } from "@/lib/profile/photoUrlSchema";
 import { INTERESTS } from "@/lib/profile/interests";
 import { track, identify } from "@/lib/analytics";
 
-const BIO_MIN = 20;
 const BIO_MAX = 240;
 const INTERESTS_MIN = 3;
 
@@ -103,7 +102,6 @@ export default function ProfileSetup({
       if (!parsed.success) throw new Error("Cette photo n'est pas valide, réessaie");
       if (interests.size < INTERESTS_MIN) throw new Error(`Choisis au moins ${INTERESTS_MIN} passions — c'est ce qui crée les points communs`);
       const trimmedBio = bio.trim();
-      if (trimmedBio.length < BIO_MIN) throw new Error(`Encore ${BIO_MIN - trimmedBio.length} caractères et c'est bon`);
       if (trimmedBio.length > BIO_MAX) throw new Error(`Un peu trop long (max ${BIO_MAX})`);
 
       await updateProfile({
@@ -244,20 +242,21 @@ export default function ProfileSetup({
           </div>
         </div>
 
-        {/* Bio courte */}
-        <label className="flex flex-col gap-1">
-          <span className="text-sm font-medium text-[color:var(--ink)]">Deux phrases sur toi</span>
-          <textarea
-            className="min-h-[88px] rounded-xl border border-[color:var(--line-2)] bg-white px-3 py-2.5 text-sm leading-relaxed text-[color:var(--ink)] focus:border-[color:var(--fire)] focus:outline-none"
-            value={bio}
-            onChange={(e) => setBio(e.target.value.slice(0, BIO_MAX))}
-            placeholder="Ex. Nouveau à Bruxelles, fan de padel et de ramen. Là pour élargir mon cercle."
-            maxLength={BIO_MAX}
-          />
-          <span className="text-xs text-[color:var(--ink-3)]">
-            {bio.trim().length < BIO_MIN ? `Encore ${BIO_MIN - bio.trim().length} caractères` : "Parfait ✓"}
-          </span>
-        </label>
+        {/* Bio courte — uniquement en édition, et optionnelle */}
+        {isEdit ? (
+          <label className="flex flex-col gap-1">
+            <span className="text-sm font-medium text-[color:var(--ink)]">
+              Deux phrases sur toi <span className="font-normal text-[color:var(--ink-3)]">(optionnel)</span>
+            </span>
+            <textarea
+              className="min-h-[88px] rounded-xl border border-[color:var(--line-2)] bg-white px-3 py-2.5 text-sm leading-relaxed text-[color:var(--ink)] focus:border-[color:var(--fire)] focus:outline-none"
+              value={bio}
+              onChange={(e) => setBio(e.target.value.slice(0, BIO_MAX))}
+              placeholder="Ex. Nouveau à Bruxelles, fan de padel et de ramen. Là pour élargir mon cercle."
+              maxLength={BIO_MAX}
+            />
+          </label>
+        ) : null}
 
         {error ? (
           <div className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
