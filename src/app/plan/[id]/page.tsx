@@ -5,17 +5,12 @@ import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth/useAuth";
 import type { PlanSummary } from "@/lib/plans/planTypes";
 import {
-  apiCancelAttendance,
-  apiConfirmAttendance,
   apiFetchPlanAttendance,
-  apiFetchMyCheckin,
   apiFetchMyPlanFeedback,
   apiFetchPlanById,
   apiJoinPlan,
   apiLeavePlan,
-  apiSetMyCheckin,
   apiSubmitMyPlanFeedback,
-  type AttendanceStatus,
   type PlanAttendanceParticipant,
 } from "@/lib/plans/planApi";
 import { canCancelOrLeaveBeforeStart, CANCELLATION_POLICY_FR } from "@/lib/plans/cancellation";
@@ -49,14 +44,11 @@ export default function PlanPage() {
   const [leaving, setLeaving] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
   const [shareNotice, setShareNotice] = useState<string | null>(null);
-  const [checkinStatus, setCheckinStatus] = useState<"on_my_way" | "arrived" | null>(null);
-  const [checkinBusy, setCheckinBusy] = useState(false);
   const [feedbackVote, setFeedbackVote] = useState<boolean | null>(null);
   const [feedbackComment, setFeedbackComment] = useState("");
   const [feedbackBusy, setFeedbackBusy] = useState(false);
   const [feedbackDone, setFeedbackDone] = useState(false);
   const [attendance, setAttendance] = useState<PlanAttendanceParticipant[]>([]);
-  const [attendanceBusy, setAttendanceBusy] = useState(false);
   const [showReveal, setShowReveal] = useState(false);
   // Groupe de rituel : rendu par l'expérience GroupSpace dédiée.
   const [group, setGroup] = useState<GroupDto | null>(null);
@@ -97,9 +89,6 @@ export default function PlanPage() {
   useEffect(() => {
     if (status !== "authenticated" || !userId) return;
     if (!plan?.is_joined) return;
-    apiFetchMyCheckin({ planId: plan.id, accessToken, userId })
-      .then((row) => setCheckinStatus(row?.status ?? null))
-      .catch(() => undefined);
     apiFetchMyPlanFeedback({ planId: plan.id, accessToken, userId })
       .then((row) => {
         if (!row) return;
@@ -183,20 +172,6 @@ export default function PlanPage() {
     }
   }
 
-  async function onCheckin(statusValue: "on_my_way" | "arrived") {
-    if (!plan) return;
-    setCheckinBusy(true);
-    setActionError(null);
-    try {
-      await apiSetMyCheckin({ planId: plan.id, status: statusValue, accessToken, userId });
-      setCheckinStatus(statusValue);
-    } catch (err) {
-      setActionError(err instanceof Error ? err.message : "Check-in impossible");
-    } finally {
-      setCheckinBusy(false);
-    }
-  }
-
   async function onSubmitFeedback() {
     if (!plan) return;
     if (feedbackVote === null) {
@@ -218,30 +193,6 @@ export default function PlanPage() {
       setActionError(err instanceof Error ? err.message : "Feedback impossible");
     } finally {
       setFeedbackBusy(false);
-    }
-  }
-
-  async function setAttendanceStatus(next: AttendanceStatus) {
-    if (!plan || !userId) return;
-    setAttendanceBusy(true);
-    setActionError(null);
-    const previous = attendance;
-    setAttendance((curr) =>
-      curr.map((p) => (p.user_id === userId ? { ...p, status: next } : p))
-    );
-    try {
-      if (next === "confirmed") {
-        await apiConfirmAttendance({ planId: plan.id, accessToken, userId });
-      } else {
-        await apiCancelAttendance({ planId: plan.id, accessToken, userId });
-      }
-      const rows = await apiFetchPlanAttendance({ planId: plan.id, accessToken, userId });
-      setAttendance(rows);
-    } catch (err) {
-      setAttendance(previous);
-      setActionError(err instanceof Error ? err.message : "Action impossible");
-    } finally {
-      setAttendanceBusy(false);
     }
   }
 
@@ -280,22 +231,15 @@ export default function PlanPage() {
   const canStillCancel = canCancelOrLeaveBeforeStart(plan.start_time);
   const nowMs = Date.now();
   const startMs = start.getTime();
-  const showCheckin = plan.is_joined && nowMs >= startMs - 3 * 60 * 60 * 1000 && nowMs <= startMs + 3 * 60 * 60 * 1000;
-  const showFeedback = plan.is_joined && nowMs >= startMs - 30 * 60 * 1000;
-  const confirmed = attendance.filter((p) => p.status === "confirmed");
-  const pending = attendance.filter((p) => p.status === "pending" || p.status === "maybe");
+  // Le feedback n'apparaît qu'une fois l'événement passé.
+  const showFeedback = plan.is_joined && nowMs >= startMs;
+  // Rejoindre = venir : on affiche tout le monde sauf les désistements.
+  const attending = attendance.filter((p) => p.status !== "cancelled");
   const cancelled = attendance.filter((p) => p.status === "cancelled");
-  const myAttendanceStatus = attendance.find((p) => p.user_id === userId)?.status ?? null;
 
   const timelineSteps = [
     { key: "created", label: "Créé", done: true, current: false },
     { key: "joined", label: "Inscrit", done: plan.is_joined, current: !plan.is_joined },
-    {
-      key: "checkin",
-      label: "Check-in",
-      done: Boolean(checkinStatus),
-      current: plan.is_joined && !checkinStatus && showCheckin,
-    },
     {
       key: "done",
       label: "Feedback",
@@ -415,7 +359,7 @@ export default function PlanPage() {
           <div className="flex items-center justify-between gap-3">
             <h2 className="font-display text-xl font-semibold text-[color:var(--ink)]">Ton groupe</h2>
             <div className="text-xs font-semibold text-[color:var(--ink-2)]">
-              {status === "authenticated" ? `${confirmed.length} confirmés / ${plan.max_participants} max` : `${plan.participants_count} / ${plan.max_participants}`}
+              {status === "authenticated" ? `${attending.length} / ${plan.max_participants}` : `${plan.participants_count} / ${plan.max_participants}`}
             </div>
           </div>
 
@@ -437,57 +381,39 @@ export default function PlanPage() {
             </div>
           ) : (
             <>
-              {plan.is_joined ? (
-                <div className="mt-3 flex gap-2">
-                  <button
-                    type="button"
-                    disabled={attendanceBusy}
-                    onClick={() => setAttendanceStatus("confirmed")}
-                    className={
-                      myAttendanceStatus === "confirmed"
-                        ? "rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white"
-                        : "rounded-xl border border-[color:var(--line-2)] bg-[color:var(--cream-2)] px-4 py-2 text-sm font-semibold text-[color:var(--ink)]"
-                    }
-                  >
-                    Je viens
-                  </button>
-                  <button
-                    type="button"
-                    disabled={attendanceBusy}
-                    onClick={() => setAttendanceStatus("cancelled")}
-                    className={
-                      myAttendanceStatus === "cancelled"
-                        ? "rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white"
-                        : "rounded-xl border border-[color:var(--line-2)] bg-[color:var(--cream-2)] px-4 py-2 text-sm font-semibold text-[color:var(--ink)]"
-                    }
-                  >
-                    Je ne peux plus
-                  </button>
-                </div>
-              ) : null}
-
               <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4">
-                {confirmed.map((p) => (
-                  <div key={`c-${p.user_id}`} className="flex flex-col items-center gap-1.5 text-center">
-                    <span className="relative">
-                      <Avatar
-                        src={p.photo_url}
-                        name={p.first_name}
-                        size={64}
-                        className="h-16 w-16 rounded-full border-2 border-[color:var(--cream-2)] object-cover shadow-sm"
-                        fallbackClassName="grid h-16 w-16 place-items-center rounded-full border-2 border-[color:var(--cream-2)] bg-[color:var(--espresso)] text-base font-bold text-[color:var(--cream)] shadow-sm"
-                      />
-                      <span
-                        className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full border-2 border-[color:var(--cream-2)] bg-emerald-500"
-                        title="Confirmé"
-                      />
-                    </span>
-                    <span className="max-w-full truncate text-xs font-semibold text-[color:var(--ink)]">
-                      {p.first_name?.trim() || "Membre"}
-                    </span>
-                  </div>
-                ))}
-                {Array.from({ length: Math.max(0, plan.max_participants - confirmed.length) }).map((_, i) => (
+                {attending.map((p) => {
+                  const isMe = p.user_id === userId;
+                  return (
+                    <div key={`c-${p.user_id}`} className="flex flex-col items-center gap-1.5 text-center">
+                      <span className="relative">
+                        <Avatar
+                          src={p.photo_url}
+                          name={p.first_name}
+                          size={64}
+                          className={
+                            isMe
+                              ? "h-16 w-16 rounded-full border-2 border-[color:var(--fire)] object-cover shadow-sm"
+                              : "h-16 w-16 rounded-full border-2 border-[color:var(--cream-2)] object-cover shadow-sm"
+                          }
+                          fallbackClassName={
+                            isMe
+                              ? "grid h-16 w-16 place-items-center rounded-full border-2 border-[color:var(--fire)] bg-[color:var(--espresso)] text-base font-bold text-[color:var(--cream)] shadow-sm"
+                              : "grid h-16 w-16 place-items-center rounded-full border-2 border-[color:var(--cream-2)] bg-[color:var(--espresso)] text-base font-bold text-[color:var(--cream)] shadow-sm"
+                          }
+                        />
+                        <span
+                          className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full border-2 border-[color:var(--cream-2)] bg-emerald-500"
+                          title="Présent·e"
+                        />
+                      </span>
+                      <span className="max-w-full truncate text-xs font-semibold text-[color:var(--ink)]">
+                        {isMe ? "Toi" : p.first_name?.trim() || "Membre"}
+                      </span>
+                    </div>
+                  );
+                })}
+                {Array.from({ length: Math.max(0, plan.max_participants - attending.length) }).map((_, i) => (
                   <div key={`empty-${i}`} className="flex flex-col items-center gap-1.5 text-center">
                     <span className="grid h-16 w-16 place-items-center rounded-full border-2 border-dashed border-[color:var(--line-2)] text-xl text-[color:var(--ink-3)]">
                       +
@@ -497,55 +423,19 @@ export default function PlanPage() {
                 ))}
               </div>
 
-              {pending.length > 0 || cancelled.length > 0 ? (
-                <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-xs font-medium text-[color:var(--ink-3)]">
-                  {pending.length > 0 ? <span>⏳ {pending.length} en attente</span> : null}
-                  {cancelled.length > 0 ? (
-                    <span>✕ {cancelled.length} annulé{cancelled.length > 1 ? "s" : ""}</span>
-                  ) : null}
+              {cancelled.length > 0 ? (
+                <div className="mt-4 text-xs font-medium text-[color:var(--ink-3)]">
+                  ✕ {cancelled.length} désistement{cancelled.length > 1 ? "s" : ""}
                 </div>
               ) : null}
             </>
           )}
         </div>
 
-        {showCheckin && status === "authenticated" ? (
-          <div className="mt-4 rounded-2xl border border-[color:var(--line)] bg-[color:var(--cream-3)]/50 p-3">
-            <div className="text-sm font-semibold text-[color:var(--ink)]">Check-in rapide</div>
-            <div className="mt-1 text-xs text-[color:var(--ink-2)]">Dis au groupe où tu en es pour limiter les no-shows.</div>
-            <div className="mt-3 flex gap-2">
-              <button
-                type="button"
-                disabled={checkinBusy}
-                onClick={() => onCheckin("on_my_way")}
-                className={
-                  checkinStatus === "on_my_way"
-                    ? "flex-1 rounded-xl bg-[color:var(--espresso)] px-4 py-2.5 text-sm font-semibold text-[color:var(--cream)]"
-                    : "flex-1 rounded-xl border border-[color:var(--line-2)] bg-[color:var(--cream-2)] px-4 py-2.5 text-sm font-semibold text-[color:var(--ink)]"
-                }
-              >
-                Je suis en route
-              </button>
-              <button
-                type="button"
-                disabled={checkinBusy}
-                onClick={() => onCheckin("arrived")}
-                className={
-                  checkinStatus === "arrived"
-                    ? "flex-1 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white"
-                    : "flex-1 rounded-xl border border-[color:var(--line-2)] bg-[color:var(--cream-2)] px-4 py-2.5 text-sm font-semibold text-[color:var(--ink)]"
-                }
-              >
-                Je suis arrivé(e)
-              </button>
-            </div>
-          </div>
-        ) : null}
-
         {showFeedback && status === "authenticated" ? (
           <div className="mt-4 rounded-2xl border border-[color:var(--line)] bg-[color:var(--cream-2)] p-3">
-            <div className="text-sm font-semibold text-[color:var(--ink)]">Retour qualité</div>
-            <div className="mt-1 text-xs text-[color:var(--ink-2)]">Tu referais un event avec ce groupe ?</div>
+            <div className="text-sm font-semibold text-[color:var(--ink)]">Alors, c&apos;était comment ?</div>
+            <div className="mt-1 text-xs text-[color:var(--ink-2)]">Tu referais une sortie avec ce groupe ? (Ça nous aide à améliorer les prochains groupes — rien n&apos;est montré aux autres.)</div>
             <div className="mt-3 flex gap-2">
               <button
                 type="button"

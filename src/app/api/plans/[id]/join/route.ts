@@ -49,7 +49,7 @@ export async function POST(
     const participants_count_before = mockCountParticipants(planId);
     const res = mockJoinPlan(planId, userId);
     if (!res.ok && res.reason === "FULL") return NextResponse.json({ error: "Plan complet" }, { status: 409 });
-    mockSetAttendanceStatus(planId, userId, "pending");
+    mockSetAttendanceStatus(planId, userId, "confirmed");
     return NextResponse.json({ ok: true, participants_count: participants_count_before });
   }
 
@@ -73,7 +73,7 @@ export async function POST(
       {
         plan_id: planId,
         user_id: userId,
-        status: "pending",
+        status: "confirmed",
         updated_at: new Date().toISOString(),
       },
       { onConflict: "plan_id,user_id" }
@@ -90,7 +90,7 @@ export async function POST(
     {
       plan_id: planId,
       user_id: userId,
-      status: "pending",
+      status: "confirmed",
       updated_at: new Date().toISOString(),
     },
     { onConflict: "plan_id,user_id" }
