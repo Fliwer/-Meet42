@@ -344,6 +344,32 @@ export function mockGetUserReservationsAll(userId: string): MockReservation[] {
   return getState().reservations.filter((r) => r.user_id === userId);
 }
 
+// ── Lectures globales (dashboard admin) ──
+export function mockAllProfiles(): MockProfile[] {
+  return [...getState().profiles.values()];
+}
+
+export function mockAllReservations(): MockReservation[] {
+  return [...getState().reservations];
+}
+
+export function mockCountEncounters(): number {
+  return getState().encounters.length;
+}
+
+export function mockCountMutualBelles(): number {
+  const belles = getState().belles;
+  const set = new Set<string>();
+  for (const b of belles) {
+    const rev = belles.some((x) => x.from_user === b.to_user && x.to_user === b.from_user);
+    if (rev) {
+      const key = b.from_user < b.to_user ? `${b.from_user}|${b.to_user}` : `${b.to_user}|${b.from_user}`;
+      set.add(key);
+    }
+  }
+  return set.size;
+}
+
 export function mockGetUserReservation(userId: string, ritualId: string, occursAt: string): MockReservation | null {
   return (
     getState().reservations.find(

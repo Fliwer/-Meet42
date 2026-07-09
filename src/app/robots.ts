@@ -9,7 +9,7 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: "*",
         allow: "/",
         // API privée + portail d'accès + pages personnelles sans intérêt SEO
-        disallow: ["/api/", "/gate", "/mes-plans", "/profile"],
+        disallow: ["/api/", "/gate", "/admin", "/mes-plans", "/profile"],
       },
     ],
     sitemap: `${BASE}/sitemap.xml`,
