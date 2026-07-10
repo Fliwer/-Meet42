@@ -1,20 +1,13 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { isSupabaseConfigured } from "@/lib/supabase/client";
+import { isAdminRequest } from "@/lib/admin/requireAdmin";
 
 /**
  * Déclenche le matching (force) depuis le dashboard admin — mode concierge.
  * Relaie vers /api/cron/match?force=1 côté serveur en injectant CRON_SECRET,
  * pour ne jamais exposer ce secret au client.
  */
-function isAuthorized(req: NextRequest): boolean {
-  const secret = process.env.ADMIN_SECRET;
-  if (!isSupabaseConfigured()) return true;
-  if (!secret) return false;
-  return req.headers.get("x-admin-key") === secret;
-}
-
 export async function POST(req: NextRequest) {
-  if (!isAuthorized(req)) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+  if (!(await isAdminRequest(req))) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
 
   const origin = req.nextUrl.origin;
   const headers: Record<string, string> = {};

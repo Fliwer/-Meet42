@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { type SupabaseClient } from "@supabase/supabase-js";
 import { getServerSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/client";
+import { isAdminRequest } from "@/lib/admin/requireAdmin";
 import { RITUALS, nextOccurrence, formatOccurrenceFr } from "@/lib/rituals/rituals";
 import { ACTIVITIES } from "@/lib/plans/activities";
 import { INTERESTS } from "@/lib/profile/interests";
@@ -12,6 +13,7 @@ import {
   mockListProfilesByIds,
   mockCountEncounters,
   mockCountMutualBelles,
+  mockCountBelleGivers,
 } from "@/lib/mock/mockDb";
 
 /**
@@ -22,13 +24,6 @@ import {
  * de Supabase), l'accès est ouvert pour le dev. En prod sans ADMIN_SECRET
  * défini, l'accès est refusé (fail-safe).
  */
-
-function isAuthorized(req: NextRequest): boolean {
-  const secret = process.env.ADMIN_SECRET;
-  if (!isSupabaseConfigured()) return true; // dev local (mock)
-  if (!secret) return false; // prod sans secret → verrouillé
-  return req.headers.get("x-admin-key") === secret;
-}
 
 const interestLabel = (id: string) => INTERESTS.find((i) => i.id === id)?.label ?? id;
 const activityLabel = (id: string) => ACTIVITIES.find((a) => a.id === id)?.label ?? id;
@@ -61,6 +56,13 @@ export type AdminGroup = {
   is_past: boolean;
 };
 
+export type AdminFunnel = {
+  signups: number; // profils créés
+  reserved: number; // ont réservé ≥ 1 fois
+  matched: number; // ont été placés dans un groupe
+  belles: number; // ont gardé ≥ 1 belle rencontre
+};
+
 export type AdminOverview = {
   stats: {
     members: number;
@@ -69,20 +71,22 @@ export type AdminOverview = {
     encounters: number;
     mutualBelles: number;
   };
+  funnel: AdminFunnel;
   slots: AdminSlot[];
   members: AdminMember[];
   groups: AdminGroup[];
 };
 
 export async function GET(req: NextRequest) {
-  if (!isAuthorized(req)) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+  if (!(await isAdminRequest(req))) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
   const now = Date.now();
 
   // ── Mock ──
   if (!isSupabaseConfigured()) {
     const profiles = mockAllProfiles();
     const byId = new Map(profiles.map((p) => [p.id, p]));
-    const reservations = mockAllReservations().filter((r) => r.status !== "cancelled");
+    const allReservations = mockAllReservations().filter((r) => r.status !== "cancelled");
+    const reservations = allReservations;
 
     const slots: AdminSlot[] = RITUALS.map((r) => {
       const occ = nextOccurrence(r);
@@ -114,6 +118,12 @@ export async function GET(req: NextRequest) {
         groups: ritualPlans.length,
         encounters: mockCountEncounters(),
         mutualBelles: mockCountMutualBelles(),
+      },
+      funnel: {
+        signups: profiles.length,
+        reserved: new Set(allReservations.map((r) => r.user_id)).size,
+        matched: new Set(allReservations.filter((r) => r.status === "matched").map((r) => r.user_id)).size,
+        belles: mockCountBelleGivers(),
       },
       slots,
       members: profiles.map((p) => ({
@@ -198,6 +208,12 @@ export async function GET(req: NextRequest) {
       groups: ritualPlans.length,
       encounters: encCount ?? 0,
       mutualBelles: mutualSet.size,
+    },
+    funnel: {
+      signups: profiles.length,
+      reserved: new Set(reservations.map((r) => r.user_id)).size,
+      matched: new Set(reservations.filter((r) => r.status === "matched").map((r) => r.user_id)).size,
+      belles: new Set(bellesArr.map((b) => b.from_user)).size,
     },
     slots,
     members: profiles.map((p) => ({

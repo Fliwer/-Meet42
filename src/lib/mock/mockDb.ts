@@ -357,6 +357,11 @@ export function mockCountEncounters(): number {
   return getState().encounters.length;
 }
 
+/** Nombre d'utilisateurs distincts ayant gardé ≥ 1 belle rencontre. */
+export function mockCountBelleGivers(): number {
+  return new Set(getState().belles.map((b) => b.from_user)).size;
+}
+
 export function mockCountMutualBelles(): number {
   const belles = getState().belles;
   const set = new Set<string>();

@@ -5,10 +5,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth/useAuth";
 import ProfileSetup from "@/components/ProfileSetup";
+import { isAdminEmail } from "@/lib/admin/isAdmin";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { status, profileStatus, profile, refreshProfile, signOut } = useAuth();
+  const { status, profileStatus, profile, refreshProfile, signOut, user } = useAuth();
+  const isAdmin = isAdminEmail(user?.email);
 
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -149,6 +151,22 @@ export default function ProfilePage() {
             </div>
           ) : null}
         </div>
+
+        {isAdmin ? (
+          <Link
+            href="/admin"
+            className="mt-4 flex items-center justify-between gap-3 rounded-3xl border-2 border-[color:var(--espresso)] bg-[color:var(--espresso)] p-5 text-[color:var(--cream)] shadow-sm transition hover:opacity-95"
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-2xl" aria-hidden>📊</span>
+              <div>
+                <div className="font-display text-lg font-semibold">Command center</div>
+                <div className="text-sm text-[rgb(246_239_230_/_0.7)]">Membres, réservations, groupes, funnel</div>
+              </div>
+            </div>
+            <span className="text-lg" aria-hidden>→</span>
+          </Link>
+        ) : null}
 
         <div className="mt-4 rounded-3xl bg-[color:var(--cream-2)] border border-[color:var(--line-2)] p-6 shadow-sm">
           <div className="text-sm font-semibold text-[color:var(--ink)]">Conseils pour organiser de belles rencontres IRL</div>
