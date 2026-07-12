@@ -1,5 +1,23 @@
 @import "tailwindcss";
 
+/* Tailwind v4 retire cursor:pointer par défaut sur les contrôles.
+   On le restaure globalement pour tous les éléments cliquables. */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  label[for],
+  select:not(:disabled),
+  summary,
+  a[href] {
+    cursor: pointer;
+  }
+  button:disabled,
+  [role="button"][aria-disabled="true"],
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+}
+
 /* ─────────────────────────────────────────────────────────
    Meet42 — Direction « Éditorial chaud »
    Papier crème · encre espresso · UN accent corail-feu · Fraunces display
