@@ -7,27 +7,30 @@ import { mainNavItems } from "@/components/navItems";
 
 export default function BottomNav() {
   const pathname = usePathname();
-  if (pathname.startsWith("/login")) return null;
+  const hidden = pathname.startsWith("/login");
+
+  if (hidden) return null;
 
   return (
-    <nav className="md:hidden fixed inset-x-0 bottom-0 z-30 px-4 pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
-      <div className="mx-auto flex max-w-md items-center justify-between rounded-full border border-[color:var(--line)] bg-[color:var(--cream-2)]/85 px-3 py-2 shadow-[0_14px_36px_-10px_rgba(29,22,13,0.4)] backdrop-blur-md">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 px-4 pb-2">
+      <div className="max-w-md mx-auto rounded-full border border-[color:var(--line)] bg-[color:var(--cream-2)]/90 backdrop-blur-md shadow-[0_12px_40px_rgba(29,22,13,0.15)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.4)] grid grid-cols-5 items-center px-2 py-1.5 relative">
         {mainNavItems.map((it) => {
-          const active = pathname === it.href || (it.href !== "/" && pathname.startsWith(it.href));
+          const active =
+            pathname === it.href || (it.href !== "/" && pathname.startsWith(it.href));
+          
+          const isCreate = it.href === "/create";
 
-          // Bouton central surélevé : lancer une activité
-          if (it.href === "/create") {
+          if (isCreate) {
             return (
-              <Link
-                key={it.href}
-                href={it.href}
-                aria-label={it.label}
-                className="meet42-pulse-glow -mt-7 grid h-14 w-14 shrink-0 place-items-center rounded-full bg-[color:var(--fire)] text-[#fff5f1] shadow-lg shadow-[rgb(255_77_46_/_0.45)] transition-transform active:scale-95"
-              >
-                <span className="text-2xl leading-none" aria-hidden>
-                  ＋
-                </span>
-              </Link>
+              <div key={it.href} className="flex justify-center relative -translate-y-3.5">
+                <Link
+                  href={it.href}
+                  className="w-14 h-14 rounded-full bg-[color:var(--fire)] hover:bg-[color:var(--fire-2)] active:scale-95 transition-all duration-300 flex items-center justify-center shadow-[0_8px_20px_rgba(255,77,46,0.4)] meet42-pulse-glow"
+                  aria-label={it.label}
+                >
+                  <span className="text-white text-3xl font-light -mt-1" aria-hidden>＋</span>
+                </Link>
+              </div>
             );
           }
 
@@ -35,23 +38,27 @@ export default function BottomNav() {
             <Link
               key={it.href}
               href={it.href}
-              aria-current={active ? "page" : undefined}
-              className={
-                active
-                  ? "flex flex-1 flex-col items-center gap-0.5 py-1.5 text-[color:var(--ink)] transition-colors"
-                  : "flex flex-1 flex-col items-center gap-0.5 py-1.5 text-[color:var(--ink-3)] transition-colors hover:text-[color:var(--ink)]"
-              }
+              className="flex flex-col items-center justify-center gap-0.5 py-1 text-center transition-all duration-300 relative group"
             >
-              <span className={active ? "text-xl" : "text-xl opacity-80"} aria-hidden>
+              <span 
+                className={`text-xl transition-transform duration-300 group-hover:-translate-y-0.5 ${
+                  active ? "text-[color:var(--fire)] scale-110" : "text-[color:var(--ink-2)] opacity-80 group-hover:opacity-100"
+                }`} 
+                aria-hidden
+              >
                 {it.icon}
               </span>
-              <span className="text-[10px] font-semibold">{it.label}</span>
+              <span 
+                className={`text-[10px] font-semibold transition-colors duration-300 ${
+                  active ? "text-[color:var(--fire)]" : "text-[color:var(--ink-3)] group-hover:text-[color:var(--ink)]"
+                }`}
+              >
+                {it.label}
+              </span>
               <span
-                className={
-                  active
-                    ? "mt-0.5 h-1 w-1 rounded-full bg-[color:var(--fire)] transition-all"
-                    : "mt-0.5 h-1 w-1 rounded-full bg-transparent transition-all"
-                }
+                className={`mt-0.5 h-1 w-1 rounded-full transition-all duration-300 ${
+                  active ? "bg-[color:var(--fire)] scale-110" : "bg-transparent scale-0"
+                }`}
                 aria-hidden
               />
             </Link>

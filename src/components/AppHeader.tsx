@@ -69,8 +69,8 @@ export default function AppHeader() {
               <button
                 className={
                   onHome
-                    ? "rounded-full px-3.5 py-2 text-sm font-semibold text-white/90 transition-colors hover:bg-white/15"
-                    : "rounded-full px-3.5 py-2 text-sm font-semibold text-[color:var(--ink-2)] transition-colors hover:bg-[color:var(--cream-3)]"
+                    ? "rounded-full px-3.5 py-2 text-sm font-semibold text-white/90 transition-colors hover:bg-white/15 cursor-pointer"
+                    : "rounded-full px-3.5 py-2 text-sm font-semibold text-[color:var(--ink-2)] transition-colors hover:bg-[color:var(--cream-3)] cursor-pointer"
                 }
                 onClick={() => signOut()}
                 type="button"
