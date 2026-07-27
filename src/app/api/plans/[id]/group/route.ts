@@ -110,20 +110,35 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
 
   // ── Réel ──
   const admin = getServerSupabaseAdmin() as unknown as SupabaseClient;
-  const { data: plan } = await admin
+  // Résilience : si la colonne `source` n'est pas encore migrée, on relit sans.
+  const planWithSource = await admin
     .from("plans")
     .select("id, activity, start_time, location_text, lat, lng, source")
     .eq("id", planId)
     .maybeSingle();
+  const plan = planWithSource.error
+    ? (
+        await admin
+          .from("plans")
+          .select("id, activity, start_time, location_text, lat, lng")
+          .eq("id", planId)
+          .maybeSingle()
+      ).data
+    : planWithSource.data;
   if (!plan) return NextResponse.json({ error: "Introuvable" }, { status: 404 });
 
   const { data: parts } = await admin.from("plan_participants").select("user_id").eq("plan_id", planId);
   const memberIds = ((parts ?? []) as { user_id: string }[]).map((r) => r.user_id);
 
-  const { data: profs } = await admin
+  const idFilter = memberIds.length ? memberIds : ["00000000-0000-0000-0000-000000000000"];
+  // Résilience : si `interests` n'est pas encore migré, on relit sans.
+  const profsWithInterests = await admin
     .from("profiles")
     .select("user_id, first_name, age, photo_url, interests")
-    .in("user_id", memberIds.length ? memberIds : ["00000000-0000-0000-0000-000000000000"]);
+    .in("user_id", idFilter);
+  const profs = profsWithInterests.error
+    ? (await admin.from("profiles").select("user_id, first_name, age, photo_url").in("user_id", idFilter)).data
+    : profsWithInterests.data;
   type Prof = { user_id: string; first_name: string; age: number; photo_url: string | null; interests: string[] | null };
   const profById = new Map<string, Prof>(((profs ?? []) as Prof[]).map((p) => [p.user_id, p]));
 

@@ -140,11 +140,20 @@ export async function GET(req: NextRequest) {
   // ── Réel ──
   const admin = getServerSupabaseAdmin() as unknown as SupabaseClient;
 
-  const { data: profRows } = await admin
+  // Résilience : si `interests` n'est pas encore migré, on relit sans.
+  const profWithInterests = await admin
     .from("profiles")
     .select("user_id, first_name, age, photo_url, interests, created_at")
     .order("created_at", { ascending: false });
-  type Prof = { user_id: string; first_name: string; age: number; photo_url: string | null; interests: string[] | null };
+  const profRows = profWithInterests.error
+    ? (
+        await admin
+          .from("profiles")
+          .select("user_id, first_name, age, photo_url, created_at")
+          .order("created_at", { ascending: false })
+      ).data
+    : profWithInterests.data;
+  type Prof = { user_id: string; first_name: string; age: number; photo_url: string | null; interests?: string[] | null };
   const profiles = (profRows ?? []) as Prof[];
   const byId = new Map(profiles.map((p) => [p.user_id, p]));
 
@@ -166,13 +175,19 @@ export async function GET(req: NextRequest) {
     return { ritual_id: r.id, label: r.label, emoji: r.emoji, occurs_at: occIso, when_label: formatOccurrenceFr(occ), reserved };
   });
 
-  const { data: planRows } = await admin
+  // Résilience : si `source` n'est pas encore migré, aucun plan rituel → liste vide.
+  const planRowsRes = await admin
     .from("plans")
     .select("id, activity, start_time, location_text, source")
     .eq("source", "ritual")
     .order("start_time", { ascending: false })
     .limit(100);
-  const ritualPlans = (planRows ?? []) as { id: string; activity: string; start_time: string; location_text: string }[];
+  const ritualPlans = (planRowsRes.error ? [] : planRowsRes.data ?? []) as {
+    id: string;
+    activity: string;
+    start_time: string;
+    location_text: string;
+  }[];
 
   const groups: AdminGroup[] = [];
   for (const p of ritualPlans) {
