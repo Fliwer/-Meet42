@@ -187,8 +187,8 @@ export default function Home() {
             </span>
           </h1>
 
-          <p className="mt-3 max-w-lg text-[15px] sm:text-xl leading-snug text-[rgb(255_246_236_/_0.9)]">
-            Des sorties à 4–6 personnes près de toi — un café, un apéro, une balade. Tu rejoins, tu viens, tu rencontres. Pas de swipe.
+          <p className="mt-3 max-w-xl text-[15px] sm:text-xl leading-snug text-[rgb(255_246_236_/_0.92)]">
+            Chaque semaine, un groupe de 4 à 6 inconnus et une vraie sortie à Bruxelles. Tu réserves, on te révèle ton groupe la veille. C&apos;est ton <span className="font-semibold text-white">42</span>.
           </p>
 
           <div className="mt-6 flex flex-col gap-2.5 sm:flex-row sm:items-center">
@@ -225,7 +225,7 @@ export default function Home() {
             <p className="text-sm font-semibold text-[rgb(255_246_236_/_0.9)]">
               {hasPlansToday
                 ? `${todayStats.peopleToday} participant·es · ${todayStats.plansToday} ${todayStats.plansToday > 1 ? "plans" : "plan"} aujourd’hui`
-                : "Sois le premier à lancer un plan aujourd’hui."}
+                : "Gratuit · lieux publics · groupes de 4 à 6"}
             </p>
           </div>
         </div>
@@ -235,6 +235,28 @@ export default function Home() {
 
         <section id="rituels" className="pt-8 scroll-mt-24">
           <RitualsSection />
+        </section>
+
+        {/* Manifeste — la phrase de positionnement (mémorable, éditoriale) */}
+        <section className="mt-14 overflow-hidden rounded-[2rem] bg-[color:var(--espresso)] px-6 py-12 sm:px-12 sm:py-16">
+          <div className="mx-auto max-w-3xl text-center">
+            <span className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-[color:var(--fire)]">
+              <span className="meet42-live-pulse meet42-spark" style={{ background: "var(--fire)" }} aria-hidden />
+              La réponse à ta semaine
+            </span>
+            <p className="font-display mt-5 text-[1.7rem] leading-[1.15] font-semibold tracking-[-0.02em] text-[#f6efe6] sm:text-[2.9rem] sm:leading-[1.1]">
+              Les autres apps te font{" "}
+              <span className="italic text-[rgb(246_239_230_/_0.55)]">rencontrer des gens.</span>
+              <span className="mt-2 block">
+                Meet<span className="text-[color:var(--fire)]">42</span> fait que les bonnes personnes{" "}
+                <span className="meet42-underline">restent dans ta vie.</span>
+              </span>
+            </p>
+            <p className="mx-auto mt-6 max-w-xl text-[15px] leading-relaxed text-[rgb(246_239_230_/_0.72)] sm:text-base">
+              Parce qu&apos;une belle rencontre ne devrait pas être un hasard qui disparaît le lendemain.
+              Des groupes de 4 à 6, en vrai, à Bruxelles. Zéro swipe.
+            </p>
+          </div>
         </section>
 
         {isTonightActive ? (
@@ -375,26 +397,77 @@ export default function Home() {
             {[
               {
                 n: "1",
+                when: "Aujourd'hui",
                 title: "Réserve ta place",
                 text: "Un tap, c'est tout. Tu choisis ton 42 de la semaine — l'apéro du jeudi ou la balade du dimanche.",
               },
               {
                 n: "2",
-                title: "La veille midi : le Reveal",
+                when: "La veille, midi",
+                title: "Le Reveal",
                 text: "Tu découvres ton groupe de 4 à 6, le lieu, vos points communs et de quoi briser la glace.",
               },
               {
                 n: "3",
+                when: "Le jour J",
                 title: "Vous vous retrouvez en vrai",
                 text: "Un bar, une heure, des vraies personnes. Pas de swipe, pas de blabla infini — une rencontre.",
               },
             ].map((s) => (
               <div key={s.n} className="rounded-3xl border border-[color:var(--line)] bg-[color:var(--cream-2)] p-5">
-                <div className="grid h-10 w-10 place-items-center rounded-full bg-[color:var(--fire)] font-display text-lg font-bold text-white">
-                  {s.n}
+                <div className="flex items-center gap-2.5">
+                  <div className="grid h-10 w-10 place-items-center rounded-full bg-[color:var(--fire)] font-display text-lg font-bold text-white">
+                    {s.n}
+                  </div>
+                  <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-[color:var(--fire-ink)]">{s.when}</span>
                 </div>
                 <h3 className="font-display mt-3 text-xl font-semibold text-[color:var(--ink)]">{s.title}</h3>
                 <p className="mt-1.5 text-sm leading-relaxed text-[color:var(--ink-2)]">{s.text}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Pourquoi Meet42 est différent — le moat, la vision */}
+        <section className="mt-16" aria-label="Pourquoi Meet42">
+          <span className="meet42-kicker">
+            <span className="meet42-kicker-dot" aria-hidden />
+            <span className="meet42-kicker-dot -ml-0.5" aria-hidden />
+            Pas une app de rencontres de plus
+          </span>
+          <h2 className="meet42-section-title mt-1 max-w-2xl text-[1.8rem] sm:text-[2.4rem]">
+            Trois choses que personne d&apos;autre ne fait
+          </h2>
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            {[
+              {
+                emoji: "👋",
+                title: "Zéro swipe, que du vrai",
+                text: "On ne matche pas des profils derrière un écran. On réunit 4 à 6 personnes autour d'une vraie activité, en vrai. L'anti-Tinder, assumé.",
+              },
+              {
+                emoji: "🔥",
+                title: "L'anticipation, pas l'impatience",
+                text: "Le Reveal : la veille, tu découvres ton groupe, le lieu, vos points communs. Cinq jours d'attente délicieuse — le voyage commence avant la soirée.",
+              },
+              {
+                emoji: "♥",
+                title: "Ton cercle qui grandit",
+                text: "Chaque belle rencontre nourrit ton cercle. Plus tu vis de 42, plus tes groupes te ressemblent. Une couche sociale bâtie sur des moments vécus — impossible à copier.",
+              },
+            ].map((c) => (
+              <div
+                key={c.title}
+                className="flex flex-col rounded-[1.6rem] border border-[color:var(--line)] bg-[color:var(--cream-2)] p-6 shadow-[0_1px_0_rgb(255_255_255_/_0.65)_inset,0_14px_30px_-20px_rgb(29_22_13_/_0.45)]"
+              >
+                <span
+                  className="grid h-12 w-12 -rotate-3 place-items-center rounded-2xl border border-[rgb(255_77_46_/_0.2)] bg-[linear-gradient(135deg,var(--fire-wash),var(--cream-3))] text-2xl shadow-[inset_0_1px_0_rgb(255_255_255_/_0.8)]"
+                  aria-hidden
+                >
+                  {c.emoji}
+                </span>
+                <h3 className="font-display mt-4 text-xl font-semibold text-[color:var(--ink)]">{c.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-[color:var(--ink-2)]">{c.text}</p>
               </div>
             ))}
           </div>
