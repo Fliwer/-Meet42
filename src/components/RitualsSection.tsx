@@ -17,6 +17,12 @@ import type { RitualSlotDto } from "@/app/api/rituals/route";
 const DRAFT_KEY = "meet42:ritual-draft";
 const DRAFT_TTL_MS = 30 * 60 * 1000;
 
+// Vraies photos d'ambiance par rituel (locales → jamais cassées en démo)
+const RITUAL_PHOTO: Record<string, string> = {
+  "jeudi-apero": "/activities/apero.jpg",
+  "dimanche-balade": "/activities/balade.jpg",
+};
+
 type RitualDraft = { ritual_id: string; replay: boolean; ts: number };
 
 function readDraft(): RitualDraft | null {
@@ -198,27 +204,34 @@ export default function RitualsSection() {
         ) : (
           slots.map((slot, idx) => {
             const featured = idx === 0;
+            const photo = RITUAL_PHOTO[slot.id] ?? "/activities/apero.jpg";
             const inner = (
-              <div className="flex h-full flex-col rounded-[1.6rem] border border-[color:var(--line)] bg-[color:var(--cream-2)] p-5 sm:p-6">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[color:var(--fire-ink)]">
-                      {featured ? "Le plus proche" : "Le week-end"} · {slot.communeLabel}
-                    </p>
-                    <h3 className="font-display mt-1 text-[1.6rem] leading-tight font-semibold text-[color:var(--ink)] sm:text-[1.85rem]">
-                      {slot.label}
-                    </h3>
-                    <p className="mt-1 text-sm font-semibold text-[color:var(--ink-2)]">{formatWhenFr(slot.occurs_at)}</p>
-                  </div>
+              <div className="flex h-full flex-col overflow-hidden rounded-[1.6rem] border border-[color:var(--line)] bg-[color:var(--cream-2)]">
+                {/* Bandeau photo — vraie ambiance, titre en overlay */}
+                <div className="relative h-36 w-full overflow-hidden sm:h-44">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={photo} alt="" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                  <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(29,22,13,0.72),rgba(29,22,13,0.12)_55%,transparent)]" />
                   <span
-                    className="grid h-14 w-14 shrink-0 -rotate-3 place-items-center rounded-2xl border border-[rgb(255_77_46_/_0.2)] bg-[linear-gradient(135deg,var(--fire-wash),var(--cream-3))] text-2xl shadow-[inset_0_1px_0_rgb(255_255_255_/_0.8)]"
+                    className="absolute right-3 top-3 grid h-11 w-11 place-items-center rounded-2xl border border-white/25 bg-[rgba(29,22,13,0.5)] text-2xl backdrop-blur-sm"
                     aria-hidden
                   >
                     {slot.emoji}
                   </span>
+                  <div className="absolute inset-x-4 bottom-3">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[rgb(246_239_230_/_0.85)]">
+                      {featured ? "Le plus proche" : "Le week-end"} · {slot.communeLabel}
+                    </p>
+                    <h3 className="font-display text-[1.5rem] leading-tight font-semibold text-[#f6efe6] sm:text-[1.75rem]">
+                      {slot.label}
+                    </h3>
+                  </div>
                 </div>
 
-                <p className="mt-3 text-sm leading-relaxed text-[color:var(--ink-2)]">{slot.tagline}</p>
+                <div className="flex flex-1 flex-col p-5 sm:p-6">
+                <p className="text-sm font-semibold text-[color:var(--ink-2)]">{formatWhenFr(slot.occurs_at)}</p>
+
+                <p className="mt-2 text-sm leading-relaxed text-[color:var(--ink-2)]">{slot.tagline}</p>
 
                 <div className="mt-3 flex flex-wrap items-center gap-2">
                   <span className="meet42-spots-chip">
@@ -270,17 +283,18 @@ export default function RitualsSection() {
                     </button>
                   )}
                 </div>
+                </div>
               </div>
             );
             return featured ? (
               <div
                 key={slot.id}
-                className="rounded-[1.7rem] bg-[linear-gradient(135deg,rgb(255_77_46_/_0.6),rgb(232_144_42_/_0.45))] p-[3px] shadow-[0_18px_40px_-22px_rgba(255,77,46,0.5)]"
+                className="group rounded-[1.7rem] bg-[linear-gradient(135deg,rgb(255_77_46_/_0.6),rgb(232_144_42_/_0.45))] p-[3px] shadow-[0_18px_40px_-22px_rgba(255,77,46,0.5)]"
               >
                 {inner}
               </div>
             ) : (
-              <div key={slot.id}>{inner}</div>
+              <div key={slot.id} className="group">{inner}</div>
             );
           })
         )}

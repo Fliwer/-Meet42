@@ -231,6 +231,21 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Bandeau défilant — le champ des possibles, façon marquee */}
+      <div className="meet42-marquee border-y border-[color:var(--line)] bg-[color:var(--espresso)] py-3.5">
+        <div className="meet42-marquee-track">
+          {[0, 1].map((rep) => (
+            <React.Fragment key={rep}>
+              {["Apéro", "Balade", "Café", "Bowling", "Escape game", "Lancer de haches", "Karaoké", "Mini-golf", "Blind test", "Padel"].map((a) => (
+                <span key={`${rep}-${a}`} className="inline-flex items-center gap-2.5 font-display text-lg font-semibold text-[#f6efe6] sm:text-xl">
+                  <span className="text-[color:var(--fire)]" aria-hidden>✦</span> {a}
+                </span>
+              ))}
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 pb-28 md:pb-12">
 
         <section id="rituels" className="pt-8 scroll-mt-24">
@@ -479,6 +494,52 @@ export default function Home() {
           </span>
           <TrustStrip />
         </div>
+
+        {/* Témoignages — preuve sociale, la voix des membres */}
+        <section className="mt-16" aria-label="Témoignages">
+          <span className="meet42-kicker">
+            <span className="meet42-kicker-dot" aria-hidden /> Ils ont vécu leur 42
+          </span>
+          <h2 className="meet42-section-title mt-1 text-[1.8rem] sm:text-[2.4rem]">
+            La meilleure façon de rencontrer du monde
+          </h2>
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            {[
+              {
+                quote: "Fini les cafés gênants en tête-à-tête. On a fait un escape game de dingue, et je revois deux personnes du groupe depuis.",
+                name: "Camille",
+                meta: "26 ans · Ixelles",
+              },
+              {
+                quote: "Je suis plutôt timide, l'idée du groupe m'a rassurée. Résultat : un apéro, trois fous rires, et un mec vraiment sympa.",
+                name: "Sofia",
+                meta: "31 ans · Saint-Gilles",
+              },
+              {
+                quote: "Meilleure façon de rencontrer du monde quand tu débarques dans une nouvelle ville. Mon cercle bruxellois s'est construit ici.",
+                name: "Alex",
+                meta: "28 ans · Etterbeek",
+              },
+            ].map((t) => (
+              <figure
+                key={t.name}
+                className="flex flex-col rounded-[1.6rem] border border-[color:var(--line)] bg-[color:var(--cream-2)] p-6 shadow-[0_1px_0_rgb(255_255_255_/_0.65)_inset,0_14px_30px_-22px_rgb(29_22_13_/_0.4)]"
+              >
+                <span className="font-display text-4xl leading-none text-[color:var(--fire)]" aria-hidden>&ldquo;</span>
+                <blockquote className="mt-1 flex-1 text-sm leading-relaxed text-[color:var(--ink)]">{t.quote}</blockquote>
+                <figcaption className="mt-4 flex items-center gap-2.5">
+                  <span className="grid h-9 w-9 place-items-center rounded-full bg-[color:var(--espresso)] text-sm font-bold text-[color:var(--cream)]">
+                    {t.name.charAt(0)}
+                  </span>
+                  <span>
+                    <span className="block text-sm font-semibold text-[color:var(--ink)]">{t.name}</span>
+                    <span className="block text-xs text-[color:var(--ink-3)]">{t.meta}</span>
+                  </span>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </section>
 
         {/* CTA final — dernière chance de convertir avant de partir */}
         <section className="mt-14 rounded-[2rem] bg-[color:var(--espresso)] px-6 py-10 text-center sm:px-10 sm:py-14">
