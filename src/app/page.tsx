@@ -185,7 +185,7 @@ export default function Home() {
           </h1>
 
           <p className="mt-3 max-w-xl text-[15px] sm:text-xl leading-snug text-[rgb(255_246_236_/_0.92)]">
-            Chaque semaine, un groupe de 4 à 6 inconnus et une vraie sortie à Bruxelles. Tu réserves, on te révèle ton groupe la veille. C&apos;est ton <span className="font-semibold text-white">42</span>.
+            Escape game, padel, bowling, café… Chaque semaine, une vraie activité à Bruxelles avec un groupe de 4 à 6 inconnus. Tu réserves, on te révèle ton groupe la veille. C&apos;est ton <span className="font-semibold text-white">42</span>.
           </p>
 
           <div className="mt-6 flex flex-col gap-2.5 sm:flex-row sm:items-center">
@@ -233,7 +233,7 @@ export default function Home() {
         <div className="meet42-marquee-track">
           {[0, 1].map((rep) => (
             <React.Fragment key={rep}>
-              {["Apéro", "Balade", "Café", "Bowling", "Escape game", "Lancer de haches", "Karaoké", "Mini-golf", "Blind test", "Padel"].map((a) => (
+              {["Escape game", "Padel", "Bowling", "Café", "Karaoké", "Mini-golf", "Lancer de haches", "Blind test", "Balade", "Billard"].map((a) => (
                 <span key={`${rep}-${a}`} className="inline-flex items-center gap-2.5 font-display text-lg font-semibold text-[#f6efe6] sm:text-xl">
                   <span className="text-[color:var(--fire)]" aria-hidden>✦</span> {a}
                 </span>
@@ -284,7 +284,7 @@ export default function Home() {
                 n: "1",
                 when: "Aujourd'hui",
                 title: "Réserve ta place",
-                text: "Un tap, c'est tout. Tu choisis ton 42 de la semaine — l'apéro du jeudi ou la balade du dimanche.",
+                text: "Un tap, c'est tout. Tu choisis ton 42 de la semaine — escape game, padel, café, bowling, balade…",
               },
               {
                 n: "2",

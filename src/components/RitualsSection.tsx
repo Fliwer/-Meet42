@@ -19,7 +19,8 @@ const DRAFT_TTL_MS = 30 * 60 * 1000;
 
 // Vraies photos d'ambiance par rituel (locales → jamais cassées en démo)
 const RITUAL_PHOTO: Record<string, string> = {
-  "jeudi-apero": "/activities/apero.jpg",
+  "jeudi-jeux": "/activities/escape.jpg",
+  "samedi-cafe": "/activities/cafe.jpg",
   "dimanche-balade": "/activities/balade.jpg",
 };
 
@@ -189,8 +190,8 @@ export default function RitualsSection() {
       </span>
       <h2 className="meet42-section-title mt-1 text-[1.8rem] sm:text-[2.2rem]">Ton prochain 42</h2>
       <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-[color:var(--ink-2)]">
-        Un groupe de 4 à 6, un lieu choisi pour vous, zéro organisation. Tu découvres ton groupe la
-        veille à midi — c&apos;est le Reveal.
+        Une nouvelle activité chaque semaine — escape game, padel, café, bowling, balade… Un groupe de
+        4 à 6, un lieu choisi pour vous. Tu découvres ton groupe la veille à midi : c&apos;est le Reveal.
       </p>
 
       {notice ? <p className="mt-3 text-sm font-medium text-red-600">{notice}</p> : null}
@@ -204,7 +205,7 @@ export default function RitualsSection() {
         ) : (
           slots.map((slot, idx) => {
             const featured = idx === 0;
-            const photo = RITUAL_PHOTO[slot.id] ?? "/activities/apero.jpg";
+            const photo = RITUAL_PHOTO[slot.id] ?? "/activities/cafe.jpg";
             const inner = (
               <div className="flex h-full flex-col overflow-hidden rounded-[1.6rem] border border-[color:var(--line)] bg-[color:var(--cream-2)]">
                 {/* Bandeau photo — vraie ambiance, titre en overlay */}

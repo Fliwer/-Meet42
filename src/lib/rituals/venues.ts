@@ -7,13 +7,17 @@
 export type Venue = { name: string; lat: number; lng: number };
 
 const VENUES: Record<string, Venue[]> = {
-  "jeudi-apero": [
-    { name: "Café Belga, Place Eugène Flagey 18, 1050 Ixelles", lat: 50.8258, lng: 4.3666 },
-    { name: "L'Amère à Boire, Chaussée d'Ixelles 174, 1050 Ixelles", lat: 50.8353, lng: 4.3589 },
-    { name: "Le Tavernier, Chaussée de Boondael 445, 1050 Ixelles", lat: 50.8154, lng: 4.3922 },
-    { name: "Kokob, Rue de la Paix 10, 1050 Ixelles", lat: 50.8346, lng: 4.3609 },
-    { name: "Le Pantin, Chaussée d'Ixelles 355, 1050 Ixelles", lat: 50.8245, lng: 4.3659 },
-    { name: "L'Ultime Atome, Chaussée Saint-Pierre 14, 1040 Etterbeek", lat: 50.8386, lng: 4.3815 },
+  "jeudi-jeux": [
+    { name: "Escape Hunt Brussels, Rue Théodore Verhaegen 132, 1060 Saint-Gilles", lat: 50.8273, lng: 4.3498 },
+    { name: "Enygma Escape Rooms, Rue du Vieux Marché aux Grains 33, 1000 Bruxelles", lat: 50.848, lng: 4.3457 },
+    { name: "One Hour, Rue de Flandre 63, 1000 Bruxelles", lat: 50.8523, lng: 4.3452 },
+    { name: "Crosly Bowling, Bd de l'Empereur 36, 1000 Bruxelles", lat: 50.8422, lng: 4.3556 },
+  ],
+  "samedi-cafe": [
+    { name: "OR Coffee Roasters, Rue Auguste Orts 9, 1000 Bruxelles", lat: 50.8476, lng: 4.3526 },
+    { name: "Mok Coffee, Rue Antoine Dansaert 196, 1000 Bruxelles", lat: 50.8501, lng: 4.3448 },
+    { name: "Café Capitale, Rue du Midi 129, 1000 Bruxelles", lat: 50.8459, lng: 4.3512 },
+    { name: "My Little Cup, Galerie du Roi 16, 1000 Bruxelles", lat: 50.8478, lng: 4.3556 },
   ],
   "dimanche-balade": [
     { name: "Étangs d'Ixelles — devant le kiosque, 1050 Ixelles", lat: 50.8237, lng: 4.3737 },
