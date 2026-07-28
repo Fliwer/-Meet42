@@ -6,13 +6,10 @@ import { useRouter } from "next/navigation";
 import { ApiError, isLikelyNetworkFailure } from "@/lib/api/apiError";
 import { useAuth } from "@/lib/auth/useAuth";
 import { apiFetchPlansAround, apiJoinPlan } from "@/lib/plans/planApi";
-import EventCard, { EventCardEmpty, EventCardLoading } from "@/components/EventCard";
 import Avatar from "@/components/Avatar";
 import RitualsSection from "@/components/RitualsSection";
-import { QUICK_FORMATS } from "@/lib/plans/quickFormats";
 import type { PlanSummary } from "@/lib/plans/planTypes";
 import { matchesMoment, type MomentFilter } from "@/lib/plans/feed";
-import TrustStrip from "@/components/TrustStrip";
 
 const FALLBACK_CITY = { name: "Bruxelles", lat: 50.8466, lng: 4.3528 };
 
@@ -274,133 +271,6 @@ export default function Home() {
           </div>
         </section>
 
-        {isTonightActive ? (
-          <div className="mt-4 rounded-2xl border border-[rgb(255_77_46_/_0.3)] bg-[color:var(--fire-wash)] px-3 py-2 text-center text-xs font-bold text-[color:var(--fire-ink)]">
-            🔥 Ce soir, c’est chaud — la plupart des plans sont aujourd’hui
-          </div>
-        ) : null}
-
-        <section id="plans-feed" className="mt-12 scroll-mt-20">
-          <div className="mb-1 flex items-end gap-3">
-            <h2 className="meet42-section-title text-[1.8rem] sm:text-[2.2rem]">
-              En ce moment <span className="text-[color:var(--fire)]">autour de toi</span>
-            </h2>
-          </div>
-          <p className="mb-5 text-sm text-[color:var(--ink-2)]">
-            Des plans lancés librement par des membres — rejoins-les, ou lance le tien.
-          </p>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-            <div className="flex flex-wrap gap-2" role="group" aria-label="Quand">
-              {(
-                [
-                  { id: "today" as const, label: "Aujourd’hui" },
-                  { id: "tomorrow" as const, label: "Demain" },
-                ] as const
-              ).map((m) => (
-                <button
-                  key={m.id}
-                  type="button"
-                  onClick={() => setMomentFilter(m.id)}
-                  className={
-                    momentFilter === m.id
-                      ? "rounded-full border-2 border-[color:var(--espresso)] bg-[color:var(--espresso)] px-4 py-2 text-sm font-bold text-[color:var(--cream)]"
-                      : "rounded-full border-2 border-[color:var(--line)] bg-[color:var(--cream-2)] px-4 py-2 text-sm font-semibold text-[color:var(--ink-2)] hover:border-[color:var(--line-2)]"
-                  }
-                >
-                  {m.label}
-                </button>
-              ))}
-            </div>
-            <div className="flex flex-wrap gap-2" role="group" aria-label="Activité">
-              {ACTIVITY_FILTERS.map((a) => (
-                <button
-                  key={a.id ?? "all"}
-                  type="button"
-                  onClick={() => setActivityFilter(a.id)}
-                  className={
-                    activityFilter === a.id
-                      ? "rounded-full border-2 border-[color:var(--espresso)] bg-[color:var(--espresso)] px-3 py-2 text-sm font-bold text-[color:var(--cream)]"
-                      : "rounded-full border-2 border-[color:var(--line)] bg-[color:var(--cream-2)] px-3 py-2 text-sm font-semibold text-[color:var(--ink-2)] hover:border-[color:var(--line-2)]"
-                  }
-                >
-                  <span aria-hidden>{a.emoji}</span> {a.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-[color:var(--ink-3)]">
-            <span className="font-semibold text-[color:var(--ink-2)]">
-              {zoneSource === "gps" ? "Autour de ta position" : `Autour de ${FALLBACK_CITY.name}`}
-            </span>
-            <span aria-hidden>·</span>
-            <button
-              type="button"
-              onClick={requestLocation}
-              disabled={geoBusy}
-              className="font-bold text-[color:var(--ink)] underline-offset-2 hover:underline disabled:opacity-50"
-            >
-              {geoBusy ? "…" : "Utiliser ma position"}
-            </button>
-            {geoError ? <span className="text-red-600">{geoError}</span> : null}
-          </div>
-
-          {plansBusy ? (
-            <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              <EventCardLoading />
-              <EventCardLoading />
-              <EventCardLoading />
-              <EventCardLoading />
-              <EventCardLoading />
-              <EventCardLoading />
-            </div>
-          ) : null}
-
-          {!plansBusy && plansError && plansErrorNetwork ? (
-            <div
-              className="mt-5 rounded-3xl border border-rose-200 bg-gradient-to-br from-rose-50 to-white p-6 sm:p-8 text-center shadow-sm"
-              role="alert"
-            >
-              <p className="text-lg font-black text-rose-950">Connexion impossible</p>
-              <p className="mt-2 text-sm leading-relaxed text-rose-900/90">{plansError}</p>
-              <button
-                type="button"
-                onClick={() => {
-                  if (!coords) return;
-                  void loadPlans(coords.lat, coords.lng);
-                }}
-                className="mt-5 inline-flex min-h-[48px] items-center justify-center rounded-2xl bg-rose-900 px-8 py-3 text-sm font-black text-white shadow-md hover:bg-rose-950 active:scale-[0.99]"
-              >
-                Réessayer
-              </button>
-            </div>
-          ) : null}
-          {!plansBusy && plansError && !plansErrorNetwork ? (
-            <div className="mt-4 text-sm font-medium text-red-600" role="alert">
-              {plansError}
-            </div>
-          ) : null}
-          {joinError ? <div className="mt-2 text-sm font-medium text-red-600">{joinError}</div> : null}
-
-          {!plansBusy && !plansError && coords ? (
-            <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {displayPlans.length === 0 ? (
-                <div className="md:col-span-2 xl:col-span-3">
-                  <EventCardEmpty onCreate={() => router.push(`/create?format=${QUICK_FORMATS[0]?.id ?? ""}`)} />
-                </div>
-              ) : null}
-              {displayPlans.map((p, idx) => (
-                <div
-                  key={p.id}
-                  className="meet42-rise"
-                  style={{ animationDelay: `${Math.min(idx, 8) * 55}ms` }}
-                >
-                  <EventCard plan={p} onJoin={() => onJoinPlan(p)} disabled={joiningId === p.id} />
-                </div>
-              ))}
-            </div>
-          ) : null}
-        </section>
 
         {/* Comment ça marche — pour le visiteur qui découvre */}
         <section className="mt-14" aria-label="Comment ça marche">
@@ -487,13 +357,6 @@ export default function Home() {
             ))}
           </div>
         </section>
-
-        <div className="mt-12">
-          <span className="meet42-kicker mb-3">
-            <span className="meet42-kicker-dot" aria-hidden /> Pourquoi c’est safe
-          </span>
-          <TrustStrip />
-        </div>
 
         {/* Témoignages — preuve sociale, la voix des membres */}
         <section className="mt-16" aria-label="Témoignages">
