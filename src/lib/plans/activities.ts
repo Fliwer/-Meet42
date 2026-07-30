@@ -6,6 +6,7 @@ export const ACTIVITIES = [
   { id: "bowling", label: "Bowling", emoji: "🎳" },
   { id: "axe", label: "Lancer de hache", emoji: "🪓" },
   { id: "escape", label: "Escape game", emoji: "🧩" },
+  { id: "padel", label: "Padel", emoji: "🎾" },
   { id: "billiard", label: "Billard", emoji: "🎱" },
   { id: "kicker", label: "Kicker", emoji: "⚽" },
   { id: "work", label: "Travailler", emoji: "💻" },

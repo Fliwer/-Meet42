@@ -19,7 +19,7 @@ async function resolveUserId(req: NextRequest): Promise<string | null> {
   return data.user?.id ?? xUserId ?? null;
 }
 
-/** Toggle « J'ai hâte » — réservé aux membres du groupe. */
+/** Toggle « J'ai hâte », réservé aux membres du groupe. */
 export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   const { id: planId } = await ctx.params;
   const userId = await resolveUserId(req);

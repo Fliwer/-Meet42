@@ -1,5 +1,5 @@
 /**
- * Lieux réels des rituels — révélés au Reveal (J-1), jamais avant.
+ * Lieux réels des rituels, révélés au Reveal (J-1), jamais avant.
  * Rotation par semaine + index de groupe : deux groupes du même créneau
  * ne se retrouvent pas dans le même bar.
  */
@@ -13,15 +13,30 @@ const VENUES: Record<string, Venue[]> = {
     { name: "One Hour, Rue de Flandre 63, 1000 Bruxelles", lat: 50.8523, lng: 4.3452 },
     { name: "Crosly Bowling, Bd de l'Empereur 36, 1000 Bruxelles", lat: 50.8422, lng: 4.3556 },
   ],
-  "samedi-cafe": [
+  "lundi-billard": [
+    { name: "Billard Royal, Rue de Livourne 116, 1000 Ixelles", lat: 50.8326, lng: 4.3604 },
+    { name: "The Corner Pool, Chaussée de Wavre 195, 1050 Ixelles", lat: 50.8365, lng: 4.3695 },
+    { name: "Golden 8 Pool, Chaussée de Bruxelles 100, 1190 Forest", lat: 50.8175, lng: 4.3342 },
+  ],
+  "mardi-bowling": [
+    { name: "Crosly Bowling, Bd de l'Empereur 36, 1000 Bruxelles", lat: 50.8422, lng: 4.3556 },
+    { name: "Bowling Stones Wolubilis, Cours Paul-Henri Spaak 1, 1200 Woluwe", lat: 50.849, lng: 4.4342 },
+  ],
+  "vendredi-cafe": [
     { name: "OR Coffee Roasters, Rue Auguste Orts 9, 1000 Bruxelles", lat: 50.8476, lng: 4.3526 },
     { name: "Mok Coffee, Rue Antoine Dansaert 196, 1000 Bruxelles", lat: 50.8501, lng: 4.3448 },
     { name: "Café Capitale, Rue du Midi 129, 1000 Bruxelles", lat: 50.8459, lng: 4.3512 },
     { name: "My Little Cup, Galerie du Roi 16, 1000 Bruxelles", lat: 50.8478, lng: 4.3556 },
   ],
+  "samedi-brunch": [
+    { name: "Peck 47, Rue du Marché aux Poulets 47, 1000 Bruxelles", lat: 50.8492, lng: 4.3499 },
+    { name: "Café Georgette, Rue de Suède 71, 1060 Saint-Gilles", lat: 50.8354, lng: 4.339 },
+    { name: "Comptoir des Galeries, Galerie du Roi 6, 1000 Bruxelles", lat: 50.8478, lng: 4.3554 },
+    { name: "Le Pain Quotidien Flagey, Place Eugène Flagey, 1050 Ixelles", lat: 50.8271, lng: 4.3719 },
+  ],
   "dimanche-balade": [
-    { name: "Étangs d'Ixelles — devant le kiosque, 1050 Ixelles", lat: 50.8237, lng: 4.3737 },
-    { name: "Parc Tenbosch — entrée rue de l'Aqueduc, 1050 Ixelles", lat: 50.8248, lng: 4.3588 },
+    { name: "Étangs d'Ixelles, devant le kiosque, 1050 Ixelles", lat: 50.8237, lng: 4.3737 },
+    { name: "Parc Tenbosch, entrée rue de l'Aqueduc, 1050 Ixelles", lat: 50.8248, lng: 4.3588 },
   ],
 };
 
@@ -35,7 +50,7 @@ function isoWeek(d: Date): number {
 }
 
 export function pickVenue(ritualId: string, occursAt: Date, groupIndex: number): Venue {
-  const pool = VENUES[ritualId] ?? VENUES["jeudi-apero"];
+  const pool = VENUES[ritualId] ?? VENUES["samedi-cafe"];
   const offset = isoWeek(occursAt) + groupIndex;
   return pool[offset % pool.length];
 }

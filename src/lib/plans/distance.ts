@@ -12,7 +12,7 @@ export function haversineKm(lat1: number, lon1: number, lat2: number, lon2: numb
 }
 
 export function formatDistanceKm(km: number) {
-  if (!Number.isFinite(km)) return "—";
+  if (!Number.isFinite(km)) return ", ";
   if (km < 1) return `${Math.round(km * 1000)} m`;
   return `${km.toFixed(1)} km`;
 }

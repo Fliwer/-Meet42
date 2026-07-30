@@ -8,9 +8,9 @@ export const dynamic = "force-dynamic";
 
 /**
  * Cron quotidien (07:30 UTC ≈ 9h30 Bruxelles) :
- * 1) RAPPEL jour J — plans rituels qui commencent dans les 12 h :
+ * 1) RAPPEL jour J, plans rituels qui commencent dans les 12 h :
  *    « C'est aujourd'hui » à chaque membre.
- * 2) APRÈS-42 — plans rituels d'hier (fenêtre 3h-27h passées) :
+ * 2) APRÈS-42, plans rituels d'hier (fenêtre 3h-27h passées) :
  *    - écrit le graphe `encounters` (paires canoniques, idempotent) ;
  *    - envoie « Alors, ton 42 ? » (lien vers Belle rencontre).
  * La fenêtre quotidienne garantit qu'un plan n'est traité qu'une fois.

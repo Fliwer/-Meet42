@@ -3,7 +3,7 @@
 import posthog from "posthog-js";
 
 /**
- * Analytics Meet42 — le funnel des KPIs : activation, réservation, retissage
+ * Analytics Meet42, le funnel des KPIs : activation, réservation, retissage
  * (belle rencontre), retour. Actif uniquement si NEXT_PUBLIC_POSTHOG_KEY est
  * défini ; sinon no-op complet (aucun réseau, aucune erreur).
  */

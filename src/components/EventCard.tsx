@@ -149,7 +149,7 @@ export function EventCardLoading() {
 
 export function EventCardEmpty({
   title = "Rien de prévu ici… pour l'instant",
-  description = "Sois celui ou celle qui lance le plan — 30 secondes, et les autres n'ont plus qu'à te rejoindre.",
+  description = "Sois celui ou celle qui lance le plan, 30 secondes, et les autres n'ont plus qu'à te rejoindre.",
   ctaLabel = "Lancer le plan",
   onCreate,
 }: {

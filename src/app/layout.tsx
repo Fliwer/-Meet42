@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// Display éditoriale — serif à fort caractère (titres, hero, cartes)
+// Display éditoriale, serif à fort caractère (titres, hero, cartes)
 const fraunces = Fraunces({
   variable: "--font-display",
   subsets: ["latin"],
@@ -25,9 +25,9 @@ const fraunces = Fraunces({
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://meet42.app"),
-  title: { default: "Meet42 — petits groupes, vraies rencontres", template: "%s · Meet42" },
+  title: { default: "Meet42, petits groupes, vraies rencontres", template: "%s · Meet42" },
   description:
-    "Rejoins des activités IRL en petits groupes (4–6) près de toi. Café, apéro, marche — sans friction. Gratuit pour participer.",
+    "Rejoins des activités IRL en petits groupes (4–6) près de toi. Café, apéro, marche, sans friction. Gratuit pour participer.",
   manifest: "/manifest.webmanifest",
   applicationName: "Meet42",
   keywords: ["Meet42", "Bruxelles", "Ixelles", "IRL", "rencontre", "apéro", "sortie", "groupe"],
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "fr_BE",
     siteName: "Meet42",
-    title: "Meet42 — Meet people. Do something. Simple.",
+    title: "Meet42, Meet people. Do something. Simple.",
     description: "Plans réels à 4–6 personnes près de toi. Connexion rapide, groupes humains.",
   },
   twitter: {
@@ -71,7 +71,7 @@ const jsonLd = {
     description: "Création et participation aux plans IRL",
   },
   description:
-    "Application de plans IRL en petits groupes à Bruxelles, Ixelles et alentours — café, apéro, marche, sans swipe.",
+    "Application de plans IRL en petits groupes à Bruxelles, Ixelles et alentours, café, apéro, marche, sans swipe.",
 } as const;
 
 export default function RootLayout({

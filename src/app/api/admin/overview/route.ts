@@ -17,7 +17,7 @@ import {
 } from "@/lib/mock/mockDb";
 
 /**
- * Dashboard admin (mode concierge) — vue d'ensemble : membres, réservations
+ * Dashboard admin (mode concierge), vue d'ensemble : membres, réservations
  * par créneau, groupes formés, KPIs.
  *
  * Sécurité : exige l'en-tête x-admin-key === ADMIN_SECRET. En local (mock, pas

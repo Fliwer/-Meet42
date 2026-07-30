@@ -3,14 +3,14 @@ import { CANCELLATION_POLICY_FR } from "@/lib/plans/cancellation";
 import { SITE_CONTACT_EMAIL, mailtoHref } from "@/lib/config/site";
 
 export default function ConfiancePage() {
-  const contact = SITE_CONTACT_EMAIL ? mailtoHref("Meet42 — question") : null;
+  const contact = SITE_CONTACT_EMAIL ? mailtoHref("Meet42, question") : null;
 
   return (
     <main className="min-h-screen bg-transparent px-4 py-10 md:py-14">
       <div className="max-w-2xl mx-auto">
         <h1 className="font-display text-4xl font-semibold tracking-[-0.02em] text-[color:var(--ink)]">Confiance & données</h1>
         <p className="mt-2 text-[color:var(--ink-2)]">
-          Transparence minimale pour lancer sereinement — une politique complète pourra évoluer avec le produit.
+          Transparence minimale pour lancer sereinement, une politique complète pourra évoluer avec le produit.
         </p>
 
         <section className="mt-10 space-y-4 text-sm text-[color:var(--ink-2)] leading-relaxed">

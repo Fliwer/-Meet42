@@ -1,9 +1,9 @@
 /**
- * Intérêts du profil — la matière première des points communs et des
+ * Intérêts du profil, la matière première des points communs et des
  * brise-glace. Volontairement peu nombreux (12) : choisir 3-5 doit prendre
  * 10 secondes, pas devenir un questionnaire.
  *
- * Règle produit : jamais de « % de compatibilité » — des faits humains qui
+ * Règle produit : jamais de « % de compatibilité », des faits humains qui
  * deviennent des conversations autour de la table.
  */
 

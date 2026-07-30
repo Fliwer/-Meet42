@@ -4,7 +4,7 @@ import React from "react";
 import RitualsSection from "@/components/RitualsSection";
 
 /**
- * Onglet « Ton 42 » — réserver sa place sur les rituels de la semaine.
+ * Onglet « Ton 42 », réserver sa place sur les rituels de la semaine.
  * Même composant que le home : un seul code, le vrai moteur partout.
  */
 export default function MatchPage() {

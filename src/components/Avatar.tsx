@@ -14,7 +14,7 @@ type AvatarProps = {
 
 /**
  * Avatar robuste : affiche la photo si elle charge, sinon retombe sur
- * l'initiale du prénom. Gère les URLs cassées (onError) — important car
+ * l'initiale du prénom. Gère les URLs cassées (onError), important car
  * d'anciennes photos / profils de test peuvent avoir des URLs invalides.
  */
 export default function Avatar({ src, name, className, fallbackClassName, size = 32 }: AvatarProps) {

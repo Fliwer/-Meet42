@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { isAdminRequest } from "@/lib/admin/requireAdmin";
 
 /**
- * Déclenche le matching (force) depuis le dashboard admin — mode concierge.
+ * Déclenche le matching (force) depuis le dashboard admin, mode concierge.
  * Relaie vers /api/cron/match?force=1 côté serveur en injectant CRON_SECRET,
  * pour ne jamais exposer ce secret au client.
  */

@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 /**
- * Portail « accès réservé » — verrouille tout le site (domaine custom inclus)
+ * Portail « accès réservé », verrouille tout le site (domaine custom inclus)
  * tant qu'on n'a pas le mot de passe. Utile pendant la construction / la phase
  * testeurs, sur n'importe quel plan Vercel (le password protection natif de
  * Vercel est réservé au plan Pro).

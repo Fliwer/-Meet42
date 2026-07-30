@@ -57,6 +57,10 @@ const SUGGESTED_SPOTS: Record<ActivityId, SuggestedSpot[]> = {
     { name: "Escape Hunt Brussels", lat: 50.848, lng: 4.3577 },
     { name: "Enygma Escape Rooms", lat: 50.8273, lng: 4.3498 },
   ],
+  padel: [
+    { name: "Casa Padel (Auderghem)", lat: 50.8155, lng: 4.4372 },
+    { name: "Urban Padel Ixelles", lat: 50.827, lng: 4.373 },
+  ],
   billiard: [
     { name: "Billard Royal Ixelles", lat: 50.8326, lng: 4.3604 },
     { name: "Golden 8 Pool Forest", lat: 50.8175, lng: 4.3342 },
@@ -327,7 +331,7 @@ export default function CreatePage() {
               </div>
             ))}
             <div className="ml-2 text-xs font-medium text-[color:var(--ink-3)]">
-              {step === 1 ? "Activité" : "Quand & où — publier"}
+              {step === 1 ? "Activité" : "Quand & où, publier"}
             </div>
           </div>
         </div>
@@ -599,7 +603,7 @@ export default function CreatePage() {
                     </button>
                   ))}
                 </div>
-                <p className="mt-2 text-xs text-[color:var(--ink-3)]">Petits groupes uniquement — c’est notre promesse.</p>
+                <p className="mt-2 text-xs text-[color:var(--ink-3)]">Petits groupes uniquement, c’est notre promesse.</p>
               </div>
 
               <div className="mt-4 rounded-2xl border border-dashed border-[color:var(--line-2)] bg-[color:var(--cream-2)] p-3">

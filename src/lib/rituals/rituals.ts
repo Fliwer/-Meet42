@@ -1,7 +1,7 @@
 /**
- * Les rituels Meet42 — créneaux hebdo fixes qui concentrent la demande
+ * Les rituels Meet42, créneaux hebdo fixes qui concentrent la demande
  * (mécanisme de liquidité, backstage ; la marque vend « ton 42 », pas le jeudi).
- * Lancement : 2 rituels, 1 commune (Ixelles) — la densité avant l'étendue.
+ * Lancement : 2 rituels, 1 commune (Ixelles), la densité avant l'étendue.
  *
  * Logique pure, testable, sans I/O.
  */
@@ -41,13 +41,41 @@ export const RITUALS: Ritual[] = [
     lng: 4.3577,
   },
   {
-    id: "samedi-cafe",
-    label: "Le café du samedi",
-    tagline: "Un café, de vraies discussions, zéro pression. Le rendez-vous doux.",
+    id: "lundi-billard",
+    label: "Le billard du lundi",
+    tagline: "Quelques parties, une ambiance feutrée. Facile, même sans savoir jouer.",
+    activity: "billiard",
+    emoji: "🎱",
+    weekday: 1,
+    hour: 19,
+    minute: 30,
+    commune: "ixelles",
+    communeLabel: "Ixelles",
+    lat: 50.8326,
+    lng: 4.3604,
+  },
+  {
+    id: "mardi-bowling",
+    label: "Le bowling du mardi",
+    tagline: "Strikes, gouttières et fous rires. Le classique qui met tout le monde à l'aise.",
+    activity: "bowling",
+    emoji: "🎳",
+    weekday: 2,
+    hour: 20,
+    minute: 0,
+    commune: "bruxelles-centre",
+    communeLabel: "Bruxelles-Centre",
+    lat: 50.8422,
+    lng: 4.3556,
+  },
+  {
+    id: "vendredi-cafe",
+    label: "Le café du vendredi",
+    tagline: "Afterwork tout doux : un café, de vraies discussions, zéro pression.",
     activity: "coffee",
     emoji: "☕",
-    weekday: 6,
-    hour: 15,
+    weekday: 5,
+    hour: 18,
     minute: 0,
     commune: "bruxelles-centre",
     communeLabel: "Bruxelles-Centre",
@@ -55,9 +83,23 @@ export const RITUALS: Ritual[] = [
     lng: 4.3526,
   },
   {
+    id: "samedi-brunch",
+    label: "Le brunch du samedi",
+    tagline: "Œufs, café, tartines et discussions qui s'éternisent. Le rendez-vous gourmand.",
+    activity: "coffee",
+    emoji: "🥐",
+    weekday: 6,
+    hour: 11,
+    minute: 30,
+    commune: "ixelles",
+    communeLabel: "Ixelles",
+    lat: 50.8258,
+    lng: 4.3666,
+  },
+  {
     id: "dimanche-balade",
     label: "La balade du dimanche",
-    tagline: "Marcher, découvrir la ville, respirer — départ étangs d'Ixelles.",
+    tagline: "Marcher, découvrir la ville, respirer. Départ étangs d'Ixelles.",
     activity: "walk",
     emoji: "🚶",
     weekday: 0,

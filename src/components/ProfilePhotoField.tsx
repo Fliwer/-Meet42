@@ -57,7 +57,7 @@ export default function ProfilePhotoField({ value, onChange, showUrlFallback = t
             disabled={busy}
             onChange={onPick}
           />
-          <p className="mt-1 text-xs text-[color:var(--ink-3)]">JPG, PNG ou WebP — max 2 Mo</p>
+          <p className="mt-1 text-xs text-[color:var(--ink-3)]">JPG, PNG ou WebP, max 2 Mo</p>
         </div>
       </div>
       {busy ? <p className="text-xs font-medium text-[color:var(--ink-2)]">Envoi de la photo…</p> : null}

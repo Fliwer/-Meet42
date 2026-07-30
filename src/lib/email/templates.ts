@@ -1,5 +1,5 @@
 /**
- * Templates e-mail Meet42 — la voix du 42 : le pote bruxellois qui organise.
+ * Templates e-mail Meet42, la voix du 42 : le pote bruxellois qui organise.
  * HTML simple, inline, palette cream/ink/fire. Chaque e-mail est un moment
  * du voyage émotionnel, pas une notification système.
  */
@@ -27,11 +27,11 @@ const card = (inner: string) =>
 
 export function emailReserved(params: { firstName: string; ritualLabel: string; whenLabel: string }) {
   return {
-    subject: `C'est noté ${params.firstName} — ton 42 se prépare`,
+    subject: `C'est noté ${params.firstName}, ton 42 se prépare`,
     html: shell(
       h1("C'est noté.") +
         p(`Ta place pour <strong>${params.ritualLabel}</strong> (${params.whenLabel}) est réservée. On s'occupe de tout : le groupe, le lieu, l'étincelle.`) +
-        p(`La veille à midi, tu découvres ton groupe — c'est le Reveal. D'ici là, on te tient au courant.`) +
+        p(`La veille à midi, tu découvres ton groupe, c'est le Reveal. D'ici là, on te tient au courant.`) +
         p(`Un empêchement ? Tu peux libérer ta place jusqu'à la veille midi, ça ne pose aucun souci.`)
     ),
   };
@@ -63,11 +63,11 @@ export function emailReveal(params: {
         )
       : "";
   return {
-    subject: `Ça y est ${params.firstName} — voici ton 42 🔥`,
+    subject: `Ça y est ${params.firstName}, voici ton 42 🔥`,
     html: shell(
       h1("Ça y est. Voici ton 42.") +
         p(`${params.ritualLabel}, ${params.whenLabel}.`) +
-        p(`Autour de la table : <strong>${names.join(", ")}</strong> — et toi.`) +
+        p(`Autour de la table : <strong>${names.join(", ")}</strong>, et toi.`) +
         card(`<div style="font-size:16px;"><strong>📍 ${params.venueName}</strong></div>`) +
         commons +
         ice +
@@ -79,10 +79,10 @@ export function emailReveal(params: {
 
 export function emailReminder(params: { firstName: string; venueName: string; timeLabel: string; planUrl: string }) {
   return {
-    subject: `C'est ce soir ${params.firstName} — ils t'attendent`,
+    subject: `C'est ce soir ${params.firstName}, ils t'attendent`,
     html: shell(
       h1("C'est aujourd'hui.") +
-        p(`Ton 42, c'est à <strong>${params.timeLabel}</strong> — <strong>${params.venueName}</strong>.`) +
+        p(`Ton 42, c'est à <strong>${params.timeLabel}</strong>, <strong>${params.venueName}</strong>.`) +
         p(`Ton groupe compte sur toi. Si tu es en retard de quelques minutes, pas de panique : préviens-les depuis la page du groupe.`) +
         cta("J'y serai", params.planUrl)
     ),
@@ -95,7 +95,7 @@ export function emailPost42(params: { firstName: string; planUrl: string }) {
     html: shell(
       h1("Alors, c'était comment ?") +
         p(`Sois honnête, on ne dira rien.`) +
-        p(`Et surtout : <strong>une belle rencontre hier soir ?</strong> Garde les personnes que tu aimerais recroiser — si c'est réciproque, on fera en sorte que vos chemins se recroisent. Personne ne le voit, c'est entre toi et nous.`) +
+        p(`Et surtout : <strong>une belle rencontre hier soir ?</strong> Garde les personnes que tu aimerais recroiser, si c'est réciproque, on fera en sorte que vos chemins se recroisent. Personne ne le voit, c'est entre toi et nous.`) +
         cta("Une belle rencontre ?", params.planUrl)
     ),
   };
@@ -103,10 +103,10 @@ export function emailPost42(params: { firstName: string; planUrl: string }) {
 
 export function emailPostponed(params: { firstName: string; ritualLabel: string; nextWhenLabel: string }) {
   return {
-    subject: `On décale ton 42 — pas assez de monde cette fois`,
+    subject: `On décale ton 42, pas assez de monde cette fois`,
     html: shell(
       h1("On est pas encore assez.") +
-        p(`Pas assez de réservations pour <strong>${params.ritualLabel}</strong> cette semaine — ça arrive au début, Bruxelles se réveille doucement.`) +
+        p(`Pas assez de réservations pour <strong>${params.ritualLabel}</strong> cette semaine, ça arrive au début, Bruxelles se réveille doucement.`) +
         p(`Ta place est automatiquement reportée à <strong>${params.nextWhenLabel}</strong>. Tu n'as rien à faire.`) +
         p(`Un coup de pouce ? Amène un ami : plus on est, plus vite les groupes s'allument.`) +
         cta("Voir mon 42", SITE)

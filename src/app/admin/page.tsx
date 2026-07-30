@@ -8,7 +8,7 @@ import { isAdminEmail } from "@/lib/admin/isAdmin";
 import type { AdminOverview } from "@/app/api/admin/overview/route";
 
 /**
- * Command center Meet42 — réservé aux e-mails admin (session Google).
+ * Command center Meet42, réservé aux e-mails admin (session Google).
  * Funnel de conversion, réservations par créneau, membres, groupes, et le
  * bouton concierge « Former les groupes ».
  */
@@ -81,7 +81,7 @@ export default function AdminPage() {
       });
       const j = await res.json();
       if (res.ok) {
-        setMatchNote("✓ Matching lancé — les groupes sont formés (onglet Groupes).");
+        setMatchNote("✓ Matching lancé, les groupes sont formés (onglet Groupes).");
         await load();
       } else {
         setMatchNote(j?.error ?? "Échec du matching.");

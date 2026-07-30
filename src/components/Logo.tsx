@@ -1,7 +1,7 @@
 import React from "react";
 
 /**
- * Marque Meet42 — squircle plum + pin de rencontre (deux personnes à un lieu).
+ * Marque Meet42, squircle plum + pin de rencontre (deux personnes à un lieu).
  * Réutilisable : header, footer, splash. La taille pilote tout (carré).
  */
 export function LogoMark({ size = 34, className }: { size?: number; className?: string }) {

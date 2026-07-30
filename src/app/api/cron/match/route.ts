@@ -11,7 +11,7 @@ import { mockGetSlotReservations, mockMarkReservationsMatched, mockFormGroupPlan
 export const dynamic = "force-dynamic";
 
 /**
- * Matching batch — tourne 1×/jour (Vercel Cron, 10:00 UTC ≈ midi Bruxelles).
+ * Matching batch, tourne 1×/jour (Vercel Cron, 10:00 UTC ≈ midi Bruxelles).
  * Pour chaque rituel dont l'occurrence est demain (fenêtre 3h-30h) :
  *  - < 4 réservations → report automatique à la semaine suivante + e-mail ;
  *  - sinon → groupes de 4-6 (Fil rouge : les belles rencontres mutuelles
@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
 
   const now = new Date();
   const results: Record<string, unknown>[] = [];
-  // ?force=1 : déclenchement manuel (mode concierge) — ignore la fenêtre J-1
+  // ?force=1 : déclenchement manuel (mode concierge), ignore la fenêtre J-1
   const force = req.nextUrl.searchParams.get("force") === "1";
 
   for (const ritual of RITUALS) {

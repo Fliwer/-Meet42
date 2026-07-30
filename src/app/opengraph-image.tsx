@@ -1,11 +1,11 @@
 import { ImageResponse } from "next/og";
 
 /**
- * Image OpenGraph par défaut — c'est la carte qu'on voit quand meet42.app est
+ * Image OpenGraph par défaut, c'est la carte qu'on voit quand meet42.app est
  * partagé (WhatsApp, Insta, iMessage…). Style éditorial cream/ink/fire.
  */
 
-export const alt = "Meet42 — Rencontre du monde. Fais quelque chose.";
+export const alt = "Meet42, Rencontre du monde. Fais quelque chose.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

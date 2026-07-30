@@ -5,7 +5,7 @@ const year = new Date().getFullYear();
 
 export default function MarketingFooter() {
   const contact = SITE_CONTACT_EMAIL
-    ? mailtoHref("Meet42 — contact", "Bonjour,\n\n")
+    ? mailtoHref("Meet42, contact", "Bonjour,\n\n")
     : "/confiance";
 
   return (
@@ -17,7 +17,7 @@ export default function MarketingFooter() {
               Meet<span className="text-[color:var(--fire)]">42</span>
             </div>
             <p className="mt-2 text-sm text-[color:var(--ink-2)] leading-relaxed">
-              Petits groupes, vraies rencontres. Pensé pour Bruxelles, Ixelles et alentours — sans feed infini ni
+              Petits groupes, vraies rencontres. Pensé pour Bruxelles, Ixelles et alentours, sans feed infini ni
               algorithmes opaques.
             </p>
           </div>

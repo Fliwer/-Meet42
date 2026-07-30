@@ -27,7 +27,7 @@ function hasPendingRitualDraft(): boolean {
 }
 
 /**
- * Création / édition de profil — une photo, trois passions, deux phrases.
+ * Création / édition de profil, une photo, trois passions, deux phrases.
  * Pensé comme la dernière marche avant le 42, pas comme un formulaire :
  * si une réservation attend, on le dit et le CTA finit le geste.
  */
@@ -95,12 +95,12 @@ export default function ProfileSetup({
     setSaving(true);
     setError(null);
     try {
-      if (!firstName.trim()) throw new Error("Ton prénom, c'est tout ce qu'on montre — il en faut un");
+      if (!firstName.trim()) throw new Error("Ton prénom, c'est tout ce qu'on montre, il en faut un");
       if (!Number.isFinite(age) || age < 18 || age > 99) throw new Error("Âge invalide (18-99)");
-      if (!photoUrl.trim()) throw new Error("Ajoute une photo — ton groupe doit pouvoir te reconnaître au bar");
+      if (!photoUrl.trim()) throw new Error("Ajoute une photo, ton groupe doit pouvoir te reconnaître au bar");
       const parsed = profilePhotoUrlsSchema.safeParse([photoUrl.trim()]);
       if (!parsed.success) throw new Error("Cette photo n'est pas valide, réessaie");
-      if (interests.size < INTERESTS_MIN) throw new Error(`Choisis au moins ${INTERESTS_MIN} passions — c'est ce qui crée les points communs`);
+      if (interests.size < INTERESTS_MIN) throw new Error(`Choisis au moins ${INTERESTS_MIN} passions, c'est ce qui crée les points communs`);
       const trimmedBio = bio.trim();
       if (trimmedBio.length > BIO_MAX) throw new Error(`Un peu trop long (max ${BIO_MAX})`);
 
@@ -146,14 +146,14 @@ export default function ProfileSetup({
           </h1>
           <p className="mt-2 text-sm leading-relaxed text-[color:var(--ink-2)]">
             {pendingReservation
-              ? "Encore 30 secondes et ta réservation est validée. Une photo, trois passions, deux phrases — c'est ce que ton groupe découvrira au Reveal."
-              : "Une photo, trois passions, deux phrases. C'est ce que ton groupe découvrira au Reveal — rien d'autre."}
+              ? "Encore 30 secondes et ta réservation est validée. Une photo, trois passions, deux phrases, c'est ce que ton groupe découvrira au Reveal."
+              : "Une photo, trois passions, deux phrases. C'est ce que ton groupe découvrira au Reveal, rien d'autre."}
           </p>
         </>
       )}
 
       <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-6">
-        {/* Photo — le héros de l'écran, un seul geste */}
+        {/* Photo, le héros de l'écran, un seul geste */}
         <div className="flex flex-col items-center gap-2">
           <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={onPickFile} />
           <button
@@ -183,7 +183,7 @@ export default function ProfileSetup({
             </span>
           </button>
           <span className="text-xs font-semibold text-[color:var(--ink-3)]">
-            {uploading ? "Envoi en cours…" : photoUrl ? "Touche pour changer" : "Ajoute ta photo — celle où on te reconnaît"}
+            {uploading ? "Envoi en cours…" : photoUrl ? "Touche pour changer" : "Ajoute ta photo, celle où on te reconnaît"}
           </span>
         </div>
 
@@ -217,7 +217,7 @@ export default function ProfileSetup({
           <div>
             <span className="text-sm font-medium text-[color:var(--ink)]">Ce qui te fait vibrer</span>
             <p className="text-xs text-[color:var(--ink-3)]">
-              Choisis-en au moins {INTERESTS_MIN} — c&apos;est ce qui crée les points communs et brise-glace de ton groupe.
+              Choisis-en au moins {INTERESTS_MIN}, c&apos;est ce qui crée les points communs et brise-glace de ton groupe.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -242,7 +242,7 @@ export default function ProfileSetup({
           </div>
         </div>
 
-        {/* Bio courte — uniquement en édition, et optionnelle */}
+        {/* Bio courte, uniquement en édition, et optionnelle */}
         {isEdit ? (
           <label className="flex flex-col gap-1">
             <span className="text-sm font-medium text-[color:var(--ink)]">

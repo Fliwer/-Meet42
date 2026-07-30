@@ -35,7 +35,7 @@ function LoginPageInner() {
         router.push(nextPath);
       } else {
         // Compte léger : email + mot de passe. Le profil (prénom, photo, bio)
-        // est complété juste après, dans l'étape ProfileSetup dédiée — moins
+        // est complété juste après, dans l'étape ProfileSetup dédiée, moins
         // de friction qu'un formulaire géant à l'inscription.
         await signUpWithEmail(email.trim(), password);
         // Si signup ne crée pas de session (email confirmation activée), on tente un sign-in direct.
@@ -186,7 +186,7 @@ function LoginPageInner() {
           {mode === "signup" ? (
             <p className="rounded-xl border border-[color:var(--line)] bg-[color:var(--cream-3)]/60 px-3 py-2 text-xs leading-relaxed text-[color:var(--ink-2)]">
               Juste ton email et un mot de passe pour commencer. On te demandera une
-              photo et deux phrases juste après — ça prend 30 secondes.
+              photo et deux phrases juste après, ça prend 30 secondes.
             </p>
           ) : null}
 

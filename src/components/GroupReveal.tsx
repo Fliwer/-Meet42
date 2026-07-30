@@ -6,7 +6,7 @@ import Avatar from "@/components/Avatar";
 type Face = { first_name: string; photo_url: string | null };
 
 /**
- * « Group reveal » — moment de célébration quand le groupe se forme/se complète.
+ * « Group reveal », moment de célébration quand le groupe se forme/se complète.
  * Les visages s'assemblent (pop animé) + burst de lumière corail.
  */
 export default function GroupReveal({
@@ -66,7 +66,7 @@ export default function GroupReveal({
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-[rgb(255_246_236_/_0.85)]">
           {complete
-            ? `Vous êtes ${count} — ça se passe en vrai. On se retrouve sur place.`
+            ? `Vous êtes ${count}, ça se passe en vrai. On se retrouve sur place.`
             : `${count}/${max} déjà là. Encore un ou deux et c'est parti.`}
         </p>
 

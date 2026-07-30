@@ -6,7 +6,7 @@ type MockProfile = {
   id: string;
   first_name: string;
   age: number;
-  /** 1ʳᵉ photo (affichage cartes) — dérivée de photo_urls si besoin */
+  /** 1ʳᵉ photo (affichage cartes), dérivée de photo_urls si besoin */
   photo_url?: string | null;
   photo_urls?: string[];
   bio?: string | null;

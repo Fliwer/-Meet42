@@ -1,6 +1,6 @@
 /**
  * Envoi d'e-mails transactionnels via Resend (API HTTP directe, zéro dépendance).
- * Sans RESEND_API_KEY : no-op silencieux loggé — l'app fonctionne, rien ne casse.
+ * Sans RESEND_API_KEY : no-op silencieux loggé, l'app fonctionne, rien ne casse.
  */
 
 const RESEND_URL = "https://api.resend.com/emails";

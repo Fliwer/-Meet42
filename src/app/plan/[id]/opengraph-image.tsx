@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { getPlanForMeta, formatStartFr } from "@/lib/plans/getPlanForMeta";
 
 /**
- * Image OpenGraph d'un plan — la carte vue quand un lien /plan/xxx est partagé
+ * Image OpenGraph d'un plan, la carte vue quand un lien /plan/xxx est partagé
  * (bouton « Inviter un pote »). Aucune info personnelle : activité, moment,
  * coin, places restantes.
  */
@@ -74,9 +74,9 @@ export default async function OgImage({ params }: { params: Promise<{ id: string
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", fontSize: 30, fontWeight: 700, color: "#1d160d" }}>
             {spotsLeft === null
-              ? "Groupe de 4 à 6 — rejoins-les"
+              ? "Groupe de 4 à 6, rejoins-les"
               : spotsLeft <= 0
-                ? "Groupe complet — d'autres plans t'attendent"
+                ? "Groupe complet, d'autres plans t'attendent"
                 : `${spotsLeft} ${spotsLeft > 1 ? "places restantes" : "place restante"} sur ${plan?.max_participants}`}
           </div>
           <div

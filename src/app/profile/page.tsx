@@ -101,7 +101,7 @@ export default function ProfilePage() {
               <div className="min-w-0">
               <div className="text-sm text-[color:var(--ink-2)]">Profil</div>
               <div className="mt-1 text-xl font-bold text-[color:var(--ink)] truncate">
-                {profile?.first_name ?? "—"}
+                {profile?.first_name ?? ", "}
               </div>
               <div className="mt-1 text-sm text-[color:var(--ink-2)]">
                 {profile?.age ? `${profile.age} ans` : ""}

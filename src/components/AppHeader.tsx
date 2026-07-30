@@ -42,7 +42,7 @@ export default function AppHeader() {
       ) : null}
       <div className="max-w-7xl mx-auto px-4 py-3">
         <div className="flex items-center gap-3">
-          <Link href="/" className="shrink-0" aria-label="Meet42 — accueil">
+          <Link href="/" className="shrink-0" aria-label="Meet42, accueil">
             <Logo size={34} onDark={onHome} />
           </Link>
 

@@ -9,7 +9,7 @@ import Avatar from "@/components/Avatar";
 import type { GroupDto } from "@/app/api/plans/[id]/group/route";
 
 /**
- * L'espace de groupe — le cœur émotionnel du 42.
+ * L'espace de groupe, le cœur émotionnel du 42.
  * Trois phases : avant (anticipation + « J'ai hâte »), le jour J (« J'arrive »),
  * après (« Belle rencontre »). Le Reveal (arrivée avec ?reveal=1) dévoile les
  * membres une à une. Toutes les infos personnelles restent internes au groupe.
@@ -140,7 +140,7 @@ export default function GroupSpace({ planId, initialGroup }: { planId: string; i
         <div className="mt-4">
           <span className="meet42-kicker">
             <span className="meet42-kicker-dot meet42-spark" aria-hidden />
-            {group.phase === "after" ? "Ton 42 — c'était hier" : group.phase === "today" ? "Ton 42 — c'est aujourd'hui" : "Ton 42 est prêt"}
+            {group.phase === "after" ? "Ton 42, c'était hier" : group.phase === "today" ? "Ton 42, c'est aujourd'hui" : "Ton 42 est prêt"}
           </span>
           <h1 className="meet42-reveal-title font-display mt-1 text-[2rem] leading-tight font-semibold tracking-[-0.02em] text-[color:var(--ink)] sm:text-[2.6rem]">
             {group.phase === "after" ? "Alors, c'était comment ?" : `Vous êtes ${group.members.length}.`}
@@ -253,7 +253,7 @@ export default function GroupSpace({ planId, initialGroup }: { planId: string; i
                   : "meet42-join-btn"
               }
             >
-              {group.i_am_hyped ? "🔥 T'as hâte — comme eux" : "J'ai hâte"}
+              {group.i_am_hyped ? "🔥 T'as hâte, comme eux" : "J'ai hâte"}
             </button>
             <p className="mt-2 text-center text-xs font-semibold text-[color:var(--ink-2)]">
               {group.hype_count > 0
@@ -303,7 +303,7 @@ export default function GroupSpace({ planId, initialGroup }: { planId: string; i
             <div className="rounded-2xl border border-[color:var(--line)] bg-[color:var(--cream-2)] p-4">
               <div className="text-base font-bold text-[color:var(--ink)]">Une belle rencontre ?</div>
               <p className="mt-1 text-sm leading-relaxed text-[color:var(--ink-2)]">
-                Garde les personnes que tu aimerais recroiser. C&apos;est entre toi et nous — jamais montré à
+                Garde les personnes que tu aimerais recroiser. C&apos;est entre toi et nous, jamais montré à
                 l&apos;autre. Si c&apos;est réciproque, on fera en sorte que vos chemins se recroisent.
               </p>
               <div className="mt-3 space-y-2">

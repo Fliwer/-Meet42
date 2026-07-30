@@ -8,7 +8,7 @@ import { track } from "@/lib/analytics";
 import type { RitualSlotDto } from "@/app/api/rituals/route";
 
 /**
- * « Ton prochain 42 » — l'entrée principale du produit.
+ * « Ton prochain 42 », l'entrée principale du produit.
  * Réservation 1-tap sur les rituels de la semaine ; le groupe et le lieu
  * sont révélés la veille à midi (le Reveal). La sélection survit au détour
  * par /login (brouillon localStorage + replay, même pattern que l'envie).
@@ -19,8 +19,11 @@ const DRAFT_TTL_MS = 30 * 60 * 1000;
 
 // Vraies photos d'ambiance par rituel (locales → jamais cassées en démo)
 const RITUAL_PHOTO: Record<string, string> = {
+  "lundi-billard": "/activities/billard.jpg",
+  "mardi-bowling": "/activities/bowling.jpg",
   "jeudi-jeux": "/activities/escape.jpg",
-  "samedi-cafe": "/activities/cafe.jpg",
+  "vendredi-cafe": "/activities/cafe.jpg",
+  "samedi-brunch": "/activities/cafe.jpg",
   "dimanche-balade": "/activities/balade.jpg",
 };
 
@@ -46,7 +49,7 @@ function writeDraft(d: Omit<RitualDraft, "ts">) {
   try {
     window.localStorage.setItem(DRAFT_KEY, JSON.stringify({ ...d, ts: Date.now() }));
   } catch {
-    // mode privé — on dégrade
+    // mode privé, on dégrade
   }
 }
 
@@ -56,6 +59,11 @@ function clearDraft() {
   } catch {
     // ignore
   }
+}
+
+function weekdayFr(iso: string): string {
+  const s = new Intl.DateTimeFormat("fr-BE", { weekday: "long", timeZone: "Europe/Brussels" }).format(new Date(iso));
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 function formatWhenFr(iso: string): string {
@@ -190,7 +198,7 @@ export default function RitualsSection() {
       </span>
       <h2 className="meet42-section-title mt-1 text-[1.8rem] sm:text-[2.2rem]">Ton prochain 42</h2>
       <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-[color:var(--ink-2)]">
-        Une nouvelle activité chaque semaine — escape game, padel, café, bowling, balade… Un groupe de
+        Une nouvelle activité chaque semaine, escape game, padel, café, bowling, balade… Un groupe de
         4 à 6, un lieu choisi pour vous. Tu découvres ton groupe la veille à midi : c&apos;est le Reveal.
       </p>
 
@@ -208,7 +216,7 @@ export default function RitualsSection() {
             const photo = RITUAL_PHOTO[slot.id] ?? "/activities/cafe.jpg";
             const inner = (
               <div className="flex h-full flex-col overflow-hidden rounded-[1.6rem] border border-[color:var(--line)] bg-[color:var(--cream-2)]">
-                {/* Bandeau photo — vraie ambiance, titre en overlay */}
+                {/* Bandeau photo, vraie ambiance, titre en overlay */}
                 <div className="relative h-36 w-full overflow-hidden sm:h-44">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={photo} alt="" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
@@ -221,7 +229,7 @@ export default function RitualsSection() {
                   </span>
                   <div className="absolute inset-x-4 bottom-3">
                     <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[rgb(246_239_230_/_0.85)]">
-                      {featured ? "Le plus proche" : "Le week-end"} · {slot.communeLabel}
+                      {featured ? "Le plus proche" : weekdayFr(slot.occurs_at)} · {slot.communeLabel}
                     </p>
                     <h3 className="font-display text-[1.5rem] leading-tight font-semibold text-[#f6efe6] sm:text-[1.75rem]">
                       {slot.label}
@@ -257,7 +265,7 @@ export default function RitualsSection() {
                       onClick={() => router.push(`/plan/${slot.my_plan_id}?reveal=1`)}
                       className="meet42-join-btn"
                     >
-                      🔥 Ton groupe est prêt — découvre-le
+                      🔥 Ton groupe est prêt, découvre-le
                     </button>
                   ) : slot.my_status === "pending" ? (
                     <div>

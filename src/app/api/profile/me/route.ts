@@ -35,7 +35,7 @@ const ProfilePayloadSchema = z.object({
   first_name: z.string().min(1).max(40),
   age: z.number().int().min(18).max(99),
   photo_urls: profilePhotoUrlsSchema,
-  // La bio est optionnelle (retirée de la création — dispo en édition)
+  // La bio est optionnelle (retirée de la création, dispo en édition)
   bio: z.string().max(240).optional().default(""),
   interests: z.array(z.string().min(1).max(30)).max(12).optional(),
 });

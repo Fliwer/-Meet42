@@ -271,7 +271,7 @@ export default function PlanPage() {
             </div>
             <p className="mt-3 text-sm font-medium text-[color:var(--ink)] leading-relaxed">
               {plan.is_joined
-                ? `Tu fais partie d’un groupe de ${plan.participants_count} / ${plan.max_participants} — petit, humain, sans pression.`
+                ? `Tu fais partie d’un groupe de ${plan.participants_count} / ${plan.max_participants}, petit, humain, sans pression.`
                 : `Rejoins un groupe de max ${plan.max_participants} personnes. Ici, on privilégie la qualité à la quantité.`}
             </p>
           </div>
@@ -320,7 +320,7 @@ export default function PlanPage() {
             </button>
           </div>
           <div className="mt-2 text-xs text-[color:var(--ink-3)]">
-            Rendez-vous sur place — pas de chat obligatoire.
+            Rendez-vous sur place, pas de chat obligatoire.
           </div>
         </div>
 
@@ -331,7 +331,7 @@ export default function PlanPage() {
 
         {plan.is_joined ? (
           <div className="mt-5 flex items-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-900">
-            <span aria-hidden>✅</span> Tu es dans ce groupe — on se retrouve sur place.
+            <span aria-hidden>✅</span> Tu es dans ce groupe, on se retrouve sur place.
           </div>
         ) : (
           <>
@@ -435,7 +435,7 @@ export default function PlanPage() {
         {showFeedback && status === "authenticated" ? (
           <div className="mt-4 rounded-2xl border border-[color:var(--line)] bg-[color:var(--cream-2)] p-3">
             <div className="text-sm font-semibold text-[color:var(--ink)]">Alors, c&apos;était comment ?</div>
-            <div className="mt-1 text-xs text-[color:var(--ink-2)]">Tu referais une sortie avec ce groupe ? (Ça nous aide à améliorer les prochains groupes — rien n&apos;est montré aux autres.)</div>
+            <div className="mt-1 text-xs text-[color:var(--ink-2)]">Tu referais une sortie avec ce groupe ? (Ça nous aide à améliorer les prochains groupes, rien n&apos;est montré aux autres.)</div>
             <div className="mt-3 flex gap-2">
               <button
                 type="button"

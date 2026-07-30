@@ -1,5 +1,5 @@
 /**
- * Autorisation admin par e-mail — le dashboard /admin est réservé au(x)
+ * Autorisation admin par e-mail, le dashboard /admin est réservé au(x)
  * propriétaire(s). La liste par défaut peut être surchargée via ADMIN_EMAILS
  * (séparés par des virgules). Connaître l'e-mail ne donne aucun accès :
  * l'autorisation réelle est vérifiée côté serveur contre la session Supabase.

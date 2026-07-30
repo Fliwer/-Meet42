@@ -26,7 +26,7 @@ const BodySchema = z.object({
 });
 
 /**
- * « Belle rencontre » — marque (ou retire) l'intention de recroiser un membre
+ * « Belle rencontre », marque (ou retire) l'intention de recroiser un membre
  * du groupe. Double opt-in strict : la mutualité n'est jamais révélée ici,
  * seulement calculée plus tard côté /group. Aucune notification à l'autre.
  */

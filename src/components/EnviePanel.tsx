@@ -20,7 +20,7 @@ type EnvieResultState = "formed" | "joined" | "seeded" | "pending";
 
 // Brouillon d'envie persisté pour survivre au détour par /login (y compris le
 // round-trip OAuth Google). Sans ça, l'utilisateur non connecté perd toute sa
-// sélection au moment de « Trouve-moi un groupe » — la fuite nº1 du tunnel.
+// sélection au moment de « Trouve-moi un groupe », la fuite nº1 du tunnel.
 const DRAFT_KEY = "meet42:envie-draft";
 const DRAFT_TTL_MS = 30 * 60 * 1000;
 
@@ -53,7 +53,7 @@ function writeDraft(d: Omit<EnvieDraft, "ts">) {
   try {
     window.localStorage.setItem(DRAFT_KEY, JSON.stringify({ ...d, ts: Date.now() }));
   } catch {
-    // quota/private mode — on dégrade silencieusement
+    // quota/private mode, on dégrade silencieusement
   }
 }
 
@@ -67,7 +67,7 @@ function clearDraft() {
 }
 
 /**
- * Panneau « Dis ton envie » embarqué sur le home — l'entrée principale
+ * Panneau « Dis ton envie » embarqué sur le home, l'entrée principale
  * (Envies-first). L'utilisateur exprime une envie (collectée), et la preuve
  * sociale agrégée montre la demande du jour. Marche même sans plans existants
  * → moteur d'acquisition / anti cold-start. Matching = concierge au début.
@@ -85,7 +85,7 @@ export default function EnviePanel() {
   const [resultPlanId, setResultPlanId] = useState<string | null>(null);
   const [resultState, setResultState] = useState<EnvieResultState | null>(null);
   const [shareNote, setShareNote] = useState<string | null>(null);
-  // Vrai une fois le brouillon localStorage relu — garde le replay de se
+  // Vrai une fois le brouillon localStorage relu, garde le replay de se
   // déclencher avant que la sélection sauvegardée soit réhydratée.
   const [hydrated, setHydrated] = useState(false);
   const replayPending = useRef(false);
@@ -169,7 +169,7 @@ export default function EnviePanel() {
     }
   }, [accessToken, commune, selected, user?.id, when]);
 
-  // Partage natif (mobile) avec repli copie de lien — moteur d'invitation.
+  // Partage natif (mobile) avec repli copie de lien, moteur d'invitation.
   const sharePlan = useCallback(async () => {
     if (!resultPlanId) return;
     const url = `${window.location.origin}/plan/${resultPlanId}`;
@@ -181,9 +181,9 @@ export default function EnviePanel() {
         return;
       }
       await navigator.clipboard.writeText(url);
-      setShareNote("Lien copié — envoie-le à tes potes !");
+      setShareNote("Lien copié, envoie-le à tes potes !");
     } catch {
-      // partage annulé / indisponible — silencieux
+      // partage annulé / indisponible, silencieux
     }
   }, [resultPlanId]);
 
@@ -199,7 +199,7 @@ export default function EnviePanel() {
   }
 
   // Au retour du login : si un replay est en attente et qu'on est authentifié,
-  // on envoie l'envie automatiquement — l'utilisateur retrouve son groupe sans
+  // on envoie l'envie automatiquement, l'utilisateur retrouve son groupe sans
   // refaire la sélection.
   useEffect(() => {
     if (!hydrated || !replayPending.current) return;
@@ -249,7 +249,7 @@ export default function EnviePanel() {
         )}
       </p>
       <p className="mt-1 text-sm text-[color:var(--ink-2)]">
-        Tu choisis, on te place dans un groupe de 4–6. Zéro organisation — l&apos;anti-swipe.
+        Tu choisis, on te place dans un groupe de 4–6. Zéro organisation, l&apos;anti-swipe.
       </p>
 
       <div className="mt-5">
@@ -312,7 +312,7 @@ export default function EnviePanel() {
         <div className="mt-6 rounded-2xl border-2 border-[color:var(--fire)] bg-[color:var(--fire-wash)] p-4">
           <div className="text-base font-bold text-[color:var(--ink)]">🎉 Ton groupe est formé !</div>
           <p className="mt-1 text-sm leading-relaxed text-[color:var(--ink-2)]">
-            On t&apos;a trouvé un groupe pour <span className="font-semibold text-[color:var(--ink)]">{activitiesLabel}</span> du côté de {communeLabel}. Ça se passe en vrai — découvre qui en est.
+            On t&apos;a trouvé un groupe pour <span className="font-semibold text-[color:var(--ink)]">{activitiesLabel}</span> du côté de {communeLabel}. Ça se passe en vrai, découvre qui en est.
           </p>
           <button type="button" onClick={() => router.push(`/plan/${resultPlanId}`)} className="meet42-cta-primary mt-3 w-full">
             Voir mon groupe
@@ -326,11 +326,11 @@ export default function EnviePanel() {
           <p className="mt-1 text-sm leading-relaxed text-[color:var(--ink-2)]">
             {resultState === "joined" ? (
               <>
-                D&apos;autres veulent <span className="font-semibold text-[color:var(--ink)]">{activitiesLabel}</span> à {communeLabel} — tu es des leurs. Plus on est, mieux c&apos;est : ramène un pote.
+                D&apos;autres veulent <span className="font-semibold text-[color:var(--ink)]">{activitiesLabel}</span> à {communeLabel}, tu es des leurs. Plus on est, mieux c&apos;est : ramène un pote.
               </>
             ) : (
               <>
-                On a créé ton plan <span className="font-semibold text-[color:var(--ink)]">{activitiesLabel}</span> à {communeLabel}. Il s&apos;ouvre aux autres dès maintenant — invite un pote pour le remplir plus vite.
+                On a créé ton plan <span className="font-semibold text-[color:var(--ink)]">{activitiesLabel}</span> à {communeLabel}. Il s&apos;ouvre aux autres dès maintenant, invite un pote pour le remplir plus vite.
               </>
             )}
           </p>
@@ -348,7 +348,7 @@ export default function EnviePanel() {
         <div className="mt-6 rounded-2xl border border-[color:var(--line)] bg-[color:var(--cream-3)]/50 p-4">
           <div className="text-sm font-bold text-[color:var(--ink)]">C&apos;est noté 🎯</div>
           <p className="mt-1 text-sm leading-relaxed text-[color:var(--ink-2)]">
-            On te cherche un groupe pour <span className="font-semibold text-[color:var(--ink)]">{activitiesLabel}</span> du côté de {communeLabel}. En attendant, lance le plan toi-même — d&apos;autres pourront le rejoindre tout de suite.
+            On te cherche un groupe pour <span className="font-semibold text-[color:var(--ink)]">{activitiesLabel}</span> du côté de {communeLabel}. En attendant, lance le plan toi-même, d&apos;autres pourront le rejoindre tout de suite.
           </p>
           <button type="button" onClick={createDirect} className="meet42-cta-primary mt-3 w-full">
             Créer ce plan en direct
